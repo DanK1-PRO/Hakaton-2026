@@ -6,7 +6,8 @@ Updated: 2026-09-20. Version: 0.1.0. Implementation pass.
 
 The repository now contains a working FastAPI / React 18 / PostgreSQL 15 application,
 not only source folders. Git origin: https://github.com/DanK1-PRO/Hakaton-2026.git (private).
-Publication and CI result are recorded in docs/VERIFICATION.md; do not infer CI success.
+Private main is published. GitHub run 35509118528 passed verify and containers
+for application commit 9d0227c. Evidence: docs/VERIFICATION.md.
 
 Implemented: role-aware JWT/Argon2 login, incidents/search/filter/create/edit,
 source-derived classifier (1283 rows), DDS service states and 30-second acknowledgement,

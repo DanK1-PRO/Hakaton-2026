@@ -14,7 +14,7 @@ Updated: 2026-09-20.
 - [x] Persistence after full restart and local ML/fallback integration.
 - [x] Bilingual README, source traceability, operations/acceptance docs, PDF and screenshots.
 - [x] Physical project skills and compact memory.
-- [ ] Record actual GitHub publication and Compose CI result in verification report.
+- [x] Published private main; GitHub run 35509118528 passed both verify and containers.
 
 ## Next Team Integration Pass (Not An Automatic New Goal)
 
