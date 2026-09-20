@@ -21,6 +21,7 @@ Python 3.12 was used locally; Docker/CI targets 3.11.
 ## Evidence
 
 15 pytest cases passed. 8 real-browser tests passed at 1440/390px.
+The browser suite includes a delayed-response regression for the phone/edit version race.
 Build/typecheck, Ruff, Python/npm audits passed. Restart preserved saved evaluations.
 Separate local ML and failed-ML fallback passed. See docs/VERIFICATION.md and docs/evidence.
 Original customer files unchanged and excluded from Git. Source hash manifest exists.

@@ -70,6 +70,7 @@ export const api = createApi({
     }),
     incident: b.query<Incident, string>({
       query: (id) => '/incidents/' + id,
+      merge: (current, incoming) => (incoming.version >= current.version ? incoming : current),
       providesTags: ['Incidents'],
     }),
     create: b.mutation<Incident, CardFields>({

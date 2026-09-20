@@ -39,6 +39,7 @@ function Login() {
             setError(undefined);
             try {
               const r = await login({ username: v.email, password: v.password }).unwrap();
+              dispatch(api.util.resetApiState());
               dispatch(signedIn({ token: r.access_token, user: r.user, remember: !!v.remember }));
             } catch (e) {
               setError(e);

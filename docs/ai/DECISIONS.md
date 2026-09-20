@@ -90,3 +90,11 @@ Accepted 2026-09-20. Bilingual repository with real screenshots, source traceabi
 operating/acceptance documents and a generated PDF. The document set is informed by
 GOST 34.201-2020 but is a working edition, not formal certification or state acceptance.
 Original customer documents, secrets and runtime data are not published to Git.
+
+## DEC-009 - Monotonic UI Card State
+
+Accepted 2026-09-20. An actual CI trace exposed a stale edit version immediately
+after phone hangup. Apply returned cards to the query cache, reject older polling
+responses, and wait for a pending phone operation before capturing a modal's version.
+Retain optimistic locking for genuine competing changes. Browser regression delays
+GET responses by two seconds instead of masking the bug with test retries.

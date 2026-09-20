@@ -113,6 +113,13 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   await page.getByRole('button', { name: /Учебный вызов$/ }).click();
   await page.getByRole('button', { name: 'Принять вызов' }).click();
   await expect(page.getByText('Разговор', { exact: true })).toBeVisible();
+  // A delayed refresh must not discard the newer card returned by a mutation.
+  await page.route('**/api/v1/incidents/' + id, async (route) => {
+    if (route.request().method() !== 'GET') return route.continue();
+    const response = await route.fetch();
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await route.fulfill({ response });
+  });
   await page.getByRole('button', { name: 'Завершить вызов' }).click();
   await page.getByRole('button', { name: 'Редактировать карточку', exact: true }).click();
   await page
@@ -121,6 +128,7 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   await page.getByRole('button', { name: 'Сохранить', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
   await setStatus('Начало реагирования', 'Бригада выехала к месту происшествия');
+  await page.unrouteAll({ behavior: 'wait' });
   await expect(page.locator('.ant-message-notice')).toHaveCount(0);
   await page.screenshot({
     path: '../docs/images/workspace-' + testInfo.project.name + '.png',

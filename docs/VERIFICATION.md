@@ -7,13 +7,14 @@ Chromium Playwright. Целевой Python 3.11 проверяется в CI/к�
 | Проверка | Фактический результат |
 |---|---|
 | `python -m pytest -q` | 15 passed, 6.54s после обновления FastAPI/Starlette/JWT |
-| `ruff check backend` | Passed |
+| `ruff check backend ml scripts` | Passed |
 | `npm run build` | TypeScript + production build; предупреждение о размере vendor bundle |
-| `npm test` | 8 passed, 42.4s; desktop 1440px и mobile 390px |
+| `npm test` | 8 passed, 44.1s; desktop 1440px и mobile 390px; задержанный GET после звонка |
 | `pip-audit -r backend/requirements.txt` | No known vulnerabilities found |
 | `npm audit` | 0 vulnerabilities |
 | Полный stop/start API/UI/PostgreSQL | 2 ранее сохранённые оценки совпали после запуска |
 | Отдельный local ML, затем остановка ML | mode=local, затем mode=fallback; сессии завершены |
+| Два одновременных запроса завершения в PostgreSQL | Один сохранённый результат, оба ответа совпали |
 | GitHub Compose smoke | Итог фиксируется после запуска CI |
 
 ## Что Проверяют Тесты

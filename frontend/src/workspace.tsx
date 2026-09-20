@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Alert,
   App,
@@ -29,7 +29,7 @@ import {
   EditOutlined,
   PhoneOutlined,
 } from '@ant-design/icons';
-import { api, type RootState } from './store';
+import { api, store, type RootState, type AppDispatch } from './store';
 import {
   CardFields as CardFieldsForm,
   ErrorPanel,
@@ -41,11 +41,12 @@ import {
   labels,
   time,
 } from './components';
-import type { CardFields } from './types';
+import type { CardFields, Incident } from './types';
 export function Workspace() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const { message } = App.useApp();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((s: RootState) => s.auth.user)!;
   const {
     data: card,
@@ -67,14 +68,37 @@ export function Workspace() {
   const [editVersion, setEditVersion] = useState(0);
   const [reactionVersion, setReactionVersion] = useState(0);
   const [now, setNow] = useState(Date.now());
+  const pendingPhone = useRef<Promise<Incident> | null>(null);
+  const synchronizeCard = useCallback(
+    (updated: Incident) => {
+      dispatch(
+        api.util.updateQueryData('incident', id, (current) =>
+          updated.version >= current.version ? updated : current,
+        ),
+      );
+    },
+    [dispatch, id],
+  );
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
   }, []);
   useEffect(() => {
     if (card?.status === 'added' && card.owner_id === user.id && card.session_status !== 'finished')
-      openCard(id);
-  }, [card?.status, card?.owner_id, card?.session_status, id, openCard, user.id]);
+      openCard(id)
+        .unwrap()
+        .then(synchronizeCard)
+        .catch((e) => message.error(errorText(e)));
+  }, [
+    card?.status,
+    card?.owner_id,
+    card?.session_status,
+    id,
+    openCard,
+    user.id,
+    synchronizeCard,
+    message,
+  ]);
   if (isLoading)
     return (
       <div className="full-loading">
@@ -93,10 +117,14 @@ export function Workspace() {
   const last = communications.at(-1);
   const callState = last?.payload.action || 'hangup';
   const phoneAction = async (action: string) => {
+    const operation = communicate({ id, action }).unwrap();
+    pendingPhone.current = operation;
     try {
-      await communicate({ id, action }).unwrap();
+      synchronizeCard(await operation);
     } catch (e) {
       message.error(errorText(e));
+    } finally {
+      if (pendingPhone.current === operation) pendingPhone.current = null;
     }
   };
   const finishAction = async () => {
@@ -107,15 +135,29 @@ export function Workspace() {
       message.error(errorText(e));
     }
   };
-  const editModal = () => {
-    form.setFieldsValue(card);
-    setEditVersion(card.version);
-    setEditOpen(true);
+  const currentCard = async () => {
+    if (pendingPhone.current) await pendingPhone.current;
+    return api.endpoints.incident.select(id)(store.getState()).data || card;
   };
-  const reactionModal = () => {
-    reactionForm.resetFields();
-    setReactionVersion(card.version);
-    setReactionOpen(true);
+  const editModal = async () => {
+    try {
+      const latest = await currentCard();
+      form.setFieldsValue(latest);
+      setEditVersion(latest.version);
+      setEditOpen(true);
+    } catch (e) {
+      message.error(errorText(e));
+    }
+  };
+  const reactionModal = async () => {
+    try {
+      const latest = await currentCard();
+      reactionForm.resetFields();
+      setReactionVersion(latest.version);
+      setReactionOpen(true);
+    } catch (e) {
+      message.error(errorText(e));
+    }
   };
   const acknowledgementLabel = card.acknowledged_at
     ? 'Получение подтверждено'
@@ -231,6 +273,7 @@ export function Workspace() {
                   aria-label="Редактировать карточку"
                   icon={<EditOutlined />}
                   onClick={editModal}
+                  disabled={calling || reacting || saving || finishing}
                 />
               </Tooltip>
             ) : null}
@@ -297,7 +340,12 @@ export function Workspace() {
             <span className="muted">{date(card.updated_at)}</span>
           </div>
           {own && !locked ? (
-            <Button type="primary" icon={<EditOutlined />} onClick={reactionModal}>
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={reactionModal}
+              disabled={calling || reacting || saving || finishing}
+            >
               Изменить статус
             </Button>
           ) : (
@@ -418,7 +466,7 @@ export function Workspace() {
           layout="vertical"
           onFinish={async (v) => {
             try {
-              await edit({ ...v, id, version: editVersion }).unwrap();
+              synchronizeCard(await edit({ ...v, id, version: editVersion }).unwrap());
               setEditOpen(false);
               message.success('Карточка сохранена');
             } catch (e) {
@@ -443,12 +491,13 @@ export function Workspace() {
           layout="vertical"
           onFinish={async (v) => {
             try {
-              await react({
+              const updated = await react({
                 id,
                 version: reactionVersion,
                 status: v.status,
                 comment: v.comment || '',
               }).unwrap();
+              synchronizeCard(updated);
               setReactionOpen(false);
               message.success('Статус сохранён');
             } catch (e) {

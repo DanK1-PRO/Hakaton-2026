@@ -8,7 +8,16 @@ import urllib.request
 REPO = "DanK1-PRO/Hakaton-2026"
 
 
-def api(path, method="GET", data=None):
+class DownloadRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        redirected = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if redirected:
+            # GitHub log downloads use signed storage URLs, not the Git credential.
+            redirected.remove_header("Authorization")
+        return redirected
+
+
+def api(path, method="GET", data=None, raw=False):
     credentials = subprocess.run(
         ["git", "credential", "fill"],
         input="protocol=https\nhost=github.com\n\n",
@@ -31,15 +40,20 @@ def api(path, method="GET", data=None):
             "User-Agent": "dds-project-tool",
         },
     )
-    with urllib.request.urlopen(request, timeout=30) as response:
+    with urllib.request.build_opener(DownloadRedirect()).open(request, timeout=30) as response:
         body = response.read()
+        if raw == "bytes":
+            return body
+        if raw:
+            return body.decode("utf-8")
         return json.loads(body) if body else None
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("operation", choices=["info", "runs", "jobs", "cancel", "setup"])
+    parser.add_argument("operation", choices=["info", "runs", "jobs", "logs", "cancel", "setup"])
     parser.add_argument("--run-id", type=int)
+    parser.add_argument("--job-id", type=int)
     args = parser.parse_args()
     if args.operation == "setup":
         api(
@@ -85,6 +99,10 @@ if __name__ == "__main__":
                 indent=2,
             )
         )
+    elif args.operation == "logs":
+        if not args.job_id:
+            parser.error("--job-id required")
+        print(api(f"/actions/jobs/{args.job_id}/logs", raw=True)[-24000:])
     elif args.operation == "cancel":
         if not args.run_id:
             parser.error("--run-id required")

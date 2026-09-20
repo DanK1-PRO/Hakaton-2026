@@ -70,5 +70,6 @@ jobs:
           JWT_SECRET: ci-only-secret-at-least-32-characters-long
         run: |
           docker compose up -d --build --wait
+          curl --fail http://127.0.0.1:8080/
           curl --fail http://127.0.0.1:8080/health
           docker compose down
