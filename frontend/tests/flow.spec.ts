@@ -14,6 +14,8 @@ test('administrator creates user and instructor reviews a result', async ({
   await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
   await page.goto('/users');
   await page.getByRole('button', { name: /Добавить пользователя$/ }).click();
+  await page.getByRole('button', { name: 'Сгенерировать пароль' }).click();
+  await expect(page.getByText(/Пароль для передачи обучающемуся/)).toBeVisible();
   await page.getByLabel('Имя', { exact: true }).fill(name);
   await page.getByLabel('Почта', { exact: true }).fill(email);
   await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
@@ -91,6 +93,9 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   await expect(page.getByRole('heading', { name: 'Учебные задания' })).toBeVisible();
   if (testInfo.project.name === 'desktop')
     await page.screenshot({ path: '../docs/images/training.png', fullPage: true });
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
+  ).toBeFalsy();
   await page
     .locator('article')
     .filter({ has: page.getByRole('heading', { name: 'Прорыв трубы в подъезде' }) })
@@ -267,4 +272,7 @@ test('administrator filters users by role', async ({ page }, testInfo) => {
   await expect(table.getByText('instructor@dds.local')).toHaveCount(0);
   if (testInfo.project.name === 'desktop')
     await page.screenshot({ path: '../docs/images/users.png', fullPage: true });
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
+  ).toBeFalsy();
 });

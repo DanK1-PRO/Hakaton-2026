@@ -66,7 +66,9 @@ export function Results() {
     },
   };
   const columns: ColumnsType<Session> = [
-    { title: 'Обучающийся', dataIndex: 'trainee' },
+    ...(staff
+      ? [{ title: 'Обучающийся', dataIndex: 'trainee' }]
+      : []),
     { title: 'Задание', dataIndex: 'scenario' },
     { title: 'Начало', dataIndex: 'started_at', render: date },
     {
@@ -270,6 +272,7 @@ export function Users() {
     { label: 'Спецсимволы (!@#$%&)', ok: (p: string) => /[!@#$%&]/.test(p) },
   ];
   const watchedPassword: string = Form.useWatch('password', form) || '';
+  const [generatedPassword, setGeneratedPassword] = useState('');
   const strengthDone = strengthChecks.filter((c) => c.ok(watchedPassword)).length;
   const strengthLabel =
     strengthDone <= 1 ? 'Слабый' : strengthDone <= 3 ? 'Средний' : 'Надёжный';
@@ -279,6 +282,7 @@ export function Users() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&';
     let p = '';
     for (let i = 0; i < 14; i += 1) p += chars[Math.floor(Math.random() * chars.length)];
+    setGeneratedPassword(p);
     form.setFieldsValue({ password: p, confirm: p });
   };
   return (
@@ -343,6 +347,8 @@ export function Users() {
               }).unwrap();
               setOpen(false);
               form.resetFields();
+              setGeneratedPassword('');
+              message.success('Пользователь создан');
             } catch (e) {
               message.error(errorText(e));
             }
@@ -391,6 +397,12 @@ export function Users() {
               Сгенерировать пароль
             </Button>
           </Form.Item>
+          {generatedPassword && watchedPassword === generatedPassword ? (
+            <div className="password-hint generated">
+              Пароль для передачи обучающемуся:{' '}
+              <strong>{generatedPassword}</strong>
+            </div>
+          ) : null}
           <Form.Item
             name="confirm"
             label="Повторите пароль"
