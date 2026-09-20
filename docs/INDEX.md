@@ -10,6 +10,7 @@
 | [Протокол проверки](VERIFICATION.md) | Фактические результаты |
 | [Контракт данных](data/DATA_CONTRACT.md) | Сущности, версии, API |
 | [Интеграция ML](ML_INTEGRATION.md) | Модули команды |
+| [Реестр командных веток](team/TEAM_BRANCH_REGISTRY.ru.md) | Кто работает в какой Git-ветке |
 | [Стартовый промт для AI-агентов](team/AI_AGENT_START_PROMPT.ru.md) | Копируемая инструкция для нейронок участников |
 | [Мастер-ТЗ UI-команды](team/DANIL_NIKITA_SANYA_UI_MASTER_SPEC.ru.md) | Даниил, Никита, Саня: зоны UI-работы и ограничения |
 | [Мастер-ТЗ ML-команды RU](team/KIRILL_MAXIM_ML_INTEGRATION_MASTER_SPEC.ru.md) | Кирилл и Максим: интеграция моделей на русском |
