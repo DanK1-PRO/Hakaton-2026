@@ -12,4 +12,7 @@ if (Test-Path $path) {
 }
 $native = Join-Path $root 'scripts\windows\node_modules\@embedded-postgres\windows-x64\native\bin'
 & (Join-Path $native 'pg_ctl.exe') stop -D (Join-Path $root '.runtime\pgdata') -m fast -w
-
+if (Test-Path 'P:\') {
+    & (Join-Path $root '.venv\Scripts\python.exe') -c "import os,sys; sys.exit(0 if os.path.samefile('P:/',sys.argv[1]) else 1)" $root
+    if ($LASTEXITCODE -eq 0) { & subst.exe P: /D }
+}
