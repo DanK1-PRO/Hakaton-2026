@@ -101,11 +101,17 @@ export function Workspace() {
   ]);
   if (isLoading)
     return (
-      <div className="full-loading">
-        <Spin />
+      <div className="workspace-loading">
+        <Spin size="large" />
+        <span>Загрузка карточки происшествия...</span>
       </div>
     );
-  if (!card) return <ErrorPanel error={error} retry={refetch} />;
+  if (!card)
+    return (
+      <div className="workspace-empty">
+        <ErrorPanel error={error} retry={refetch} />
+      </div>
+    );
   const own = card.owner_id === user.id;
   const locked =
     ['completed', 'refused'].includes(card.status) || card.session_status === 'finished';
@@ -208,13 +214,13 @@ export function Workspace() {
         <div className="phone-state">
           <PhoneOutlined />
           <div>
-            <b>
+            <span className={`call-state-indicator ${callState}`}>
               {callState === 'answer'
                 ? 'Разговор'
                 : callState === 'ring'
                   ? 'Входящий вызов'
                   : 'Телефон'}
-            </b>
+            </span>
             <small>Учебная связь</small>
           </div>
           {callState === 'answer' && last ? (

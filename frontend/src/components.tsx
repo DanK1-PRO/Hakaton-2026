@@ -47,18 +47,20 @@ export function ErrorPanel({ error, retry }: { error: unknown; retry?: () => voi
   );
 }
 export function Status({ value }: { value: string }) {
+  const statusConfig: Record<string, { color: string; icon?: string }> = {
+    added: { color: 'warning' },
+    received: { color: 'warning' },
+    accepted: { color: 'processing' },
+    rejected: { color: 'error' },
+    responding: { color: 'processing' },
+    arrived: { color: 'blue' },
+    working: { color: 'processing' },
+    completed: { color: 'success' },
+    refused: { color: 'error' },
+  };
+  const config = statusConfig[value] || { color: 'default' };
   return (
-    <Tag
-      color={
-        value === 'completed'
-          ? 'success'
-          : ['refused', 'rejected'].includes(value)
-            ? 'error'
-            : ['added', 'received'].includes(value)
-              ? 'warning'
-              : 'processing'
-      }
-    >
+    <Tag color={config.color}>
       {labels[value] || value}
     </Tag>
   );
@@ -176,10 +178,21 @@ export function History({ events }: { events: Event[] }) {
     answer: 'Вызов принят',
     hangup: 'Вызов завершён',
   };
+  const kindColors: Record<string, string> = {
+    incoming: 'blue',
+    opened: 'green',
+    updated: 'orange',
+    created: 'gray',
+    finished: 'green',
+    deleted: 'red',
+    reaction: 'blue',
+    communication: 'cyan',
+  };
   return (
     <Timeline
       items={[...events].reverse().map((e) => ({
         key: e.id,
+        color: kindColors[e.kind] || 'gray',
         children: (
           <>
             <b>

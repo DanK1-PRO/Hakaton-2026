@@ -228,17 +228,23 @@ small {
 .phone-strip {
   display: flex;
   align-items: center;
-  gap: 20px;
-  background: #e8edee;
+  gap: 16px;
+  background: linear-gradient(135deg, #f8fafb 0%, #eef2f3 100%);
   border: 1px solid #d5dfe1;
-  padding: 14px 18px;
-  margin-bottom: 18px;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 .phone-strip > div {
-  min-width: 155px;
-  padding-right: 20px;
+  min-width: 140px;
+  padding-right: 16px;
   border-right: 1px solid #cbd7da;
+}
+.phone-strip > div:last-child {
+  border-right: none;
+  padding-right: 0;
 }
 .phone-strip small {
   display: block;
@@ -263,24 +269,80 @@ small {
 }
 .timer {
   font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #177c88;
+}
+
+/* Индикаторы состояний вызова */
+.call-state-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.call-state-indicator.ring {
+  background: #fff3e0;
+  color: #e65100;
+  animation: pulse 1.5s infinite;
+}
+.call-state-indicator.answer {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.call-state-indicator.hangup {
+  background: #f5f5f5;
+  color: #616161;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 .work-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  gap: 24px;
+  gap: 20px;
   margin-bottom: 24px;
+}
+
+/* Состояния загрузки и ошибок */
+.workspace-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+  color: #63777c;
+}
+.workspace-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px dashed #d5dfe1;
+}
+.workspace-error {
+  margin-bottom: 20px;
 }
 .incident-info,
 .classification {
   padding: 18px 0;
   border-top: 2px solid #9aacb0;
   min-width: 0;
+  background: #fff;
+  padding: 18px;
+  border-radius: 8px;
+  border: 1px solid #e2e8e9;
 }
 .address-block {
   background: white;
   border-left: 3px solid #1b7b87;
   padding: 16px 18px;
   margin-bottom: 14px;
+  border-radius: 0 6px 6px 0;
 }
 .address-block small {
   font-size: 10px;
@@ -293,6 +355,7 @@ small {
   background: #fff;
   padding: 18px;
   min-height: 130px;
+  border-radius: 6px;
 }
 .description-block p {
   margin: 8px 0 0;
@@ -322,6 +385,8 @@ small {
   padding: 14px;
   margin-top: 22px;
   min-height: 64px;
+  border-radius: 6px;
+  border-left: 4px solid #326d4b;
 }
 .ack-box > .anticon {
   font-size: 20px;
@@ -348,6 +413,7 @@ small {
   justify-content: space-between;
   gap: 16px;
   padding: 15px 18px;
+  border-radius: 0 6px 6px 0;
 }
 .service-current > div {
   display: flex;
@@ -359,6 +425,8 @@ small {
   border-top: 1px solid #ccd8da;
   background: #fff;
   padding: 0 20px 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8e9;
 }
 .ant-timeline {
   padding: 10px 0 0 !important;
@@ -581,6 +649,7 @@ small {
   }
   .main-content {
     padding: 20px 14px 28px;
+    overflow-x: hidden;
   }
   .page-heading,
   .workspace-heading {
@@ -609,15 +678,24 @@ small {
   .phone-strip {
     padding: 12px;
     gap: 12px;
+    flex-direction: column;
+    align-items: stretch;
   }
   .phone-strip > div {
     flex: 1;
-    min-width: 115px;
+    min-width: 0;
     border-right: 0;
     padding: 0;
+    border-bottom: 1px solid #e0e5e7;
+    padding-bottom: 10px;
+  }
+  .phone-strip > div:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
   }
   .phone-strip > .ant-space {
     flex-basis: 100%;
+    justify-content: center;
   }
   .service-current {
     align-items: flex-start;
@@ -661,6 +739,17 @@ small {
   }
   .result-shortcut {
     padding: 14px;
+  }
+  .incident-info,
+  .classification {
+    padding: 14px 0;
+  }
+  .address-block {
+    padding: 12px 14px;
+  }
+  .description-block {
+    padding: 14px;
+    min-height: auto;
   }
 }
 @media (prefers-reduced-motion: reduce) {
