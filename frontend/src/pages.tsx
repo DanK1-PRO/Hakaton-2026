@@ -352,41 +352,45 @@ export function Training() {
       </div>
       {error ? <ErrorPanel error={error} retry={refetch} /> : null}
       {isLoading ? <Spin /> : null}
-      <div className="scenario-grid">
-        {data?.map((s: Scenario, i) => (
-          <article className="scenario" key={s.id}>
-            <div className="scenario-top">
-              <span className="scenario-number">{String(i + 1).padStart(2, '0')}</span>
-              <Tag color={s.difficulty === 'easy' ? 'green' : 'gold'}>
-                {s.difficulty === 'easy' ? 'Базовый' : 'Средний'}
-              </Tag>
-            </div>
-            <h2>{s.title}</h2>
-            <p>{s.prompt}</p>
-            <div className="scenario-meta">
-              <FileTextOutlined /> Памятка ДДС · стр. {s.source.page}
-            </div>
-            <div className="scenario-meta">
-              <ClockCircleOutlined /> Подтверждение карточки: 30 с
-            </div>
-            <Button
-              type="primary"
-              icon={<PlayCircleOutlined />}
-              loading={starting}
-              onClick={async () => {
-                try {
-                  const card = await start(s.id).unwrap();
-                  navigate('/incidents/' + card.id);
-                } catch (e) {
-                  message.error(errorText(e));
-                }
-              }}
-            >
-              Начать занятие
-            </Button>
-          </article>
-        ))}
-      </div>
+      {data && data.length === 0 ? (
+        <Empty description="Учебные задания появятся позже" />
+      ) : (
+        <div className="scenario-grid">
+          {data?.map((s: Scenario, i) => (
+            <article className="scenario" key={s.id}>
+              <div className="scenario-top">
+                <span className="scenario-number">{String(i + 1).padStart(2, '0')}</span>
+                <Tag color={s.difficulty === 'easy' ? 'green' : 'gold'}>
+                  {s.difficulty === 'easy' ? 'Базовый' : 'Средний'}
+                </Tag>
+              </div>
+              <h2>{s.title}</h2>
+              <p>{s.prompt}</p>
+              <div className="scenario-meta">
+                <FileTextOutlined /> Памятка ДДС · стр. {s.source.page}
+              </div>
+              <div className="scenario-meta">
+                <ClockCircleOutlined /> Подтверждение карточки: 30 с
+              </div>
+              <Button
+                type="primary"
+                icon={<PlayCircleOutlined />}
+                loading={starting}
+                onClick={async () => {
+                  try {
+                    const card = await start(s.id).unwrap();
+                    navigate('/incidents/' + card.id);
+                  } catch (e) {
+                    message.error(errorText(e));
+                  }
+                }}
+              >
+                Начать занятие
+              </Button>
+            </article>
+          ))}
+        </div>
+      )}
     </>
   );
 }

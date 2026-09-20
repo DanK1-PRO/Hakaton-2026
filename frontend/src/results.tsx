@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Alert, App, Button, Empty, Form, Input, Modal, Select, Space, Table, Tag } from 'antd';
+import { Alert, App, Button, Empty, Form, Input, Modal, Progress, Select, Space, Table, Tag } from 'antd';
 import type { ColumnType, ColumnsType } from 'antd/es/table';
 import {
+  CheckOutlined,
+  CloseOutlined,
   DownloadOutlined,
   KeyOutlined,
   PlusOutlined,
@@ -261,6 +263,18 @@ export function Users() {
     administrator: 'Администратор',
   };
   const filtered = roleFilter ? (data ?? []).filter((u) => u.role === roleFilter) : data;
+  const strengthChecks = [
+    { label: 'Не менее 12 символов', ok: (p: string) => p.length >= 12 },
+    { label: 'Заглавные и строчные буквы', ok: (p: string) => /[a-z]/.test(p) && /[A-Z]/.test(p) },
+    { label: 'Цифры', ok: (p: string) => /\d/.test(p) },
+    { label: 'Спецсимволы (!@#$%&)', ok: (p: string) => /[!@#$%&]/.test(p) },
+  ];
+  const watchedPassword: string = Form.useWatch('password', form) || '';
+  const strengthDone = strengthChecks.filter((c) => c.ok(watchedPassword)).length;
+  const strengthLabel =
+    strengthDone <= 1 ? 'Слабый' : strengthDone <= 3 ? 'Средний' : 'Надёжный';
+  const strengthColor =
+    strengthDone <= 1 ? '#cf1322' : strengthDone <= 3 ? '#d48806' : '#338453';
   const generatePassword = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&';
     let p = '';
@@ -291,6 +305,7 @@ export function Users() {
         rowKey="id"
         dataSource={filtered}
         scroll={{ x: 500 }}
+        locale={{ emptyText: <Empty description="Пользователей нет" /> }}
         columns={[
           { title: 'Имя', dataIndex: 'name' },
           { title: 'Почта', dataIndex: 'email' },
@@ -346,6 +361,31 @@ export function Users() {
           >
             <Input.Password maxLength={128} />
           </Form.Item>
+          {watchedPassword ? (
+            <div className="password-strength" aria-label="Сложность пароля">
+              <Progress
+                percent={Math.round((strengthDone / strengthChecks.length) * 100)}
+                size="small"
+                showInfo={false}
+                strokeColor={strengthColor}
+              />
+              <span className="password-strength-label" style={{ color: strengthColor }}>
+                {strengthLabel}
+              </span>
+              <ul className="password-checks">
+                {strengthChecks.map((c) => (
+                  <li key={c.label} className={c.ok(watchedPassword) ? 'done' : ''}>
+                    {c.ok(watchedPassword) ? <CheckOutlined /> : <CloseOutlined />}
+                    {c.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className="password-hint">
+              Не менее 12 символов: буквы в разных регистрах, цифры и спецсимволы.
+            </div>
+          )}
           <Form.Item>
             <Button icon={<KeyOutlined />} onClick={generatePassword}>
               Сгенерировать пароль

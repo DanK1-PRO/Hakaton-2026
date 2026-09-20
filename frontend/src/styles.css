@@ -218,6 +218,36 @@ small {
 .result-blocks > section:last-child {
   margin-bottom: 0;
 }
+.password-strength {
+  margin: -4px 0 16px;
+}
+.password-strength-label {
+  display: block;
+  margin: 4px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.password-checks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.password-checks li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #8a989c;
+}
+.password-checks li.done {
+  color: #338453;
+}
+.password-hint {
+  margin: -4px 0 16px;
+  font-size: 12.5px;
+  color: #75858a;
+}
 .ant-table-wrapper .ant-table-cell {
   overflow-wrap: anywhere;
 }

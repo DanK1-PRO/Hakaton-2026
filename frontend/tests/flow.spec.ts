@@ -17,6 +17,7 @@ test('administrator creates user and instructor reviews a result', async ({
   await page.getByLabel('Имя', { exact: true }).fill(name);
   await page.getByLabel('Почта', { exact: true }).fill(email);
   await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await expect(page.getByText('Надёжный', { exact: true })).toBeVisible();
   await page.getByLabel('Повторите пароль', { exact: true }).fill('DdsDemo2026!');
   await page.getByRole('button', { name: 'Создать', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
@@ -140,6 +141,9 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   expect(overflow).toBeFalsy();
   await setStatus('Работы завершены', 'Вода перекрыта, течь устранена. Работы завершены.');
   await expect(
+    page.locator('.workspace-heading').getByText('Работы завершены', { exact: true }),
+  ).toBeVisible({ timeout: 15000 });
+  await expect(
     page.getByRole('button', { name: 'Редактировать карточку', exact: true }),
   ).toBeHidden();
   await page.getByRole('button', { name: /Завершить занятие$/ }).click();
@@ -234,4 +238,33 @@ test('incident filters show tags and reset clears them', async ({ page }) => {
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
   ).toBeFalsy();
+});
+
+test('administrator filters users by role', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await page.getByLabel('Электронная почта').fill('administrator@dds.local');
+  await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
+  await page.goto('/users');
+  const table = page.getByRole('table');
+  const roleFilter = page.getByLabel('Фильтр по роли').first();
+  await roleFilter.click();
+  await page
+    .locator('.ant-select-dropdown:visible .ant-select-item-option-content')
+    .getByText('Преподаватель', { exact: true })
+    .click();
+  await expect(table.getByText('instructor@dds.local')).toBeVisible();
+  await expect(table.getByText('trainee@dds.local')).toHaveCount(0);
+  await expect(table.getByText('administrator@dds.local')).toHaveCount(0);
+  await expect(table.getByText('Обучающийся', { exact: true })).toHaveCount(0);
+  await roleFilter.click();
+  await page
+    .locator('.ant-select-dropdown:visible .ant-select-item-option-content')
+    .getByText('Администратор', { exact: true })
+    .click();
+  await expect(table.getByText('administrator@dds.local')).toBeVisible();
+  await expect(table.getByText('instructor@dds.local')).toHaveCount(0);
+  if (testInfo.project.name === 'desktop')
+    await page.screenshot({ path: '../docs/images/users.png', fullPage: true });
 });
