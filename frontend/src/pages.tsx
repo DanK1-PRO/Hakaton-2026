@@ -15,9 +15,11 @@ import {
   Tooltip,
 } from 'antd';
 import {
+  ClearOutlined,
   ClockCircleOutlined,
   EyeOutlined,
   FileTextOutlined,
+  FilterOutlined,
   PlayCircleOutlined,
   PlusOutlined,
   ReloadOutlined,
@@ -55,6 +57,15 @@ export function IncidentList() {
     working: 'Проведение работ',
     completed: 'Работы завершены',
     refused: 'Отказ от выполнения работ',
+  };
+  const hasFilters = Boolean(search || status || typeId) || sort !== 'newest';
+  const clearAll = () => {
+    setQ('');
+    setSearch('');
+    setStatus('');
+    setTypeId(undefined);
+    setSort('newest');
+    setPage(1);
   };
   return (
     <>
@@ -135,6 +146,61 @@ export function IncidentList() {
           />
         </Tooltip>
       </section>
+      {hasFilters ? (
+        <div className="filter-bar">
+          <span className="filter-bar-label">
+            <FilterOutlined /> Фильтры:
+          </span>
+          {search ? (
+            <Tag
+              closable
+              onClose={() => {
+                setSearch('');
+                setQ('');
+                setPage(1);
+              }}
+            >
+              Поиск: {search}
+            </Tag>
+          ) : null}
+          {status ? (
+            <Tag
+              closable
+              onClose={() => {
+                setStatus('');
+                setPage(1);
+              }}
+            >
+              Статус: {labels[status]}
+            </Tag>
+          ) : null}
+          {typeId ? (
+            <Tag
+              closable
+              onClose={() => {
+                setTypeId(undefined);
+                setPage(1);
+              }}
+            >
+              Тип: {types.find((t) => t.id === typeId)?.name}
+            </Tag>
+          ) : null}
+          {sort !== 'newest' ? (
+            <Tag
+              closable
+              onClose={() => {
+                setSort('newest');
+                setPage(1);
+              }}
+            >
+              Порядок: {sort === 'oldest' ? 'Сначала ранние' : sort}
+            </Tag>
+          ) : null}
+          <Button type="link" size="small" icon={<ClearOutlined />} onClick={clearAll}>
+            Сбросить
+          </Button>
+        </div>
+      ) : null}
       {error ? <ErrorPanel error={error} retry={refetch} /> : null}
       <div className="section-heading">
         <h2>
