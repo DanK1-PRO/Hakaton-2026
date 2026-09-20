@@ -27,6 +27,7 @@ Build/typecheck, Ruff, Python/npm audits passed. Restart preserved saved evaluat
 Separate local ML and failed-ML fallback passed. See docs/VERIFICATION.md and docs/evidence.
 Original customer files unchanged and excluded from Git. Source hash manifest exists.
 Skills and memory files physically exist, not merely described in a chat.
+Team handoff specs and a reusable AI-agent start prompt are published under docs/team.
 
 ## Important Boundaries
 
