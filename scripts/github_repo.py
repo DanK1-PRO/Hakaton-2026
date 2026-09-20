@@ -32,12 +32,13 @@ def api(path, method="GET", data=None):
         },
     )
     with urllib.request.urlopen(request, timeout=30) as response:
-        return json.load(response)
+        body = response.read()
+        return json.loads(body) if body else None
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("operation", choices=["info", "runs", "jobs", "setup"])
+    parser.add_argument("operation", choices=["info", "runs", "jobs", "cancel", "setup"])
     parser.add_argument("--run-id", type=int)
     args = parser.parse_args()
     if args.operation == "setup":
@@ -84,12 +85,30 @@ if __name__ == "__main__":
                 indent=2,
             )
         )
+    elif args.operation == "cancel":
+        if not args.run_id:
+            parser.error("--run-id required")
+        api(f"/actions/runs/{args.run_id}/cancel", "POST")
+        print("Run cancellation requested")
     elif args.operation == "jobs":
         if not args.run_id:
             parser.error("--run-id required")
         jobs = api(f"/actions/runs/{args.run_id}/jobs")["jobs"]
-        print(json.dumps([{"name":j["name"],"status":j["status"],"conclusion":j["conclusion"],
-                          "steps":j["steps"],"id":j["id"]} for j in jobs],indent=2))
+        print(
+            json.dumps(
+                [
+                    {
+                        "name": j["name"],
+                        "status": j["status"],
+                        "conclusion": j["conclusion"],
+                        "steps": j["steps"],
+                        "id": j["id"],
+                    }
+                    for j in jobs
+                ],
+                indent=2,
+            )
+        )
     else:
         repo = api("")
         print(

@@ -7,6 +7,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:15-alpine
@@ -51,7 +52,7 @@ jobs:
           uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/dds-api.log 2>&1 &
           cd frontend
           npm run dev > /tmp/dds-ui.log 2>&1 &
-          npx wait-on http://127.0.0.1:5173 http://127.0.0.1:8000/health
+          npx wait-on --timeout 120000 http-get://127.0.0.1:5173 http-get://127.0.0.1:8000/health
           npm test
       - uses: actions/upload-artifact@v4
         if: always()
@@ -60,6 +61,7 @@ jobs:
           path: frontend/playwright-report
   containers:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Compose smoke
@@ -70,4 +72,3 @@ jobs:
           docker compose up -d --build --wait
           curl --fail http://127.0.0.1:8080/health
           docker compose down
-

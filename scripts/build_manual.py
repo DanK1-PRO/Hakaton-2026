@@ -10,6 +10,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle, Image
 import pypdfium2
+from PIL import Image as PILImage
 
 ROOT = Path(__file__).resolve().parents[1]
 FONT = Path("C:/Windows/Fonts")
@@ -105,8 +106,6 @@ for name in ("DOCUMENT_REGISTER.md", "USER_GUIDE.md", "DEPLOYMENT.md", "ACCEPTAN
     story.append(PageBreak())
 story.append(paragraph("Рабочее место: фактический снимок", heading))
 screenshot = ROOT / "docs/images/workspace-desktop.png"
-from PIL import Image as PILImage
-
 with PILImage.open(screenshot) as img:
     width, height = img.size
 scale = min(495 / width, 660 / height)

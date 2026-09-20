@@ -2,6 +2,10 @@
 
 [Русский](README.md) · [Documentation](docs/INDEX.md) · [Deployment](docs/DEPLOYMENT.md) · [ML integration](docs/ML_INTEGRATION.md)
 
+[![Quality and integration](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml/badge.svg)](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml)
+
+[Operating document set (PDF, Russian)](docs/delivery/DDS-2026-Manual.pdf)
+
 A local training simulator for dispatchers interacting with System-112. This repository delivers Danil's team scope: an ARM-style workstation, FastAPI application, persistent simulation state and a replaceable boundary for teammates' ML packages.
 
 **v0.1.0 / training prototype.** It does not contact emergency services. Synthetic scenario references require instructor approval.
@@ -54,4 +58,3 @@ This release covers the team MVP, not the complete customer production specifica
 See [verification](docs/VERIFICATION.md), [architecture](docs/architecture.md), [source traceability](docs/REQUIREMENTS_TRACEABILITY.md), [contributing](CONTRIBUTING.md) and [security](SECURITY.md). Operational documentation is in Russian.
 
 Customer originals are excluded from Git. This private repository has no public redistribution license; third-party materials retain their respective rights.
-

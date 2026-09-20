@@ -1,6 +1,6 @@
 """Verify real HTTP synchronization with the example ML service and its failure path."""
 
-import asyncio
+from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 from pathlib import Path
@@ -68,14 +68,24 @@ try:
         for scenario in ("water", "wire"):
             card = client.post("/simulation/sessions", json={"scenario_id": scenario})
             card.raise_for_status()
-            result = client.post("/simulation/sessions/" + card.json()["session_id"] + "/finish")
-            result.raise_for_status()
+            endpoint = "/simulation/sessions/" + card.json()["session_id"] + "/finish"
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                results = list(pool.map(lambda _: client.post(endpoint), range(2)))
+            for result in results:
+                result.raise_for_status()
+            assert results[0].json() == results[1].json(), "Concurrent finish must be idempotent"
+            result = results[0]
             modes.append(result.json()["mode"])
             if scenario == "water":
                 ml.terminate()
                 ml.wait(timeout=10)
         assert modes == ["local", "fallback"], modes
-        output = {"local_http_evaluator": "passed", "service_loss_fallback": "passed", "observed_modes": modes}
+        output = {
+            "local_http_evaluator": "passed",
+            "service_loss_fallback": "passed",
+            "concurrent_finish": "passed",
+            "observed_modes": modes,
+        }
         path = ROOT / "docs/evidence"
         path.mkdir(parents=True, exist_ok=True)
         (path / "ml-integration.json").write_text(json.dumps(output, indent=2), encoding="utf-8")

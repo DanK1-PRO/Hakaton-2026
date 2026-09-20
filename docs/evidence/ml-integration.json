@@ -1,6 +1,7 @@
 {
   "local_http_evaluator": "passed",
   "service_loss_fallback": "passed",
+  "concurrent_finish": "passed",
   "observed_modes": [
     "local",
     "fallback"
