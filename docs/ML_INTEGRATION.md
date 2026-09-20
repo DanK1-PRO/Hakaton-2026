@@ -27,6 +27,40 @@ In .env set ML_MODE=local and ML_URL=http://127.0.0.1:8090; restart the API. Thi
 
 For Compose, use a local service name on the Compose network or host.docker.internal for a service on the Docker Desktop host.
 
+## ML Evaluator Service v1
+
+### Запуск
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn ml.evaluator_service:app --host 127.0.0.1 --port 8091
+```
+
+### Формулы сложности сценария
+
+Сложность рассчитывается на основе взвешенных факторов из классификатора:
+
+| Фактор | Вес | Пример |
+|--------|-----|--------|
+| Тип: пожар | +2.5 | пожар: мусор |
+| Тип: взрыв | +3.0 | взрыв в здании |
+| Признак: пострадавшие | +2.5 | ДТП с пострадавшими |
+| Признак: опасный груз | +2.0 | перевозка АХОВ |
+| Место: метро | +2.5 | пожар в метро |
+| Место: жилой дом | +2.0 | пожар в квартире |
+
+**Шкала:**
+- 1.0 - 3.0: easy (лёгкая)
+- 3.1 - 6.0: medium (нормальная)
+- 6.1 - 10.0: hard (сложная)
+
+### Импорт сценариев из Excel
+
+```powershell
+.\.venv\Scripts\python.exe ml\import_from_excel.py
+```
+
+Результат: `data_derived/scenarios/classifier_scenarios.json` (1283 сценария)
+
 ## Capability map
 
 | Capability | Current implementation | Team integration |
