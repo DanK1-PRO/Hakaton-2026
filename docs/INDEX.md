@@ -10,6 +10,9 @@
 | [Протокол проверки](VERIFICATION.md) | Фактические результаты |
 | [Контракт данных](data/DATA_CONTRACT.md) | Сущности, версии, API |
 | [Интеграция ML](ML_INTEGRATION.md) | Модули команды |
+| [Мастер-ТЗ UI-команды](team/DANIL_NIKITA_SANYA_UI_MASTER_SPEC.ru.md) | Даниил, Никита, Саня: зоны UI-работы и ограничения |
+| [Мастер-ТЗ ML-команды RU](team/KIRILL_MAXIM_ML_INTEGRATION_MASTER_SPEC.ru.md) | Кирилл и Максим: интеграция моделей на русском |
+| [Master spec for ML team EN](team/KIRILL_MAXIM_ML_INTEGRATION_MASTER_SPEC.en.md) | Kirill and Maxim: model integration in English |
 | [Трассировка](REQUIREMENTS_TRACEABILITY.md) | Источник → код → проверка |
 | [Источники](SOURCE_OF_TRUTH.md) | Приоритеты и достоверность |
 | [Демонстрация](DEMO.md) | Показы системы |
