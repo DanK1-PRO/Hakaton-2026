@@ -1,0 +1,104 @@
+generated_at: "2026-09-20"
+project_root: "D:/Хакатон (2026)"
+notes:
+  - "Original customer files must remain immutable."
+  - "ZIP-internal paths are important; do not treat them as missing."
+  - "Full source hashes and archive-member identities: docs/FILE_MANIFEST.csv."
+
+sources:
+  - id: customer_sow_pdf
+    path: "Данные заказчика/9. Деп Обороны и ЧС.pdf"
+    sha256_prefix: "c94c8f0ad3162644"
+    priority: P0
+    role: "Official customer Statement of Work and product/domain baseline."
+    status: present
+
+  - id: customer_qna_video_summary
+    path: "Данные заказчика/context_customer_answers_civil_defense.md"
+    sha256_prefix: "ba364698e08d70c0"
+    priority: P5
+    role: "Cautious summary of customer Q&A video; most answers are marked unresolved."
+    status: present
+
+  - id: dataset_zip
+    path: "Данные заказчика/Датасет.zip"
+    sha256_prefix: "b0410bdaf53ca4bb"
+    priority: P1
+    role: "Container for key DDS memo, tickets PDF, and newer classifier."
+    status: present
+    contains:
+      - id: classifier_v046_24
+        zip_path: "Классификатор_происшествий_v_046_24_корректировка_МВД_+_Департамент.xlsx"
+        size_bytes: 680116
+        priority: P2
+      - id: tickets_c112_pdf
+        zip_path: "Билеты- задачи по C 112 . АГС_ГСИ.pdf"
+        size_bytes: 6528074
+        priority: P3
+      - id: dds_arm112_memo_pdf
+        zip_path: "Работа с АРМ-112 для ДДС от ОКр_ГСИ.pdf"
+        size_bytes: 4072684
+        priority: P1
+
+  - id: card_creation_instruction_docx
+    path: "Данные заказчика/Инструкция_по_заведению_карточки_2507ГСИ.docx"
+    sha256_prefix: "11dd230f64d23bce"
+    priority: P4
+    role: "Detailed System-112 card creation workflow; useful for fields, statuses, and UI behavior."
+    status: present
+
+  - id: classifier_v046_11_root
+    path: "Данные заказчика/Классификатор_происшествий_v_046_11_ДТУ_15_11_2024_искл_пожар_задымление.xlsx"
+    sha256_prefix: "8d969b8e973a9574"
+    priority: P2_reference
+    role: "Older/root classifier copy; compare with ZIP v046_24 before deriving routing."
+    status: present
+
+  - id: presentation_template
+    path: "Данные заказчика/ЛЦТ2026 Шаблон презентации.pptx"
+    sha256_prefix: "1604aa9146b82cac"
+    priority: presentation
+    role: "Official presentation template; not needed for MVP implementation unless preparing slides."
+    status: present
+
+  - id: phone_datasheet
+    path: "Данные заказчика/РТУ Т16Р_Datasheet_ 2024_ГСИ.pdf"
+    sha256_prefix: "81041f30c6584b7"
+    priority: reference
+    role: "Phone hardware reference; use only for mock VoIP visual/terminology hints."
+    status: present
+
+  - id: dds_screenshot_docx
+    path: "Данные заказчика/СКРИНШОТ ДДСГСИ.docx"
+    sha256_prefix: "04702f5387b31128"
+    priority: P1_ui
+    role: "DDS screenshot notes and embedded images; important UI reference."
+    status: present
+
+  - id: card112_screenshot_docx
+    path: "Данные заказчика/СКРИНШОТ КАРТОЧКИ 112ГСИ.docx"
+    sha256_prefix: "ea9903a74031a8e8"
+    priority: P4_ui
+    role: "Card-112 screenshot notes and embedded images; useful for UI fields and timing visual behavior."
+    status: present
+
+  - id: customer_final_tz_docx
+    path: "Данные заказчика/ТЗ_ДГОЧСиПБ_финал_01092026ГСИ.docx"
+    sha256_prefix: "4a1d905940e8eb5e"
+    priority: P0_alt
+    role: "DOCX version/variant of final customer task; compare with official PDF if needed."
+    status: present
+
+  - id: hackathon_note_txt
+    path: "Данные заказчика/Хакатон.txt"
+    sha256_prefix: "52ad88d5074840fa"
+    priority: reference
+    role: "Short hackathon note."
+    status: present
+
+  - id: master_spec
+    path: "ТЗ для хакатона/HACKATHON_2026_MASTER_SPEC_CODEX.md"
+    sha256_prefix: "275dad9f857fd310"
+    priority: implementation_P0
+    role: "Current operational specification for Codex."
+    status: present

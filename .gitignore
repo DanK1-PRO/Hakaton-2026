@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/
+dist/
+.env
+*.db
+.pytest_cache/
+.ruff_cache/
+coverage/
+test-results/
+playwright-report/
+data_derived/raw/
+Данные заказчика/
+*.log
+.runtime/
+*.tsbuildinfo

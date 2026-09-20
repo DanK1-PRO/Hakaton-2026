@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "api_prefix": "/api/v1",
+  "schemas": [
+    "incident.schema.json",
+    "reaction.schema.json",
+    "evaluation_request.schema.json",
+    "evaluation_result.schema.json"
+  ],
+  "source_status": "TEAM_PROPOSAL",
+  "authority": "HACKATHON_2026_MASTER_SPEC_CODEX.md sections 10,13,18"
+}

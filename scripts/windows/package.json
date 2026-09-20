@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Optional Windows PostgreSQL 15 binaries for local verification without Docker",
+  "dependencies": {
+    "@embedded-postgres/windows-x64": "15.18.0-beta.17"
+  }
+}

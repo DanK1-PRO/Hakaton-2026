@@ -1,0 +1,39 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "caller_number": {
+      "default": "",
+      "maxLength": 30,
+      "title": "Caller Number",
+      "type": "string"
+    },
+    "name": {
+      "default": "",
+      "maxLength": 150,
+      "title": "Name",
+      "type": "string"
+    },
+    "address": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Address",
+      "type": "string"
+    },
+    "incident_type_id": {
+      "title": "Incident Type Id",
+      "type": "integer"
+    },
+    "comments": {
+      "default": "",
+      "maxLength": 2048,
+      "title": "Comments",
+      "type": "string"
+    }
+  },
+  "required": [
+    "address",
+    "incident_type_id"
+  ],
+  "title": "IncidentInput",
+  "type": "object"
+}

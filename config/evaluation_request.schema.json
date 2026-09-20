@@ -1,0 +1,47 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    },
+    "card": {
+      "additionalProperties": true,
+      "title": "Card",
+      "type": "object"
+    },
+    "actions": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Actions",
+      "type": "array"
+    },
+    "reference": {
+      "additionalProperties": true,
+      "title": "Reference",
+      "type": "object"
+    },
+    "timing": {
+      "additionalProperties": true,
+      "title": "Timing",
+      "type": "object"
+    }
+  },
+  "required": [
+    "session_id",
+    "card",
+    "actions",
+    "reference",
+    "timing"
+  ],
+  "title": "EvaluationRequest",
+  "type": "object"
+}

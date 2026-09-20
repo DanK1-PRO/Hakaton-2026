@@ -1,0 +1,12 @@
+**/node_modules
+**/__pycache__
+.venv
+.git
+.env
+.runtime
+Данные заказчика
+data_derived/raw
+frontend/dist
+**/test-results
+**/*.log
+

@@ -1,0 +1,207 @@
+import { test, expect } from '@playwright/test';
+
+test('administrator creates user and instructor reviews a result', async ({
+  page,
+  request,
+}, testInfo) => {
+  const suffix = Date.now() + '-' + testInfo.project.name;
+  const name = 'Проверка ролей ' + suffix;
+  const email = 'roles-' + suffix + '@dds.local';
+  await page.goto('/');
+  await page.getByLabel('Электронная почта').fill('administrator@dds.local');
+  await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
+  await page.goto('/users');
+  await page.getByRole('button', { name: /Добавить пользователя$/ }).click();
+  await page.getByLabel('Имя', { exact: true }).fill(name);
+  await page.getByLabel('Почта', { exact: true }).fill(email);
+  await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await page.getByRole('button', { name: 'Создать', exact: true }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  const auth = await request.post('/api/v1/auth/login', {
+    form: { username: email, password: 'DdsDemo2026!' },
+  });
+  expect(auth.ok()).toBeTruthy();
+  const headers = { Authorization: 'Bearer ' + (await auth.json()).access_token };
+  const started = await request.post('/api/v1/simulation/sessions', {
+    headers,
+    data: { scenario_id: 'wire' },
+  });
+  expect(started.status()).toBe(201);
+  const card = await started.json();
+  expect(
+    (
+      await request.post('/api/v1/simulation/sessions/' + card.session_id + '/finish', { headers })
+    ).ok(),
+  ).toBeTruthy();
+  await page.getByRole('button', { name: 'Выйти', exact: true }).click();
+  await page.getByLabel('Электронная почта').fill('instructor@dds.local');
+  await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
+  await page.goto('/results');
+  const row = page.getByRole('row').filter({ hasText: name });
+  await row.getByRole('button', { name: 'Результат', exact: true }).click();
+  await page
+    .getByLabel('Комментарий и правильное действие')
+    .fill('Нужно подтвердить получение и организовать реагирование.');
+  await page.getByRole('button', { name: /Сохранить заключение$/ }).click();
+  await expect(
+    page
+      .getByRole('dialog')
+      .getByText('Нужно подтвердить получение и организовать реагирование.', { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator('.ant-message-notice')).toHaveCount(0);
+  if (testInfo.project.name === 'desktop')
+    await page.screenshot({ path: '../docs/images/instructor.png', fullPage: true });
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: /Отчёт CSV$/ }).click();
+  expect((await downloadPromise).suggestedFilename()).toBe('training-report.csv');
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
+  ).toBeFalsy();
+});
+
+test('training flow, phone, terminal lock and instructor feedback', async ({
+  page,
+  request,
+}, testInfo) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  const teacher = await request.post('/api/v1/auth/login', {
+    form: { username: 'administrator@dds.local', password: 'DdsDemo2026!' },
+  });
+  expect(teacher.ok()).toBeTruthy();
+  const token = (await teacher.json()).access_token;
+  const email = 'e2e-' + Date.now() + '-' + testInfo.project.name + '@dds.local';
+  const created = await request.post('/api/v1/admin/users', {
+    headers: { Authorization: 'Bearer ' + token },
+    data: { email, name: 'Проверка интерфейса', password: 'DdsDemo2026!', role: 'trainee' },
+  });
+  expect(created.status()).toBe(201);
+  await page.goto('/');
+  await page.getByLabel('Электронная почта').fill(email);
+  await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
+  await page.getByRole('button', { name: /Начать занятие$/ }).click();
+  await expect(page.getByRole('heading', { name: 'Учебные задания' })).toBeVisible();
+  if (testInfo.project.name === 'desktop')
+    await page.screenshot({ path: '../docs/images/training.png', fullPage: true });
+  await page
+    .locator('article')
+    .filter({ has: page.getByRole('heading', { name: 'Прорыв трубы в подъезде' }) })
+    .getByRole('button', { name: 'Начать занятие' })
+    .click();
+  await expect(page.getByRole('button', { name: 'Изменить статус' })).toBeVisible();
+  await expect(page.getByText('Получена службой', { exact: true }).first()).toBeVisible();
+  const id = page.url().split('/').at(-1)!;
+  const setStatus = async (label: string, comment: string) => {
+    await page.getByRole('button', { name: 'Изменить статус' }).click();
+    await page.getByLabel('Новый статус').click();
+    await page
+      .locator('.ant-select-dropdown:visible .ant-select-item-option-content')
+      .getByText(label, { exact: true })
+      .click();
+    await page.getByLabel('Комментарий', { exact: true }).fill(comment);
+    await page.getByRole('button', { name: 'Сохранить статус' }).click();
+    await expect(page.getByRole('dialog')).toBeHidden();
+  };
+  await setStatus('Принята', 'Информация принята, бригада направлена');
+  await page.getByRole('button', { name: /Учебный вызов$/ }).click();
+  await page.getByRole('button', { name: 'Принять вызов' }).click();
+  await expect(page.getByText('Разговор', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Завершить вызов' }).click();
+  await page.getByRole('button', { name: 'Редактировать карточку', exact: true }).click();
+  await page
+    .getByLabel('Описание происшествия', { exact: true })
+    .fill('В подъезде прорвало трубу. Бригада уведомлена.');
+  await page.getByRole('button', { name: 'Сохранить', exact: true }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await setStatus('Начало реагирования', 'Бригада выехала к месту происшествия');
+  await expect(page.locator('.ant-message-notice')).toHaveCount(0);
+  await page.screenshot({
+    path: '../docs/images/workspace-' + testInfo.project.name + '.png',
+    fullPage: true,
+  });
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > window.innerWidth + 2,
+  );
+  expect(overflow).toBeFalsy();
+  await setStatus('Работы завершены', 'Вода перекрыта, течь устранена. Работы завершены.');
+  await expect(
+    page.getByRole('button', { name: 'Редактировать карточку', exact: true }),
+  ).toBeHidden();
+  await page.getByRole('button', { name: /Завершить занятие$/ }).click();
+  await page.getByRole('button', { name: 'Завершить', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Результат занятия' })).toBeVisible();
+  await expect(page.getByText('По проверяемым критериям замечаний нет')).toBeVisible();
+  await expect(page.locator('.ant-message-notice')).toHaveCount(0);
+  if (testInfo.project.name === 'desktop')
+    await page.screenshot({ path: '../docs/images/result.png', fullPage: true });
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Результат занятия' })).toBeVisible();
+  const traineeAuth = await request.post('/api/v1/auth/login', {
+    form: { username: email, password: 'DdsDemo2026!' },
+  });
+  const traineeToken = (await traineeAuth.json()).access_token;
+  const card = await (
+    await request.get('/api/v1/incidents/' + id, {
+      headers: { Authorization: 'Bearer ' + traineeToken },
+    })
+  ).json();
+  expect(card.events.some((e: { kind: string }) => e.kind === 'communication')).toBeTruthy();
+  const feedback = await request.post(
+    '/api/v1/instructor/sessions/' + card.session_id + '/feedback',
+    {
+      headers: { Authorization: 'Bearer ' + token },
+      data: {
+        verdict: 'corrected',
+        comment: 'Проверено преподавателем. Уточнение результата работ сохранено.',
+      },
+    },
+  );
+  expect(feedback.status()).toBe(201);
+  await page.reload();
+  await expect(
+    page.getByText('Проверено преподавателем. Уточнение результата работ сохранено.'),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'К списку', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Поиск происшествий', exact: true }).fill('В подъезде');
+  await page.getByRole('button', { name: 'Найти', exact: true }).click();
+  await expect(page.getByRole('link', { name: card.number, exact: true })).toBeVisible();
+  if (testInfo.project.name === 'desktop')
+    await page.screenshot({ path: '../docs/images/incidents.png', fullPage: true });
+  expect(errors).toEqual([]);
+});
+
+test('login validation and invalid password', async ({ page }) => {
+  await page.goto('/');
+  await page.getByLabel('Пароль', { exact: true }).fill('incorrect');
+  await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await expect(page.getByText('Неверная почта или пароль')).toBeVisible();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
+  ).toBeFalsy();
+});
+
+test('connection failure preserves unsaved form', async ({ page, request }) => {
+  const auth = await request.post('/api/v1/auth/login', {
+    form: { username: 'trainee@dds.local', password: 'DdsDemo2026!' },
+  });
+  const token = (await auth.json()).access_token;
+  await page.goto('/');
+  await page.evaluate((t) => sessionStorage.setItem('dds_token', t), token);
+  await page.reload();
+  await page.getByRole('button', { name: 'Создать карточку' }).click();
+  await page.getByLabel('Адрес происшествия').fill('Учебный адрес');
+  await page.getByLabel('Тип происшествия', { exact: true }).click();
+  await page.getByLabel('Тип происшествия', { exact: true }).press('ArrowDown');
+  await page.getByLabel('Тип происшествия', { exact: true }).press('Enter');
+  await page.route('**/api/v1/incidents', (route) => route.abort());
+  await page.getByRole('button', { name: 'Создать', exact: true }).click();
+  await expect(page.getByText(/Не удалось связаться с сервером/)).toBeVisible();
+  await expect(page.getByLabel('Адрес происшествия')).toHaveValue('Учебный адрес');
+});

@@ -1,0 +1,8 @@
+{
+  "local_http_evaluator": "passed",
+  "service_loss_fallback": "passed",
+  "observed_modes": [
+    "local",
+    "fallback"
+  ]
+}

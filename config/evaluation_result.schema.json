@@ -1,0 +1,94 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    },
+    "model_version": {
+      "title": "Model Version",
+      "type": "string"
+    },
+    "reference_version": {
+      "title": "Reference Version",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "mock",
+        "local",
+        "fallback"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Score"
+    },
+    "critical_errors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Critical Errors",
+      "type": "array"
+    },
+    "field_errors": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Field Errors",
+      "type": "array"
+    },
+    "missing_information": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Missing Information",
+      "type": "array"
+    },
+    "timing": {
+      "additionalProperties": true,
+      "title": "Timing",
+      "type": "object"
+    },
+    "routing_assessment": {
+      "additionalProperties": true,
+      "title": "Routing Assessment",
+      "type": "object"
+    },
+    "comment_quality": {
+      "additionalProperties": true,
+      "title": "Comment Quality",
+      "type": "object"
+    },
+    "explanation": {
+      "title": "Explanation",
+      "type": "string"
+    }
+  },
+  "required": [
+    "session_id",
+    "model_version",
+    "reference_version",
+    "mode",
+    "explanation"
+  ],
+  "title": "EvaluationResult",
+  "type": "object"
+}
