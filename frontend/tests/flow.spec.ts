@@ -139,9 +139,7 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   );
   expect(overflow).toBeFalsy();
   await setStatus('Работы завершены', 'Вода перекрыта, течь устранена. Работы завершены.');
-  await expect(
-    page.getByRole('button', { name: 'Редактировать карточку', exact: true }),
-  ).toBeHidden();
+  await expect(page.getByText('Редактирование закрыто')).toBeVisible();
   await page.getByRole('button', { name: /Завершить занятие$/ }).click();
   await page.getByRole('button', { name: 'Завершить', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Результат занятия' })).toBeVisible();
