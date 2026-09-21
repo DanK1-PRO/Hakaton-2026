@@ -7,7 +7,7 @@
 | DDS card | DDS screenshot DOCX image10; memo pp.15-19,23-25 | Grey ARM canvas; phone top; address/description left; classification right; blue/dark service response/history below | CONFIRMED_CUSTOMER, TRAINING_APPROXIMATION |
 | Card-112 reference | `СКРИНШОТ КАРТОЧКИ 112ГСИ.docx` images1-9; `КАРТОЧКА 112.docx` extracted images | Orange action/service bar, detailed address grid, incident scenario tags, save/action buttons | CONFIRMED_CUSTOMER_FOR_112, DO_NOT_AUTOMATICALLY_TRANSFER_TO_DDS |
 | Service-112 reference | `СЛУЖБЫ 112.docx` extracted images | Service dock/history/status editor variants; blue service history, dark locked bar and orange active controls | CONFIRMED_CUSTOMER_FOR_112, DDS_TRANSFER_REQUIRES_SOURCE_CHECK |
-| Local map | Danil request; Card-112 address control evidence | `MapPanel` opens a local mock map from the card address; external Yandex geocoding is locked pending explicit approval and key | TEAM_PROPOSAL_SAFE_LOCAL_ONLY |
+| Local map | Danil request; Card-112 address control evidence | `MapPanel` opens a local Moscow training map with an incident marker and service route; external API keys/geocoding are removed from this build | TEAM_PROPOSAL_OFFLINE_CONTOUR |
 | Reaction modal | memo pp.21-26; screenshot DOCX images11,13,14 | Bottom editor: status, operator, comment, save/cancel | CONFIRMED_CUSTOMER, TRAINING_APPROXIMATION |
 | Training catalogue | master §34 | Scenarios/difficulty/start | TEAM_PROPOSAL visual layout |
 | Results | master §§16-17,34 | Findings/timing/instructor correction | TEAM_PROPOSAL visual layout |

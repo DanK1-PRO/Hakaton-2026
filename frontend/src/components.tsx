@@ -59,11 +59,7 @@ export function Status({ value }: { value: string }) {
     refused: { color: 'error' },
   };
   const config = statusConfig[value] || { color: 'default' };
-  return (
-    <Tag color={config.color}>
-      {labels[value] || value}
-    </Tag>
-  );
+  return <Tag color={config.color}>{labels[value] || value}</Tag>;
 }
 export function CardFields({ types }: { types: IncidentType[] }) {
   return (

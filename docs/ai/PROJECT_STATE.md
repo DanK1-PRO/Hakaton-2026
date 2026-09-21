@@ -30,19 +30,19 @@ Skills and memory files physically exist, not merely described in a chat.
 Team handoff specs and a reusable AI-agent start prompt are published under docs/team.
 Branch ownership is tracked in docs/team/TEAM_BRANCH_REGISTRY.ru.md: main is Danil's stable base, ml/scoring-experiment is Maxim's ML test branch, ui/sanya-results-admin is Sanya's UI test branch.
 
-Danil branch `ui/danil-integration-review` is active locally. It adds a source-like ARM DDS workspace shell: dense grey card, top phone panel, left address/description, right classification block, bottom service dock/history, bottom reaction editor, explicit conflict reload, and ARM Playwright tests. Verification on 2026-09-21: frontend build passed, `npx playwright test tests/arm.spec.ts` 8/8 passed, full `npm test` 16/16 passed, backend pytest 15/15 passed, `git diff --check` passed.
+Danil branch `ui/danil-integration-review` is the active integrated UI branch. It now combines Danil ARM workspace, Sanya results/admin/filter work and Nikita compatible card-flow improvements. Verification on 2026-09-21 after the UI merge: frontend build passed, `npx playwright test tests/arm.spec.ts` 8/8 passed, full `npm test` 20/20 passed, backend pytest 15/15 passed, `git diff --check` passed.
 
-Latest visual pass on 2026-09-21 tightened fidelity to `Работа с АРМ-112 для ДДС от ОКр_ГСИ.pdf`, `СКРИНШОТ ДДСГСИ.docx`, `СКРИНШОТ КАРТОЧКИ 112ГСИ.docx`, plus new `КАРТОЧКА 112.docx` and `СЛУЖБЫ 112.docx`: flatter ARM panels, denser address grid, route/reference service tiles, Card-112 orange action/service bar, bottom blue reaction editor, local mock `MapPanel`, and training help moved behind `?`. External Yandex Maps/geocoding is not enabled because incident addresses must not be sent to a third-party provider without explicit approval. Details: `docs/ui/ARM_VISUAL_REFERENCE_PASS.md`.
+Latest visual pass on 2026-09-21 tightened fidelity to `Работа с АРМ-112 для ДДС от ОКр_ГСИ.pdf`, `СКРИНШОТ ДДСГСИ.docx`, `СКРИНШОТ КАРТОЧКИ 112ГСИ.docx`, plus new `КАРТОЧКА 112.docx` and `СЛУЖБЫ 112.docx`: flatter ARM panels, denser address grid, route/reference service tiles, Card-112 orange action/service bar, bottom blue reaction editor, fully local Moscow `MapPanel`, and training help moved behind `?`. External map APIs/Yandex key flow were removed per closed-contour requirement; the future accurate GIS path is a local OSM/PMTiles/MBTiles package documented in `docs/maps/OFFLINE_MAP_PLAN.ru.md`. Details: `docs/ui/ARM_VISUAL_REFERENCE_PASS.md`.
 
-Sanya branch `origin/ui/sanya-results-admin` currently points to `e81b63144798036f7b231ea6fc8a323cb2d8995d`. It changes incident filters, results, admin users, styles and flow tests. Do not merge automatically: one known integration adjustment is needed because `frontend/tests/flow.spec.ts:149` still targets `.workspace-heading`, which Danil's ARM workspace removes.
+Sanya branch `origin/ui/sanya-results-admin` has been integrated into Danil's UI branch. Its results/admin/filter work is included; screenshots were regenerated after the common merge.
 
 Branch integration stitches are tracked in `docs/team/INTEGRATION_STITCHES.ru.md`. Before an Astra final integration pass, show Danil the full list of open stitches so he can decide whether owners fix them, Codex fixes them on an integration branch, or the issue is deferred.
 
-Additional branches seen on origin: `ui/nikita-card-flow`, `LocalAPI`, `hht`, updated `ml/scoring-experiment`. Treat them as unreviewed until inspected.
+Additional non-UI branches seen on origin: `LocalAPI`, `hht`, updated `ml/scoring-experiment`. Treat them as unreviewed until inspected.
 
-Nikita branch `origin/ui/nikita-card-flow` points to `14ceaf58020b124de2e1034cf66a997b17e2c510`, PR #2 is open and CI is green against `main`. Merge-check into Danil branch shows a direct conflict in `frontend/src/workspace.tsx`; do not merge automatically. Track STITCH-003 and STITCH-004.
+Nikita branch `origin/ui/nikita-card-flow` has been integrated manually into Danil's UI branch. The ARM workspace remains the source-like base; compatible loading/empty states, Timeline colors and locked-state tests were carried forward. Old card visual styles were rejected.
 
-Before ML, useful non-ML work is tracked in `docs/team/PRE_ML_WORKLIST.ru.md`: UI fidelity work now includes Card-112 orange sources, frontend-only address grid and safe local map. Remaining pre-ML items are ML input/output contracts and branch stitch cleanup.
+Before ML, useful non-ML work is tracked in `docs/team/PRE_ML_WORKLIST.ru.md`: UI branch cleanup is complete for Danil/Sanya/Nikita; remaining pre-ML items are ML input/output contracts and optional local map-pack import after team sync.
 
 ## Important Boundaries
 

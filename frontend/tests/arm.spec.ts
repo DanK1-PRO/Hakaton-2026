@@ -90,7 +90,12 @@ test('ARM source layout, service history and training context remain accessible'
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Открыть карту', exact: true }).click();
   await expect(page.getByTestId('arm-map-panel')).toBeVisible();
-  await expect(page.getByText('Учебная карта работает локально', { exact: true })).toBeVisible();
+  await expect(page.getByText('Локальная карта Москвы', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Внешние API не используются/)).toBeVisible();
+  await expect(page.getByTestId('arm-offline-map')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'локальный OSM-слой', exact: true }),
+  ).toBeDisabled();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Список оповещения', exact: true }).click();
   await expect(

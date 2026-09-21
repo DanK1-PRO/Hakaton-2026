@@ -230,17 +230,15 @@ test('incident filters show tags and reset clears them', async ({ page }) => {
   await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
   await page.getByRole('button', { name: 'Войти', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
-  await page
-    .getByRole('textbox', { name: 'Поиск происшествий', exact: true })
-    .fill('Прорыв');
+  await page.getByRole('textbox', { name: 'Поиск происшествий', exact: true }).fill('Прорыв');
   await page.getByRole('button', { name: 'Найти', exact: true }).click();
   await expect(page.getByText('Фильтры:', { exact: true })).toBeVisible();
   await expect(page.getByText('Поиск: Прорыв', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: /Сбросить/ }).click();
   await expect(page.getByText('Фильтры:', { exact: true })).toBeHidden();
-  await expect(
-    page.getByRole('textbox', { name: 'Поиск происшествий', exact: true }),
-  ).toHaveValue('');
+  await expect(page.getByRole('textbox', { name: 'Поиск происшествий', exact: true })).toHaveValue(
+    '',
+  );
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
   ).toBeFalsy();

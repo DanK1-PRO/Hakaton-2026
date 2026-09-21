@@ -30,8 +30,9 @@ Do not auto-implement real telephony, scoring weights, full ticket OCR, encrypti
 ## Active Team Integration
 
 - [x] Danil branch `ui/danil-integration-review`: ARM-like DDS workspace layout, conflict-safe edit/reaction flow, service dock, screenshots, and browser coverage.
-- [x] Local verification for Danil branch: frontend build, 16 browser tests, 15 backend tests, diff check.
-- [ ] Commit and push Danil branch after final local review.
-- [ ] Sanya PR/branch: functionally promising, but update the old `.workspace-heading` test locator before final combined merge.
-- [ ] Review Nikita branch `origin/ui/nikita-card-flow` separately; do not assume compatibility yet.
+- [x] Sanya branch `ui/sanya-results-admin`: merged into Danil UI branch; results/admin/filter work retained; screenshots regenerated.
+- [x] Nikita branch `ui/nikita-card-flow`: merged manually into Danil UI branch; ARM workspace preserved; compatible loading/Timeline/lock improvements retained.
+- [x] Local verification after UI merge and offline-map pass: frontend build, 20 browser tests, 15 backend tests, diff check.
+- [x] External map API/Yandex flow removed; `MapPanel` now works as local Moscow training map.
+- [ ] Push integrated UI branch and wait for GitHub CI.
 - [ ] Review Maxim `ml/scoring-experiment` after UI branches are stable; preserve `ML_MODE=mock` as regression path.

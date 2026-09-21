@@ -11,18 +11,36 @@ Playwright desktop/mobile.
 |---|---|
 | `scripts/windows/start-app.ps1` | Успешно подняты DB/API/UI; `.env` сохранён |
 | `npm run build` в `frontend` | TypeScript + Vite production build passed; остаётся предупреждение о vendor bundle >500 kB |
-| `npx playwright test tests/arm.spec.ts` | 8 passed, 40.9s; ARM layout, история службы, conflict reload, отказ, lock, staff view |
-| `npm test` в `frontend` | 16 passed, 1.5m; старые flow + новые ARM desktop/mobile |
+| `npx playwright test tests/arm.spec.ts` | 8 passed, 39.6s; ARM layout, локальная карта, история службы, conflict reload, отказ, lock, staff view |
+| `npm test` в `frontend` | 20 passed, 1.6m; flow + ARM desktop/mobile, результаты/админка/фильтры Сани |
 | `.\.venv\Scripts\pytest.exe backend\tests` | 15 passed, 2 warnings Starlette/httpx/AnyIO |
 | `git diff --check` | Passed |
+
+Финальная UI-интеграция 21.09.2026: в `ui/danil-integration-review` объединены
+ветки `ui/sanya-results-admin` и `ui/nikita-card-flow`. Конфликты разрешены так:
+screenshots пересняты после общего merge; flow-тесты Сани сохранены и адаптированы;
+ARM workspace Даниила оставлен основой; из Никиты перенесены loading/empty states,
+Timeline colors и locked-state проверка; старый visual layer с gradients/radius/shadows
+отклонён. Карта переведена в полностью локальный режим: встроенная схема Москвы,
+детерминированная точка происшествия по адресу и учебный маршрут службы; ключи/API
+и внешнее геокодирование не используются. Проверки после UI merge: `npm run build` passed,
+`npx playwright test tests/arm.spec.ts` 8 passed, `npm test` 20 passed,
+`.venv\Scripts\pytest.exe backend\tests` 15 passed, `git diff --check` passed.
+
+Финальный offline-map pass 21.09.2026: Yandex/API key flow удалён из UI и
+документов. `MapPanel` теперь работает как локальная схема Москвы с округами,
+маршрутом службы и маркером адреса; будущий точный слой должен подключаться из
+локальных OSM/PMTiles/MBTiles-файлов. Проверки после pass: `npm run build` passed,
+`npx playwright test tests/arm.spec.ts` 8 passed, `npm test` 20 passed,
+`.venv\Scripts\pytest.exe backend\tests` 15 passed, `git diff --check` passed.
 
 Дополнительный UI/map pass 21.09.2026 после добавления заказчиком `КАРТОЧКА 112.docx`
 и `СЛУЖБЫ 112.docx`: extractor теперь кэширует embedded media из всех customer DOCX;
 из новых файлов локально извлечено 39 и 55 PNG соответственно. Рабочая карточка получила
 frontend-only адресную сетку в стиле Card-112, оранжевую активную service/action bar
-`#ec653b`, кнопку `карта` и локальный `MapPanel` mock. Реальный Yandex Maps/geocoding
-не включён: отправка адреса происшествия во внешний сервис требует отдельного разрешения
-и ключа. `scripts/extract_sources.py` в текущей backend `.venv` passed с честным skip
+`#ec653b`, кнопку `карта` и локальный `MapPanel`. Реальный онлайн-провайдер карт
+отменён по требованию закрытого контура: адрес происшествия не передаётся наружу,
+внешние API не вызываются, ключи карт в UI не запрашиваются. `scripts/extract_sources.py` в текущей backend `.venv` passed с честным skip
 PDF/XLSX частей до установки `scripts/requirements-tools.txt`, при этом DOCX media cache
 обновлён. Проверки этого прохода: `npm run build` passed, `npx playwright test
 tests/arm.spec.ts` 8 passed, `npm test` 16 passed, `.venv\Scripts\pytest.exe backend\tests`

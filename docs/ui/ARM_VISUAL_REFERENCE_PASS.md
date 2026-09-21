@@ -36,7 +36,7 @@ All screenshots are 1920x1080. The simulator copies the application-area colors 
 - Address/description stay on the left, while victims/ambulance refusal/blocked/CHS/CHP, incident type, features, class and VIS class stay on the right.
 - Unknown fields remain visibly `Нет данных` instead of being invented.
 - The address block was expanded into a Card-112-like field grid: country, subject, settlement, district, street, house, корпус, подъезд and descriptive address. It remains frontend-only until the backend schema is extended.
-- The `карта` control now opens a local training `MapPanel`. It does not send addresses to Yandex or any external provider. A future Yandex mode must require a key and explicit approval for transmitting incident addresses outside the local contour.
+- The `карта` control now opens a fully local training `MapPanel`: built-in Moscow scheme, incident marker and service route. It does not request API keys and does not send addresses to Yandex or any external provider. A future real offline map layer should be connected from local OSM/PMTiles/MBTiles files, not from an internet API.
 - The service dock now shows the real training DDS service plus reference service tiles from EKP routes. Only the training DDS tile is active; route tiles open the route reference and do not imply real notification.
 - The active service/action bar uses the Card-112 orange source color while locked/staff service variants preserve the darker DDS service style.
 - The reaction editor is styled as a bottom ARM work panel with dark-blue source-like colors instead of a generic white Ant Design dialog.
@@ -59,4 +59,4 @@ All screenshots are 1920x1080. The simulator copies the application-area colors 
 
 ## Remaining Limits
 
-This is a high-fidelity training approximation, not a legally exact certified clone of the production ARM. The backend currently models one DDS service, mock phone events and route references. Independent multi-service state, real VoIP/audio/SMS, true VIS classification fields, external map/geocoding, actor directory lookup and all official search filters remain future integration work.
+This is a high-fidelity training approximation, not a legally exact certified clone of the production ARM. The backend currently models one DDS service, mock phone events and route references. Independent multi-service state, real VoIP/audio/SMS, true VIS classification fields, production-grade offline GIS packages, actor directory lookup and all official search filters remain future integration work.

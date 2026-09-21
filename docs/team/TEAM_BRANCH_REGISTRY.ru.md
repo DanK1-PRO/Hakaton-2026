@@ -11,10 +11,10 @@
 | Ветка | Участник | Направление | Текущий статус | Комментарий |
 |---|---|---|---|---|
 | `main` | Даниил | стабильная интеграционная база | stable | Рабочая версия проекта. Напрямую не пушить без решения Даниила. |
-| `ui/danil-integration-review` | Даниил | ARM UI / интеграционная проверка | active local branch | Новый рабочий экран ДДС, service dock, conflict-safe формы, ARM-тесты. Не мержить в `main` до общей сборки веток. |
+| `ui/danil-integration-review` | Даниил | объединённая UI-сборка | active integrated branch | Ветка объединяет UI Даниила, Саню и Никиту: ARM workspace, results/admin, filters, user admin, screenshots, tests. Следующая крупная интеграция — ML ветки Максима/Кирилла. |
 | `ml/scoring-experiment` | Максим | ML / evaluator / scoring experiment | test branch | Ветка создана и запушена, обновлена на origin. Это пока тест подключения и эксперимент со скорингом, не готовый merge. |
-| `ui/sanya-results-admin` | Саня | UI / результаты / админка | PR review | PR #1 готов к ревью. Известный стык: тест `frontend/tests/flow.spec.ts` использует старый `.workspace-heading`, который исчезает в ветке Даниила. |
-| `ui/nikita-card-flow` | Никита | UI / рабочее место диспетчера / карточка | PR review | PR #2 открыт, CI зелёный относительно `main`. С веткой Даниила есть прямой конфликт `frontend/src/workspace.tsx`; переносить вручную, не мержить кнопкой. |
+| `ui/sanya-results-admin` | Саня | UI / результаты / админка | integrated into Danil UI branch | Влито в `ui/danil-integration-review` через интеграционный merge; screenshots пересняты, flow-тесты зелёные. |
+| `ui/nikita-card-flow` | Никита | UI / рабочее место диспетчера / карточка | integrated into Danil UI branch | Влито в `ui/danil-integration-review` вручную: ARM workspace сохранён, совместимые loading/Timeline/lock-test идеи перенесены, старый visual layer отклонён. |
 | `LocalAPI` | неизвестно | API / локальный эксперимент | unreviewed branch | Ветка появилась на origin; владелец и цель требуют уточнения. |
 | `hht` | неизвестно | неизвестно | unreviewed branch | Ветка появилась на origin; владелец и цель требуют уточнения. |
 
@@ -46,11 +46,11 @@
 
 ## Текущее замечание по ветке Сани
 
-`ui/sanya-results-admin` выглядит аккуратно по зоне: списки, результаты, админка, тесты и docs/images. Перед финальным merge с веткой Даниила нужно заменить проверку `frontend/tests/flow.spec.ts:149` на локатор нового ARM service dock или статус из API, потому что `.workspace-heading` больше не является частью карточки.
+`ui/sanya-results-admin` интегрирована в `ui/danil-integration-review`. Результаты, админка, фильтры, docs/images и новые flow-тесты прошли общий `npm test`: 20/20.
 
 ## Текущее замечание по ветке Никиты
 
-`ui/nikita-card-flow` содержит полезные идеи для эргономики карточки: loading/error states, окрашивание Timeline, более устойчивый locked-test, мобильные улучшения. Но ветка построена на старой карточке до ARM-прохода Даниила. Временный merge-check с `ui/danil-integration-review` дал конфликт в `frontend/src/workspace.tsx`. Общий `styles.css` Никиты добавляет gradients/radius/shadows, которые противоречат текущей цели копировать АРМ. Решение: не мержить напрямую; вручную перенести только совместимые идеи.
+`ui/nikita-card-flow` интегрирована в `ui/danil-integration-review` вручную. Полезные идеи перенесены точечно: loading/empty states, Timeline colors, locked-state тест. Старый `phone-strip`/workspace layout и gradients/radius/shadows из общего `styles.css` не приняты, чтобы не ломать ARM-похожесть.
 
 ## Как обновлять этот реестр
 
