@@ -14,9 +14,13 @@ test('administrator creates user and instructor reviews a result', async ({
   await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
   await page.goto('/users');
   await page.getByRole('button', { name: /Добавить пользователя$/ }).click();
+  await page.getByRole('button', { name: 'Сгенерировать пароль' }).click();
+  await expect(page.getByText(/Пароль для передачи обучающемуся/)).toBeVisible();
   await page.getByLabel('Имя', { exact: true }).fill(name);
   await page.getByLabel('Почта', { exact: true }).fill(email);
   await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await expect(page.getByText('Надёжный', { exact: true })).toBeVisible();
+  await page.getByLabel('Повторите пароль', { exact: true }).fill('DdsDemo2026!');
   await page.getByRole('button', { name: 'Создать', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
   const auth = await request.post('/api/v1/auth/login', {
@@ -48,15 +52,14 @@ test('administrator creates user and instructor reviews a result', async ({
     .fill('Нужно подтвердить получение и организовать реагирование.');
   await page.getByRole('button', { name: /Сохранить заключение$/ }).click();
   await expect(
-    page
-      .getByRole('dialog')
-      .getByText('Нужно подтвердить получение и организовать реагирование.', { exact: true }),
+    page.getByRole('dialog').getByText('Нужно подтвердить получение и организовать реагирование.'),
   ).toBeVisible();
   await expect(page.locator('.ant-message-notice')).toHaveCount(0);
   if (testInfo.project.name === 'desktop')
     await page.screenshot({ path: '../docs/images/instructor.png', fullPage: true });
   await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(row.getByText('Подтверждено', { exact: true })).toBeVisible({ timeout: 15000 });
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: /Отчёт CSV$/ }).click();
   expect((await downloadPromise).suggestedFilename()).toBe('training-report.csv');
@@ -91,6 +94,9 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   await expect(page.getByRole('heading', { name: 'Учебные задания' })).toBeVisible();
   if (testInfo.project.name === 'desktop')
     await page.screenshot({ path: '../docs/images/training.png', fullPage: true });
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
+  ).toBeFalsy();
   await page
     .locator('article')
     .filter({ has: page.getByRole('heading', { name: 'Прорыв трубы в подъезде' }) })
@@ -140,6 +146,9 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   );
   expect(overflow).toBeFalsy();
   await setStatus('Работы завершены', 'Вода перекрыта, течь устранена. Работы завершены.');
+  await expect(
+    page.locator('.workspace-heading').getByText('Работы завершены', { exact: true }),
+  ).toBeVisible({ timeout: 15000 });
   await expect(
     page.getByRole('button', { name: 'Редактировать карточку', exact: true }),
   ).toBeHidden();
@@ -213,4 +222,58 @@ test('connection failure preserves unsaved form', async ({ page, request }) => {
   await page.getByRole('button', { name: 'Создать', exact: true }).click();
   await expect(page.getByText(/Не удалось связаться с сервером/)).toBeVisible();
   await expect(page.getByLabel('Адрес происшествия')).toHaveValue('Учебный адрес');
+});
+
+test('incident filters show tags and reset clears them', async ({ page }) => {
+  await page.goto('/');
+  await page.getByLabel('Электронная почта').fill('trainee@dds.local');
+  await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
+  await page
+    .getByRole('textbox', { name: 'Поиск происшествий', exact: true })
+    .fill('Прорыв');
+  await page.getByRole('button', { name: 'Найти', exact: true }).click();
+  await expect(page.getByText('Фильтры:', { exact: true })).toBeVisible();
+  await expect(page.getByText('Поиск: Прорыв', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /Сбросить/ }).click();
+  await expect(page.getByText('Фильтры:', { exact: true })).toBeHidden();
+  await expect(
+    page.getByRole('textbox', { name: 'Поиск происшествий', exact: true }),
+  ).toHaveValue('');
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
+  ).toBeFalsy();
+});
+
+test('administrator filters users by role', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await page.getByLabel('Электронная почта').fill('administrator@dds.local');
+  await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
+  await page.goto('/users');
+  const table = page.getByRole('table');
+  const roleFilter = page.getByLabel('Фильтр по роли').first();
+  await roleFilter.click();
+  await page
+    .locator('.ant-select-dropdown:visible .ant-select-item-option-content')
+    .getByText('Преподаватель', { exact: true })
+    .click();
+  await expect(table.getByText('instructor@dds.local')).toBeVisible();
+  await expect(table.getByText('trainee@dds.local')).toHaveCount(0);
+  await expect(table.getByText('administrator@dds.local')).toHaveCount(0);
+  await expect(table.getByText('Обучающийся', { exact: true })).toHaveCount(0);
+  await roleFilter.click();
+  await page
+    .locator('.ant-select-dropdown:visible .ant-select-item-option-content')
+    .getByText('Администратор', { exact: true })
+    .click();
+  await expect(table.getByText('administrator@dds.local')).toBeVisible();
+  await expect(table.getByText('instructor@dds.local')).toHaveCount(0);
+  if (testInfo.project.name === 'desktop')
+    await page.screenshot({ path: '../docs/images/users.png', fullPage: true });
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
+  ).toBeFalsy();
 });
