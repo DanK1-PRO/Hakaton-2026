@@ -7,6 +7,7 @@
   --arm-service: #49555d;
   --arm-class: #303335;
   --arm-active: #157dbd;
+  --arm-action: #ec653b;
   --arm-ink: #111820;
   font-family: Arial, sans-serif;
 }
@@ -243,22 +244,58 @@
 .arm-caller small {
   font-size: 10px;
 }
-.arm-address {
-  min-height: 54px;
-  position: relative;
-  padding-right: 54px;
+.arm-caller b {
+  font-size: 14px;
 }
-.arm-address .ant-btn {
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 24px;
+.arm-caller-status {
+  color: #60676b;
+}
+.arm-address-card {
+  min-height: 210px;
+  padding: 8px 10px 10px;
+}
+.arm-address-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 7px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #c9c9c9;
+}
+.arm-address-head b {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+}
+.arm-address-head .ant-btn {
+  height: 26px;
   font-size: 10px;
-  padding-inline: 6px;
+  padding-inline: 7px;
+}
+.arm-address-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+.arm-address-grid > div,
+.arm-address-descriptive {
+  min-width: 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #d2d2d2;
+}
+.arm-address-grid span,
+.arm-address-descriptive span {
+  display: block;
+  min-height: 18px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.arm-address-descriptive {
+  margin-top: 10px;
 }
 .arm-description {
-  min-height: 336px;
+  min-height: 238px;
 }
 .arm-description p {
   white-space: pre-wrap;
@@ -276,9 +313,13 @@
   background: var(--arm-panel);
 }
 .arm-flags .ant-btn {
-  height: 26px;
+  min-height: 32px;
+  height: auto;
   font-size: 11px;
-  padding: 0 6px;
+  padding: 3px 8px;
+  white-space: normal;
+  font-weight: bold;
+  background: #f6f6f6;
 }
 .arm-type {
   font:
@@ -347,9 +388,13 @@
   gap: 1px;
   overflow-x: auto;
 }
+.arm-service-bar-active {
+  background: var(--arm-action);
+}
 .arm-service-caption {
   align-self: center;
   padding: 8px;
+  font-weight: bold;
 }
 .arm-service-tile {
   min-width: 204px;
@@ -361,6 +406,12 @@
   background: #3e4a52;
   color: #dce7ec;
   flex: 0 0 178px;
+}
+.arm-service-bar-active .arm-service-reference {
+  background: #8b9191;
+}
+.arm-service-bar-active .arm-service-tools .ant-btn {
+  border-color: #fff;
 }
 .arm-service-reference button {
   display: block;
@@ -537,6 +588,19 @@
   font-size: 30px;
   font-weight: 400;
 }
+.arm-list .page-heading .arm-create-card {
+  min-height: 74px;
+  white-space: normal;
+  background: var(--arm-action);
+  border-color: var(--arm-action);
+  color: #fff;
+  font-weight: 700;
+  text-transform: lowercase;
+}
+.arm-list .page-heading .arm-training-start {
+  background: #1b7fb8;
+  border-color: #1b7fb8;
+}
 .arm-list .page-heading .eyebrow {
   display: none;
 }
@@ -594,6 +658,107 @@
 }
 .arm-list .incident-table .ant-pagination {
   color: white;
+}
+.arm-map-panel {
+  display: grid;
+  gap: 12px;
+}
+.arm-map-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.arm-map-head b,
+.arm-map-head span {
+  display: block;
+}
+.arm-map-head span {
+  margin-top: 4px;
+  color: #4b5960;
+}
+.arm-map-mock {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  background: #dfe5e7;
+  border: 1px solid #9aa6ac;
+}
+.arm-map-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(#c2ccd1 1px, transparent 1px),
+    linear-gradient(90deg, #c2ccd1 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+.arm-map-route {
+  position: absolute;
+  height: 18px;
+  background: #ffffff;
+  border: 1px solid #b4bdc2;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.35);
+}
+.arm-map-route-main {
+  left: -20px;
+  right: -20px;
+  top: 48%;
+  transform: rotate(-8deg);
+}
+.arm-map-route-side {
+  left: 38%;
+  top: -30px;
+  bottom: -30px;
+  width: 18px;
+  height: auto;
+  transform: rotate(12deg);
+}
+.arm-map-zone {
+  position: absolute;
+  padding: 8px 12px;
+  background: rgba(21, 125, 189, 0.15);
+  border: 1px solid rgba(21, 125, 189, 0.28);
+  color: #1f596f;
+  font-weight: bold;
+}
+.arm-map-zone-one {
+  left: 24px;
+  top: 22px;
+}
+.arm-map-zone-two {
+  right: 28px;
+  bottom: 28px;
+}
+.arm-map-pin {
+  position: absolute;
+  left: 48%;
+  top: 42%;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--arm-action);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+.arm-map-card {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  max-width: min(360px, calc(100% - 36px));
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.92);
+  border-left: 4px solid var(--arm-action);
+}
+.arm-map-card b,
+.arm-map-card span {
+  display: block;
+}
+.arm-map-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 @media (max-width: 1100px) {
   .arm-phone {
@@ -657,6 +822,18 @@
   }
   .arm-description {
     min-height: 180px;
+  }
+  .arm-address-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .arm-address-head {
+    flex-wrap: wrap;
+  }
+  .arm-map-mock {
+    min-height: 300px;
+  }
+  .arm-map-head {
+    flex-direction: column;
   }
   .arm-service-history {
     margin-left: 0;

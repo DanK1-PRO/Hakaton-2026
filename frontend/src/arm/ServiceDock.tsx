@@ -64,7 +64,7 @@ export function ServiceDock({ card, own, locked, busy, onReact, onRoutes, onHist
           </div>
         </div>
       ) : null}
-      <div className="arm-service-bar">
+      <div className={'arm-service-bar ' + (own && !locked ? 'arm-service-bar-active' : '')}>
         <span className="arm-service-caption">Службы:</span>
         <div className="arm-service-tile">
           <Button

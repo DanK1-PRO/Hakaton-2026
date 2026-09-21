@@ -64,10 +64,15 @@ export function IncidentList() {
           <h1>Поиск происшествий</h1>
         </div>
         <Space wrap>
-          <Button icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
+          <Button
+            className="arm-create-card"
+            icon={<PlusOutlined />}
+            onClick={() => setCreateOpen(true)}
+          >
             Создать карточку
           </Button>
           <Button
+            className="arm-training-start"
             type="primary"
             icon={<PlayCircleOutlined />}
             onClick={() => navigate('/training')}

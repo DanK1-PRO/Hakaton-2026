@@ -26,6 +26,7 @@ import {
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
+  EnvironmentOutlined,
   InfoCircleOutlined,
   PhoneOutlined,
   ReloadOutlined,
@@ -44,7 +45,31 @@ import {
   time,
 } from './components';
 import { ServiceDock } from './arm/ServiceDock';
+import { MapPanel } from './arm/MapPanel';
 import type { CardFields, Incident } from './types';
+
+function addressParts(address: string) {
+  const parts = address
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const value = (index: number, fallback = 'не указано') => parts[index] || fallback;
+  const district = parts.find((part) => /округ|район|юао|свао|цао|зао|вао|тао/i.test(part));
+  const street = parts.find((part) => /улица|проспект|проезд|переулок|шоссе|площадь/i.test(part));
+  const house = parts.find((part) => /\bд\.?\s*\d|дом\s*\d|\b\d+[а-я]?\b/i.test(part));
+  const entrance = parts.find((part) => /под\.?|подъезд/i.test(part));
+  return [
+    ['Страна', value(0, 'Россия')],
+    ['Субъект', value(1, 'Москва')],
+    ['Населённый пункт', value(1, 'Москва')],
+    ['Округ', district || 'не указано'],
+    ['Район', district || 'не указано'],
+    ['Улица', street || value(2)],
+    ['Дом/Вл', house || 'не указано'],
+    ['Корпус', parts.find((part) => /к\.?\s*\d|корп/i.test(part)) || 'не указано'],
+    ['Подъезд', entrance || 'не указано'],
+  ];
+}
 
 export function Workspace() {
   const { id = '' } = useParams();
@@ -67,7 +92,7 @@ export function Workspace() {
   const [remove, { isLoading: removing }] = api.useRemoveMutation();
   const [editOpen, setEditOpen] = useState(false);
   const [reactionOpen, setReactionOpen] = useState(false);
-  const [panel, setPanel] = useState<'help' | 'history' | 'routes' | null>(null);
+  const [panel, setPanel] = useState<'help' | 'history' | 'routes' | 'map' | null>(null);
   const [form] = Form.useForm<CardFields>();
   const [reactionForm] = Form.useForm<{ status: string; comment: string }>();
   const [editVersion, setEditVersion] = useState(0);
@@ -146,6 +171,7 @@ export function Workspace() {
   const last = communications.at(-1);
   const callState = last?.payload.action || 'hangup';
   const routes = card.classification?.routes || [];
+  const addressGrid = addressParts(card.address);
   const currentCard = async () => {
     if (pendingPhone.current) await pendingPhone.current;
     return api.endpoints.incident.select(id)(store.getState()).data || card;
@@ -424,28 +450,51 @@ export function Workspace() {
         <div className="arm-details" data-testid="arm-details">
           <section className="arm-left" aria-label="Информация о происшествии">
             <div className="arm-field arm-caller">
-              <small>ФИО заявителя</small>
-              <span>{card.name || 'Не указано'}</span>
+              <small>Фамилия и имя заявителя</small>
+              <b>{card.name || 'Не указано'}</b>
+              <span className="arm-caller-status">очевидец</span>
             </div>
-            <div className="arm-field arm-address">
-              <small>Место происшествия</small>
-              <b>{card.address}</b>
-              <Tooltip title="Карта не подключена в учебном контуре">
-                <Button size="small" disabled>
-                  карта
-                </Button>
-              </Tooltip>
+            <div className="arm-field arm-address-card">
+              <div className="arm-address-head">
+                <div>
+                  <small>Адрес:</small>
+                  <b>{card.address}</b>
+                </div>
+                <Tooltip title="Открыть учебную карту адреса">
+                  <Button
+                    aria-label="Открыть карту"
+                    size="small"
+                    icon={<EnvironmentOutlined />}
+                    onClick={() => setPanel('map')}
+                  >
+                    карта
+                  </Button>
+                </Tooltip>
+              </div>
+              <div className="arm-address-grid">
+                {addressGrid.map(([label, value]) => (
+                  <div key={label}>
+                    <small>{label}</small>
+                    <span>{value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="arm-address-descriptive">
+                <small>Описательный адрес:</small>
+                <span>{card.address}</span>
+              </div>
             </div>
             <div className="arm-field arm-description">
+              <small>Описание со слов заявителя</small>
               <b>{date(card.created_at)} · Система-112 · учебное сообщение</b>
               <p>{card.comments || 'Описание не заполнено'}</p>
             </div>
           </section>
           <section className="arm-right" aria-label="Классификация">
             <div className="arm-flags">
-              <span>Пострадавшие: нет данных</span>
-              <span>Отказ от скорой: нет данных</span>
-              <span>Заблокированные: нет данных</span>
+              <Button>Пострадавшие: нет</Button>
+              <Button>Нет на месте / отказ от скорой: нет</Button>
+              <Button>Нет доступа / заблокированные: нет</Button>
               <Tooltip title="Признак ЧС не передаётся текущим API">
                 <span>
                   <Button disabled icon={<ThunderboltOutlined />}>
@@ -463,7 +512,7 @@ export function Workspace() {
             </div>
             <h2 className="arm-type">Происшествие: {card.incident_type}</h2>
             <div className="arm-field arm-features">
-              <small>Формализованные признаки</small>
+              <small>Признаки происшествия</small>
               {card.classification?.features.length
                 ? card.classification.features.join(' . ')
                 : 'Признаки не указаны'}
@@ -537,13 +586,17 @@ export function Workspace() {
             ? 'История действий'
             : panel === 'routes'
               ? 'Список оповещения и условия классификатора'
-              : 'Сведения о занятии'
+              : panel === 'map'
+                ? 'Карта и адрес'
+                : 'Сведения о занятии'
         }
         open={panel !== null}
         onClose={() => setPanel(null)}
       >
         {panel === 'history' ? (
           <History events={card.events || []} />
+        ) : panel === 'map' ? (
+          <MapPanel address={card.address} />
         ) : panel === 'routes' ? (
           <>
             <Alert

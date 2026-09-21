@@ -16,6 +16,19 @@ Playwright desktop/mobile.
 | `.\.venv\Scripts\pytest.exe backend\tests` | 15 passed, 2 warnings Starlette/httpx/AnyIO |
 | `git diff --check` | Passed |
 
+Дополнительный UI/map pass 21.09.2026 после добавления заказчиком `КАРТОЧКА 112.docx`
+и `СЛУЖБЫ 112.docx`: extractor теперь кэширует embedded media из всех customer DOCX;
+из новых файлов локально извлечено 39 и 55 PNG соответственно. Рабочая карточка получила
+frontend-only адресную сетку в стиле Card-112, оранжевую активную service/action bar
+`#ec653b`, кнопку `карта` и локальный `MapPanel` mock. Реальный Yandex Maps/geocoding
+не включён: отправка адреса происшествия во внешний сервис требует отдельного разрешения
+и ключа. `scripts/extract_sources.py` в текущей backend `.venv` passed с честным skip
+PDF/XLSX частей до установки `scripts/requirements-tools.txt`, при этом DOCX media cache
+обновлён. Проверки этого прохода: `npm run build` passed, `npx playwright test
+tests/arm.spec.ts` 8 passed, `npm test` 16 passed, `.venv\Scripts\pytest.exe backend\tests`
+15 passed, `.venv\Scripts\ruff.exe check scripts\extract_sources.py` passed,
+`git diff --check` passed.
+
 Повторный визуальный проход по `Работа с АРМ-112 для ДДС от ОКр_ГСИ.pdf` и
 `СКРИНШОТ ДДСГСИ.docx` выполнен 21.09.2026 после коммита `af05611`.
 Изменения: более плотная ARM-сетка, реальные source-colors, справочные плитки

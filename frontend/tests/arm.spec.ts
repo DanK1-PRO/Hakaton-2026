@@ -62,10 +62,12 @@ test('ARM source layout, service history and training context remain accessible'
         history: box('.arm-service-history'),
         bar: box('.arm-service-bar'),
         bg: getComputedStyle(document.querySelector('.arm-scene')!).backgroundColor,
+        serviceBg: getComputedStyle(document.querySelector('.arm-service-bar')!).backgroundColor,
         overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
       };
     });
     expect(geometry.bg).toBe('rgb(201, 206, 209)');
+    expect(geometry.serviceBg).toBe('rgb(236, 101, 59)');
     expect(geometry.overflow).toBeFalsy();
     expect(geometry.phone.bottom).toBeLessThanOrEqual(geometry.left.y);
     expect(geometry.history.bottom).toBeLessThanOrEqual(geometry.bar.y + 1);
@@ -85,6 +87,10 @@ test('ARM source layout, service history and training context remain accessible'
   ).toBeVisible();
   await page.getByRole('tab', { name: 'Учебный материал', exact: true }).click();
   await expect(page.getByText('Информация от реагирующей службы', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
+  await page.getByRole('button', { name: 'Открыть карту', exact: true }).click();
+  await expect(page.getByTestId('arm-map-panel')).toBeVisible();
+  await expect(page.getByText('Учебная карта работает локально', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Список оповещения', exact: true }).click();
   await expect(
