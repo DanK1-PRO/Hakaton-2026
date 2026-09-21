@@ -34,6 +34,8 @@ Danil branch `ui/danil-integration-review` is active locally. It adds a source-l
 
 Sanya branch `origin/ui/sanya-results-admin` currently points to `e81b63144798036f7b231ea6fc8a323cb2d8995d`. It changes incident filters, results, admin users, styles and flow tests. Do not merge automatically: one known integration adjustment is needed because `frontend/tests/flow.spec.ts:149` still targets `.workspace-heading`, which Danil's ARM workspace removes.
 
+Branch integration stitches are tracked in `docs/team/INTEGRATION_STITCHES.ru.md`. Before an Astra final integration pass, show Danil the full list of open stitches so he can decide whether owners fix them, Codex fixes them on an integration branch, or the issue is deferred.
+
 Additional branches seen on origin: `ui/nikita-card-flow`, `LocalAPI`, `hht`, updated `ml/scoring-experiment`. Treat them as unreviewed until inspected.
 
 ## Important Boundaries
