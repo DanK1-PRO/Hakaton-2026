@@ -35,5 +35,5 @@ Do not auto-implement real telephony, scoring weights, full ticket OCR, encrypti
 - [x] Local verification after UI merge and offline-map pass: frontend build, 20 browser tests, 15 backend tests, diff check.
 - [x] External map API/Yandex flow removed; `MapPanel` now works as local Moscow training map.
 - [x] Push integrated UI branch to GitHub: `55844b8`.
-- [ ] Wait for GitHub CI on the latest UI integration commit.
+- [x] GitHub CI on pushed UI integration head `b3a9fe9`: runs 35624475674 and 35624470738 passed.
 - [ ] Review Maxim `ml/scoring-experiment` after UI branches are stable; preserve `ML_MODE=mock` as regression path.
