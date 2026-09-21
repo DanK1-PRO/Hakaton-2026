@@ -146,9 +146,9 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   );
   expect(overflow).toBeFalsy();
   await setStatus('Работы завершены', 'Вода перекрыта, течь устранена. Работы завершены.');
-  await expect(
-    page.locator('.workspace-heading').getByText('Работы завершены', { exact: true }),
-  ).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText('Редактирование закрыто', { exact: true })).toBeVisible({
+    timeout: 15000,
+  });
   await expect(
     page.getByRole('button', { name: 'Редактировать карточку', exact: true }),
   ).toBeHidden();

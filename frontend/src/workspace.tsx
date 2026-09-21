@@ -154,11 +154,17 @@ export function Workspace() {
   }, [dirty]);
   if (isLoading)
     return (
-      <div className="full-loading">
-        <Spin />
+      <div className="workspace-loading">
+        <Spin size="large" />
+        <span>Загрузка карточки происшествия...</span>
       </div>
     );
-  if (!card) return <ErrorPanel error={error} retry={refetch} />;
+  if (!card)
+    return (
+      <div className="workspace-empty">
+        <ErrorPanel error={error} retry={refetch} />
+      </div>
+    );
   const own = card.owner_id === user.id;
   const locked =
     ['completed', 'refused'].includes(card.status) || card.session_status === 'finished';

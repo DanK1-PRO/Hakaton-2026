@@ -684,6 +684,18 @@
   background: #dfe5e7;
   border: 1px solid #9aa6ac;
 }
+.arm-map-consent {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.1fr) minmax(220px, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  background: #eef1f2;
+  border: 1px solid #c8d0d4;
+}
+.arm-map-consent .ant-checkbox-wrapper {
+  font-size: 12px;
+}
 .arm-map-grid {
   position: absolute;
   inset: 0;
@@ -834,6 +846,9 @@
   }
   .arm-map-head {
     flex-direction: column;
+  }
+  .arm-map-consent {
+    grid-template-columns: minmax(0, 1fr);
   }
   .arm-service-history {
     margin-left: 0;

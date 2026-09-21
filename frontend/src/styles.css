@@ -580,6 +580,18 @@ small {
   display: grid;
   place-items: center;
 }
+.workspace-loading {
+  min-height: 55vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #63777c;
+}
+.workspace-empty {
+  padding: 40px 16px;
+}
 .ant-alert-description,
 .ant-descriptions-item-content {
   overflow-wrap: anywhere;
