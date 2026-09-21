@@ -1,5 +1,36 @@
 # Протокол Проверки
 
+## 21.09.2026 — ветка `ui/danil-integration-review`
+
+Объект: интеграционная UI-ветка Даниила с приближением рабочего места ДДС к
+скриншотам заказчика и защитой стыков перед ветками Сани/Никиты/ML. Локально:
+Windows, PostgreSQL 15, API `127.0.0.1:8000`, UI `127.0.0.1:5173`, Chromium
+Playwright desktop/mobile.
+
+| Проверка | Фактический результат |
+|---|---|
+| `scripts/windows/start-app.ps1` | Успешно подняты DB/API/UI; `.env` сохранён |
+| `npm run build` в `frontend` | TypeScript + Vite production build passed; остаётся предупреждение о vendor bundle >500 kB |
+| `npx playwright test tests/arm.spec.ts` | 8 passed, 40.9s; ARM layout, история службы, conflict reload, отказ, lock, staff view |
+| `npm test` в `frontend` | 16 passed, 1.5m; старые flow + новые ARM desktop/mobile |
+| `.\.venv\Scripts\pytest.exe backend\tests` | 15 passed, 2 warnings Starlette/httpx/AnyIO |
+| `git diff --check` | Passed |
+
+Новые скриншоты: `docs/images/arm-reference-desktop.png`,
+`docs/images/arm-reference-mobile.png`, `docs/images/arm-reaction-desktop.png`,
+`docs/images/arm-reaction-mobile.png`. Снимки содержат синтетические учебные данные.
+
+Зафиксированное ограничение: это учебное приближение к АРМ ДДС, не полная копия
+всех служебных панелей. Реализована одна ДДС, mock-связь и справочный список
+маршрутов без фактической передачи другим службам.
+
+Интеграционная проверка ветки Сани `origin/ui/sanya-results-admin`:
+ветка меняет `frontend/src/pages.tsx`, `frontend/src/results.tsx`,
+`frontend/src/styles.css`, `frontend/tests/flow.spec.ts`, docs/images. Прямого
+конфликта с `workspace.tsx`/`frontend/src/arm/*` нет, но перед общим merge нужно
+обновить тест `frontend/tests/flow.spec.ts:149`: локатор `.workspace-heading`
+устарел после нового ARM-экрана Даниила.
+
 Дата: 20.09.2026. Объект: DDS-2026 v0.1.0, программа-минимум Даниила.
 Локально Windows, Python 3.12, PostgreSQL 15.18 (изолированный переносимый запуск),
 Chromium Playwright. Python 3.11 проверен в CI/контейнере.

@@ -1,6 +1,6 @@
 # Task Queue
 
-Updated: 2026-09-20.
+Updated: 2026-09-21.
 
 ## Implementation Pass
 
@@ -26,3 +26,12 @@ Updated: 2026-09-20.
 
 Do not auto-implement real telephony, scoring weights, full ticket OCR, encryption,
 100-user certification or unrelated UI redesign as part of the completed Danil slice.
+
+## Active Team Integration
+
+- [x] Danil branch `ui/danil-integration-review`: ARM-like DDS workspace layout, conflict-safe edit/reaction flow, service dock, screenshots, and browser coverage.
+- [x] Local verification for Danil branch: frontend build, 16 browser tests, 15 backend tests, diff check.
+- [ ] Commit and push Danil branch after final local review.
+- [ ] Sanya PR/branch: functionally promising, but update the old `.workspace-heading` test locator before final combined merge.
+- [ ] Review Nikita branch `origin/ui/nikita-card-flow` separately; do not assume compatibility yet.
+- [ ] Review Maxim `ml/scoring-experiment` after UI branches are stable; preserve `ML_MODE=mock` as regression path.

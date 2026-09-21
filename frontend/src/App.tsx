@@ -120,7 +120,16 @@ function Shell() {
       : []),
   ];
   return (
-    <Layout className="app-layout">
+    <Layout
+      className={
+        'app-layout arm-shell ' +
+        (location.pathname === '/incidents'
+          ? 'arm-list'
+          : location.pathname.startsWith('/incidents/')
+            ? 'arm-card-page'
+            : 'arm-training-page')
+      }
+    >
       <header className="topbar">
         <Link to="/incidents" className="brand">
           <div className="brand-mark">
@@ -165,7 +174,7 @@ function Shell() {
         <Routes>
           <Route path="/" element={<Navigate to="/incidents" replace />} />
           <Route path="/incidents" element={<IncidentList />} />
-          <Route path="/incidents/:id" element={<Workspace />} />
+          <Route path="/incidents/:id" element={<Workspace key={location.pathname} />} />
           <Route path="/training" element={<Training />} />
           <Route path="/results" element={<Results />} />
           <Route
