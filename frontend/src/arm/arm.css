@@ -11,10 +11,11 @@
   font-family: Arial, sans-serif;
 }
 .arm-shell .topbar {
-  min-height: 42px;
-  padding: 4px 12px;
+  min-height: 38px;
+  padding: 3px 10px;
   gap: 8px;
-  background: #efefef;
+  background: #ebecec;
+  border-bottom: 1px solid #8f999e;
 }
 .arm-shell .brand {
   gap: 8px;
@@ -43,16 +44,19 @@
   padding: 0 8px;
 }
 .arm-shell .main-nav .ant-menu {
-  line-height: 34px;
+  line-height: 30px;
   font-size: 12px;
 }
 .arm-shell .statusbar {
-  padding: 5px 12px;
+  padding: 4px 12px;
 }
 .arm-shell .ant-btn,
 .arm-shell .ant-input,
 .arm-shell .ant-select-selector {
   border-radius: 1px;
+}
+.ant-tooltip {
+  pointer-events: none;
 }
 .arm-card-page {
   background: var(--arm-canvas);
@@ -68,19 +72,31 @@
     sans-serif;
 }
 .arm-training-rail {
-  padding: 4px 8px;
+  min-height: 34px;
+  padding: 3px 8px;
   display: flex;
   gap: 8px;
   align-items: center;
   justify-content: space-between;
-  background: #fafafa;
-  border-bottom: 1px solid #aeb8bd;
+  background: #ebecec;
+  border-bottom: 1px solid #6f797f;
+}
+.arm-toolbar-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 .arm-training-rail .ant-btn,
 .arm-call-actions .ant-btn {
-  height: 26px;
+  height: 24px;
   font-size: 12px;
-  padding-inline: 8px;
+  padding-inline: 7px;
+}
+.arm-help-button,
+.arm-finish-button {
+  background: #303335;
+  border-color: #303335;
+  color: #fff;
 }
 .arm-ack {
   font-size: 12px;
@@ -92,10 +108,10 @@
   font-weight: bold;
 }
 .arm-scene {
-  min-height: calc(100dvh - 151px);
+  min-height: calc(100dvh - 138px);
   display: flex;
   flex-direction: column;
-  padding: 7px 8px 0;
+  padding: 6px 8px 0;
   background: var(--arm-canvas);
 }
 .arm-phone {
@@ -103,19 +119,19 @@
   grid-template-columns:
     minmax(225px, 1.05fr) repeat(3, minmax(95px, 1.35fr)) minmax(168px, 0.8fr)
     98px;
-  gap: 8px;
+  gap: 6px;
 }
 .arm-phone > div {
   background: var(--arm-panel);
   min-width: 0;
-  min-height: 64px;
+  min-height: 58px;
   overflow-wrap: anywhere;
 }
 .arm-phone-state {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 6px 8px;
+  padding: 5px 8px;
 }
 .arm-phone-state > .anticon {
   font-size: 22px;
@@ -126,7 +142,7 @@
 .arm-phone-links {
   display: flex;
   gap: 6px;
-  margin-top: 9px;
+  margin-top: 7px;
 }
 .arm-phone-links .ant-btn {
   height: 21px;
@@ -134,10 +150,10 @@
   padding: 0 7px;
 }
 .arm-phone-field {
-  padding: 4px 9px;
+  padding: 4px 8px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 .arm-phone small {
   font-size: 11px;
@@ -149,10 +165,10 @@
   font-size: 13px;
 }
 .arm-identity {
-  padding: 6px 8px;
+  padding: 5px 8px;
 }
 .arm-identity h1 {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.2;
   margin: 0 0 2px;
   overflow-wrap: anywhere;
@@ -187,8 +203,8 @@
   justify-content: flex-start;
   align-items: center;
   gap: 6px;
-  padding: 4px 0;
-  min-height: 34px;
+  padding: 3px 0;
+  min-height: 30px;
 }
 .arm-call-actions > span {
   color: #46535b;
@@ -197,8 +213,8 @@
 .arm-details {
   display: grid;
   grid-template-columns: minmax(0, 0.84fr) minmax(0, 1fr);
-  gap: 8px;
-  margin-top: 7px;
+  gap: 7px;
+  margin-top: 6px;
 }
 .arm-left,
 .arm-right {
@@ -206,13 +222,20 @@
 }
 .arm-field {
   background: var(--arm-panel);
-  padding: 8px;
-  margin-bottom: 8px;
+  padding: 7px 8px;
+  margin-bottom: 7px;
+  display: block;
   overflow-wrap: anywhere;
   min-height: 32px;
 }
+.arm-field small {
+  display: block;
+  color: #54585c;
+  font-size: 10px;
+  margin-bottom: 3px;
+}
 .arm-caller {
-  min-height: 41px;
+  min-height: 38px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -221,12 +244,21 @@
   font-size: 10px;
 }
 .arm-address {
-  min-height: 53px;
-  display: flex;
-  align-items: center;
+  min-height: 54px;
+  position: relative;
+  padding-right: 54px;
+}
+.arm-address .ant-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 24px;
+  font-size: 10px;
+  padding-inline: 6px;
 }
 .arm-description {
-  min-height: 310px;
+  min-height: 336px;
 }
 .arm-description p {
   white-space: pre-wrap;
@@ -234,13 +266,13 @@
   margin: 4px 0 0;
 }
 .arm-flags {
-  min-height: 41px;
+  min-height: 38px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 6px 8px;
-  margin-bottom: 8px;
+  gap: 7px;
+  padding: 5px 8px;
+  margin-bottom: 7px;
   background: var(--arm-panel);
 }
 .arm-flags .ant-btn {
@@ -252,6 +284,7 @@
   font:
     bold 13px Arial,
     sans-serif;
+  min-height: 32px;
   padding: 7px 10px;
   background: var(--arm-class);
   color: white;
@@ -260,18 +293,24 @@
 }
 .arm-features {
   font-weight: bold;
-  min-height: 32px;
+  min-height: 58px;
+}
+.arm-training-note {
+  background: #dbe7ee;
+  border-left: 4px solid var(--arm-active);
+  font-size: 11px;
 }
 .arm-service-dock {
   margin-top: auto;
-  padding-top: 24px;
+  padding-top: 14px;
 }
 .arm-service-history {
   background: var(--arm-active);
   color: #fff;
-  width: min(680px, 100%);
-  margin-left: min(14%, 280px);
-  max-width: calc(100% - min(14%, 280px));
+  width: min(760px, 100%);
+  margin-left: min(15%, 300px);
+  max-width: calc(100% - min(15%, 300px));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
 }
 .arm-service-title {
   padding: 2px 8px;
@@ -284,7 +323,7 @@
   height: 26px;
 }
 .arm-service-events {
-  max-height: 160px;
+  max-height: 148px;
   overflow-y: auto;
   padding: 0 8px 8px;
 }
@@ -302,20 +341,46 @@
 .arm-service-bar {
   display: flex;
   align-items: stretch;
-  min-height: 64px;
+  min-height: 62px;
   background: var(--arm-service);
   color: white;
-  gap: 0;
+  gap: 1px;
+  overflow-x: auto;
 }
 .arm-service-caption {
   align-self: center;
   padding: 8px;
 }
 .arm-service-tile {
-  min-width: 200px;
+  min-width: 204px;
   max-width: 420px;
   background: var(--arm-active);
   padding: 2px 7px;
+}
+.arm-service-reference {
+  background: #3e4a52;
+  color: #dce7ec;
+  flex: 0 0 178px;
+}
+.arm-service-reference button {
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  padding: 3px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font:
+    bold 11px Arial,
+    sans-serif;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.arm-service-reference span {
+  display: block;
+  padding: 0 3px 4px;
+  font-size: 10px;
 }
 .arm-service-tile > .ant-btn {
   color: #fff;
@@ -393,7 +458,7 @@
   top: auto;
   padding: 0;
   position: absolute;
-  bottom: 100px;
+  bottom: 78px;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -401,11 +466,22 @@
   overflow: auto;
 }
 .arm-reaction-modal .ant-modal-content {
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 0;
+  background: #1b5173;
+  color: white;
+  box-shadow: 0 0 0 1px #6d8798;
 }
 .arm-reaction-modal .ant-modal-title {
   font-size: 13px;
+  color: #fff;
+}
+.arm-reaction-modal .ant-modal-close {
+  color: #fff;
+}
+.arm-reaction-modal .ant-modal-header {
+  margin-bottom: 8px;
+  background: transparent;
 }
 .arm-reaction-form {
   display: grid;
@@ -421,6 +497,12 @@
 }
 .arm-reaction-form .ant-form-item-label > label {
   font-size: 12px;
+  color: #fff;
+}
+.arm-reaction-form .ant-input,
+.arm-reaction-form .ant-select-selector {
+  border-color: #8aa8ba !important;
+  background: #f6f6f6 !important;
 }
 .arm-reaction-actions {
   padding-top: 25px;

@@ -27,6 +27,11 @@ export function ServiceDock({ card, own, locked, busy, onReact, onRoutes, onHist
   );
   const service = card.scenario?.service || 'ДДС учебного района';
   const lastEvent = events.at(-1);
+  const referenceServices = Array.from(
+    new Set((card.classification?.routes || []).map((route) => route.service).filter(Boolean)),
+  )
+    .filter((name) => name !== service && !name.toLowerCase().includes('нет реагирования'))
+    .slice(0, 5);
   return (
     <section className="arm-service-dock" aria-label="Реагирование службы">
       {expanded ? (
@@ -93,6 +98,14 @@ export function ServiceDock({ card, own, locked, busy, onReact, onRoutes, onHist
             ) : null}
           </div>
         </div>
+        {referenceServices.map((name) => (
+          <div className="arm-service-tile arm-service-reference" key={name}>
+            <button type="button" aria-label={'Справочная служба ' + name} onClick={onRoutes}>
+              {name}
+            </button>
+            <span>справочник ЕКП</span>
+          </div>
+        ))}
         <div className="arm-service-tools">
           <Tooltip title="Список оповещения и условия классификатора">
             <Button

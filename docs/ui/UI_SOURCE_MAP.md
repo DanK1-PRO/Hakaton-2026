@@ -9,4 +9,4 @@
 | Training catalogue | master §34 | Scenarios/difficulty/start | TEAM_PROPOSAL visual layout |
 | Results | master §§16-17,34 | Findings/timing/instructor correction | TEAM_PROPOSAL visual layout |
 
-Observed reference layout is preserved as functional bands and source-measured colors where practical: card canvas `#c9ced1`, panels `#efefef`, services `#49555d`, active service/history `#157dbd`, list canvas `#838f97`, classification header `#303335`. Mobile stacks the same blocks. No claim of a pixel-perfect production ARM replica. No actual telephone numbers from the source screenshots appear in the demo.
+Observed reference layout is preserved as functional bands and source-measured colors where practical: card canvas `#c9ced1`, panels `#efefef`, services `#49555d`, active service/history `#157dbd`, list canvas `#838f97`, classification header `#303335`, reaction editor `#1b5173` family. Details of the latest visual pass are in `docs/ui/ARM_VISUAL_REFERENCE_PASS.md`. Mobile stacks the same blocks. No claim of a pixel-perfect production ARM replica. No actual telephone numbers from the source screenshots appear in the demo.

@@ -271,7 +271,7 @@ export function Workspace() {
               onClick={() => navigate('/incidents')}
             />
           </Tooltip>
-          <span>Учебная карточка</span>
+          <span className="arm-toolbar-title">Карточка происшествия</span>
           <span
             className={'arm-ack ' + (!card.acknowledged_at && elapsed > 30 ? 'arm-ack-late' : '')}
             role="status"
@@ -282,6 +282,7 @@ export function Workspace() {
         <Space wrap>
           <Tooltip title="Сведения о занятии и действии">
             <Button
+              className="arm-help-button"
               aria-label="Сведения о занятии"
               icon={<InfoCircleOutlined />}
               onClick={() => setPanel('help')}
@@ -309,6 +310,7 @@ export function Workspace() {
               }}
             >
               <Button
+                className="arm-finish-button"
                 icon={<CheckOutlined />}
                 loading={finishing}
                 disabled={busy || editOpen || reactionOpen}
@@ -369,9 +371,9 @@ export function Workspace() {
             <span>Нет данных</span>
           </div>
           <div className="arm-identity">
-            <h1>Происшествие {card.number}</h1>
-            <small>Сохр. {date(card.updated_at)}</small>
-            <small>{user.name}</small>
+            <h1>{card.number}</h1>
+            <small>сохр. {date(card.updated_at)}</small>
+            <small>оп. {user.name}</small>
           </div>
           <div className="arm-mode">
             <span>просмотр</span>
@@ -388,7 +390,7 @@ export function Workspace() {
         </section>
         {own && !locked ? (
           <div className="arm-call-actions">
-            <span>Учебная связь</span>
+            <span>Связь</span>
             {callState === 'hangup' ? (
               <Button
                 icon={<PhoneOutlined />}
@@ -426,10 +428,16 @@ export function Workspace() {
               <span>{card.name || 'Не указано'}</span>
             </div>
             <div className="arm-field arm-address">
+              <small>Место происшествия</small>
               <b>{card.address}</b>
+              <Tooltip title="Карта не подключена в учебном контуре">
+                <Button size="small" disabled>
+                  карта
+                </Button>
+              </Tooltip>
             </div>
             <div className="arm-field arm-description">
-              <b>{date(card.created_at)} · Учебное сообщение</b>
+              <b>{date(card.created_at)} · Система-112 · учебное сообщение</b>
               <p>{card.comments || 'Описание не заполнено'}</p>
             </div>
           </section>
@@ -455,17 +463,26 @@ export function Workspace() {
             </div>
             <h2 className="arm-type">Происшествие: {card.incident_type}</h2>
             <div className="arm-field arm-features">
+              <small>Формализованные признаки</small>
               {card.classification?.features.length
                 ? card.classification.features.join(' . ')
                 : 'Признаки не указаны'}
             </div>
             <div className="arm-field">
-              Класс.: <b>{card.incident_type}</b>
+              <small>Класс.</small>
+              <b>{card.incident_type}</b>
             </div>
             <div className="arm-field">
               <Tooltip title="Классификация внешней информационной системы не подключена">
-                <span>[ВИС] Класс.: нет данных</span>
+                <span>
+                  <small>[ВИС] Класс.</small>
+                  нет данных
+                </span>
               </Tooltip>
+            </div>
+            <div className="arm-field arm-training-note">
+              <small>Учебное расширение</small>
+              Подсказки и результаты доступны через «?». Основные поля расположены как в АРМ.
             </div>
           </section>
         </div>

@@ -16,6 +16,15 @@ Playwright desktop/mobile.
 | `.\.venv\Scripts\pytest.exe backend\tests` | 15 passed, 2 warnings Starlette/httpx/AnyIO |
 | `git diff --check` | Passed |
 
+Повторный визуальный проход по `Работа с АРМ-112 для ДДС от ОКр_ГСИ.pdf` и
+`СКРИНШОТ ДДСГСИ.docx` выполнен 21.09.2026 после коммита `af05611`.
+Изменения: более плотная ARM-сетка, реальные source-colors, справочные плитки
+служб ЕКП, нижний синий редактор статуса, учебные подсказки вынесены из основного
+поля. Проверки после прохода: `npm run build` passed, `npx playwright test
+tests/arm.spec.ts` 8 passed, `npm test` 16 passed, backend pytest 15 passed.
+Контрольные computed colors совпали с source-палитрой для canvas/panel/service/
+active/classification блоков.
+
 Новые скриншоты: `docs/images/arm-reference-desktop.png`,
 `docs/images/arm-reference-mobile.png`, `docs/images/arm-reaction-desktop.png`,
 `docs/images/arm-reaction-mobile.png`. Снимки содержат синтетические учебные данные.
