@@ -40,6 +40,10 @@ Branch integration stitches are tracked in `docs/team/INTEGRATION_STITCHES.ru.md
 
 Additional branches seen on origin: `ui/nikita-card-flow`, `LocalAPI`, `hht`, updated `ml/scoring-experiment`. Treat them as unreviewed until inspected.
 
+Nikita branch `origin/ui/nikita-card-flow` points to `14ceaf58020b124de2e1034cf66a997b17e2c510`, PR #2 is open and CI is green against `main`. Merge-check into Danil branch shows a direct conflict in `frontend/src/workspace.tsx`; do not merge automatically. Track STITCH-003 and STITCH-004.
+
+Before ML, useful non-ML work is tracked in `docs/team/PRE_ML_WORKLIST.ru.md`: a full UI fidelity pass including Card-112 orange sources, map/address adapter planning, ML input/output contracts, and branch stitch cleanup.
+
 ## Important Boundaries
 
 Do not claim full general customer-spec acceptance. Real ASR/SIP/ML weights, groups,

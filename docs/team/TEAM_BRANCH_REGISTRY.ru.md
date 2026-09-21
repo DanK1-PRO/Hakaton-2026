@@ -14,7 +14,7 @@
 | `ui/danil-integration-review` | Даниил | ARM UI / интеграционная проверка | active local branch | Новый рабочий экран ДДС, service dock, conflict-safe формы, ARM-тесты. Не мержить в `main` до общей сборки веток. |
 | `ml/scoring-experiment` | Максим | ML / evaluator / scoring experiment | test branch | Ветка создана и запушена, обновлена на origin. Это пока тест подключения и эксперимент со скорингом, не готовый merge. |
 | `ui/sanya-results-admin` | Саня | UI / результаты / админка | PR review | PR #1 готов к ревью. Известный стык: тест `frontend/tests/flow.spec.ts` использует старый `.workspace-heading`, который исчезает в ветке Даниила. |
-| `ui/nikita-card-flow` | Никита | UI / рабочее место диспетчера / карточка | unreviewed branch | Ветка появилась на origin. Проверять отдельно, не считать готовой без ревью. |
+| `ui/nikita-card-flow` | Никита | UI / рабочее место диспетчера / карточка | PR review | PR #2 открыт, CI зелёный относительно `main`. С веткой Даниила есть прямой конфликт `frontend/src/workspace.tsx`; переносить вручную, не мержить кнопкой. |
 | `LocalAPI` | неизвестно | API / локальный эксперимент | unreviewed branch | Ветка появилась на origin; владелец и цель требуют уточнения. |
 | `hht` | неизвестно | неизвестно | unreviewed branch | Ветка появилась на origin; владелец и цель требуют уточнения. |
 
@@ -47,6 +47,10 @@
 ## Текущее замечание по ветке Сани
 
 `ui/sanya-results-admin` выглядит аккуратно по зоне: списки, результаты, админка, тесты и docs/images. Перед финальным merge с веткой Даниила нужно заменить проверку `frontend/tests/flow.spec.ts:149` на локатор нового ARM service dock или статус из API, потому что `.workspace-heading` больше не является частью карточки.
+
+## Текущее замечание по ветке Никиты
+
+`ui/nikita-card-flow` содержит полезные идеи для эргономики карточки: loading/error states, окрашивание Timeline, более устойчивый locked-test, мобильные улучшения. Но ветка построена на старой карточке до ARM-прохода Даниила. Временный merge-check с `ui/danil-integration-review` дал конфликт в `frontend/src/workspace.tsx`. Общий `styles.css` Никиты добавляет gradients/radius/shadows, которые противоречат текущей цели копировать АРМ. Решение: не мержить напрямую; вручную перенести только совместимые идеи.
 
 ## Как обновлять этот реестр
 
