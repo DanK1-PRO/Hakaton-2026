@@ -34,6 +34,8 @@ Danil branch `ui/danil-integration-review` is the active integrated UI branch. I
 
 Latest visual pass on 2026-09-21 tightened fidelity to `Работа с АРМ-112 для ДДС от ОКр_ГСИ.pdf`, `СКРИНШОТ ДДСГСИ.docx`, `СКРИНШОТ КАРТОЧКИ 112ГСИ.docx`, plus new `КАРТОЧКА 112.docx` and `СЛУЖБЫ 112.docx`: flatter ARM panels, denser address grid, route/reference service tiles, Card-112 orange action/service bar, bottom blue reaction editor, fully local Moscow `MapPanel`, and training help moved behind `?`. External map APIs/Yandex key flow were removed per closed-contour requirement; the future accurate GIS path is a local OSM/PMTiles/MBTiles package documented in `docs/maps/OFFLINE_MAP_PLAN.ru.md`. Details: `docs/ui/ARM_VISUAL_REFERENCE_PASS.md`.
 
+Full UI audit on 2026-09-22 compared every screen to customer screenshots and fixed: 14-field Card-112 address grid, classifier code in type header, `Класс.: … ;`, trailing feature dots, grey flag chips + amber ЧП + pencil, caller status/result selects, call/overdue timer box, light reaction bar (was dark blue) without operator field, Дата/Время list columns, `оп. ДДС ·` history prefix, mobile service-dock tile collapse, desktop lock-note letter wrap. Console clean; 22 Playwright + 15 pytest green. Evidence: `docs/VERIFICATION.md`, `docs/images/ui-audit-*.png`.
+
 Sanya branch `origin/ui/sanya-results-admin` has been integrated into Danil's UI branch. Its results/admin/filter work is included; screenshots were regenerated after the common merge.
 
 Branch integration stitches are tracked in `docs/team/INTEGRATION_STITCHES.ru.md`. Before an Astra final integration pass, show Danil the full list of open stitches so he can decide whether owners fix them, Codex fixes them on an integration branch, or the issue is deferred.

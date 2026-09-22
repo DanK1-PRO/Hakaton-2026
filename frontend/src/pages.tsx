@@ -226,7 +226,7 @@ export function IncidentList() {
         className="incident-table"
         dataSource={data?.items}
         loading={isFetching && !data}
-        scroll={{ x: 1020 }}
+        scroll={{ x: 1100 }}
         pagination={{
           current: page,
           total: data?.total,
@@ -263,16 +263,32 @@ export function IncidentList() {
           {
             title: 'Номер',
             dataIndex: 'number',
-            width: 120,
+            width: 110,
             render: (v: string, row: Incident) => <Link to={'/incidents/' + row.id}>{v}</Link>,
           },
-          { title: 'Поступило', dataIndex: 'created_at', width: 158, render: date },
-          { title: 'Тип происшествия', dataIndex: 'incident_type', width: 240 },
+          {
+            title: 'Дата',
+            dataIndex: 'created_at',
+            width: 100,
+            render: (v: string) => new Date(v).toLocaleDateString('ru-RU'),
+          },
+          {
+            title: 'Время',
+            dataIndex: 'created_at',
+            width: 90,
+            render: (v: string) =>
+              new Date(v).toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              }),
+          },
+          { title: 'Тип происшествия', dataIndex: 'incident_type', width: 230 },
           { title: 'Адрес', dataIndex: 'address' },
           {
             title: 'Заявитель',
             dataIndex: 'name',
-            width: 170,
+            width: 160,
             render: (v: string, row: Incident) => (
               <>
                 {v}
@@ -283,7 +299,7 @@ export function IncidentList() {
           {
             title: 'Статус службы',
             dataIndex: 'status',
-            width: 190,
+            width: 180,
             render: (v: string, row: Incident) => (
               <>
                 <Status value={v} />

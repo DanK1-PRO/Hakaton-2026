@@ -58,16 +58,24 @@ function addressParts(address: string) {
   const street = parts.find((part) => /улица|проспект|проезд|переулок|шоссе|площадь/i.test(part));
   const house = parts.find((part) => /\bд\.?\s*\d|дом\s*\d|\b\d+[а-я]?\b/i.test(part));
   const entrance = parts.find((part) => /под\.?|подъезд/i.test(part));
+  const corpus = parts.find((part) => /к\.?\s*\d|корп/i.test(part));
+  const flat = parts.find((part) => /кв\.?\s*\d|квартира/i.test(part));
+  const floor = parts.find((part) => /этаж\s*\d|\b\d\s*этаж/i.test(part));
   return [
     ['Страна', value(0, 'Россия')],
     ['Субъект', value(1, 'Москва')],
     ['Населённый пункт', value(1, 'Москва')],
+    ['Объект', parts.find((part) => /объект|строение/i.test(part)) || 'не указано'],
     ['Округ', district || 'не указано'],
     ['Район', district || 'не указано'],
     ['Улица', street || value(2)],
     ['Дом/Вл', house || 'не указано'],
-    ['Корпус', parts.find((part) => /к\.?\s*\d|корп/i.test(part)) || 'не указано'],
+    ['Корпус', corpus || 'не указано'],
+    ['Стр/сокр', 'не указано'],
+    ['Квартира/офис', flat || 'не указано'],
     ['Подъезд', entrance || 'не указано'],
+    ['Этаж', floor || 'не указано'],
+    ['Код', 'не указано'],
   ];
 }
 
@@ -178,6 +186,10 @@ export function Workspace() {
   const callState = last?.payload.action || 'hangup';
   const routes = card.classification?.routes || [];
   const addressGrid = addressParts(card.address);
+  const typeCode = types.find((t) => t.id === card.incident_type_id)?.external_code;
+  const callSeconds = last
+    ? Math.max(0, (now - new Date(last.created_at).getTime()) / 1000)
+    : 0;
   const currentCard = async () => {
     if (pendingPhone.current) await pendingPhone.current;
     return api.endpoints.incident.select(id)(store.getState()).data || card;
@@ -403,9 +415,22 @@ export function Workspace() {
             <span>Нет данных</span>
           </div>
           <div className="arm-identity">
-            <h1>{card.number}</h1>
-            <small>сохр. {date(card.updated_at)}</small>
-            <small>оп. {user.name}</small>
+            <div className="arm-identity-main">
+              <h1>{card.number}</h1>
+              <small>сохр. {date(card.updated_at)}</small>
+              <small>оп. {user.name}</small>
+            </div>
+            {callState === 'answer' || callState === 'ring' ? (
+              <div className="arm-timer-box" role="timer" aria-label="Таймер вызова">
+                <b>{time(callSeconds)}</b>
+                <small>минут секунд</small>
+              </div>
+            ) : !card.acknowledged_at && !locked && elapsed > 30 ? (
+              <div className="arm-timer-box arm-timer-late" role="timer" aria-label="Таймер подтверждения">
+                <b>{time(elapsed)}</b>
+                <small>минут секунд</small>
+              </div>
+            ) : null}
           </div>
           <div className="arm-mode">
             <span>просмотр</span>
@@ -459,6 +484,24 @@ export function Workspace() {
               <small>Фамилия и имя заявителя</small>
               <b>{card.name || 'Не указано'}</b>
               <span className="arm-caller-status">очевидец</span>
+              <Tooltip title="Учебный контур: статусы обращения не подключены">
+                <Select
+                  className="arm-caller-select"
+                  size="small"
+                  disabled
+                  placeholder="Выберите статус"
+                  aria-label="Статус обращения"
+                />
+              </Tooltip>
+              <Tooltip title="Учебный контур: итог обращения не подключён">
+                <Select
+                  className="arm-caller-select"
+                  size="small"
+                  disabled
+                  placeholder="Итог обращения"
+                  aria-label="Итог обращения"
+                />
+              </Tooltip>
             </div>
             <div className="arm-field arm-address-card">
               <div className="arm-address-head">
@@ -498,9 +541,9 @@ export function Workspace() {
           </section>
           <section className="arm-right" aria-label="Классификация">
             <div className="arm-flags">
-              <Button>Пострадавшие: нет</Button>
-              <Button>Нет на месте / отказ от скорой: нет</Button>
-              <Button>Нет доступа / заблокированные: нет</Button>
+              <span className="arm-flag-text">Пострадавшие: нет</span>
+              <span className="arm-flag-text">Отказ от скорой: нет</span>
+              <span className="arm-flag-text">Заблокированные: нет</span>
               <Tooltip title="Признак ЧС не передаётся текущим API">
                 <span>
                   <Button disabled icon={<ThunderboltOutlined />}>
@@ -510,22 +553,29 @@ export function Workspace() {
               </Tooltip>
               <Tooltip title="Признак ЧП не передаётся текущим API">
                 <span>
-                  <Button disabled icon={<WarningOutlined />}>
+                  <Button disabled className="arm-flag-emergency" icon={<WarningOutlined />}>
                     ЧП
                   </Button>
                 </span>
               </Tooltip>
+              <Tooltip title="Учебный контур: редактирование признаков не подключено">
+                <span>
+                  <Button disabled aria-label="Редактировать признаки" icon={<EditOutlined />} />
+                </span>
+              </Tooltip>
             </div>
-            <h2 className="arm-type">Происшествие: {card.incident_type}</h2>
+            <h2 className="arm-type">
+              Происшествие{typeCode ? ' ' + typeCode : ': ' + card.incident_type}
+            </h2>
             <div className="arm-field arm-features">
               <small>Признаки происшествия</small>
               {card.classification?.features.length
-                ? card.classification.features.join(' . ')
+                ? card.classification.features.join(' . ') + ' .'
                 : 'Признаки не указаны'}
             </div>
             <div className="arm-field">
-              <small>Класс.</small>
-              <b>{card.incident_type}</b>
+              <small>Класс.:</small>
+              <b>{card.incident_type} ;</b>
             </div>
             <div className="arm-field">
               <Tooltip title="Классификация внешней информационной системы не подключена">
@@ -791,9 +841,6 @@ export function Workspace() {
             <Select
               options={card.allowed_statuses.map((value) => ({ value, label: labels[value] }))}
             />
-          </Form.Item>
-          <Form.Item label="Оператор">
-            <Input value={user.name} readOnly />
           </Form.Item>
           <Form.Item noStyle shouldUpdate={(a, b) => a.status !== b.status}>
             {({ getFieldValue }) => (

@@ -37,4 +37,5 @@ Do not auto-implement real telephony, scoring weights, full ticket OCR, encrypti
 - [x] Push integrated UI branch to GitHub: `55844b8`.
 - [x] GitHub CI on pushed UI integration head `b3a9fe9`: runs 35624475674 and 35624470738 passed.
 - [x] Offline GIS pack: PMTiles Moscow + MapLibre + ODbL + range middleware + `map-gis.spec.ts`; preview prod-bundle fixed by copying `maplibre-gl-shared.mjs`; full suite 22 browser + 15 pytest green.
+- [x] Full UI audit vs customer screenshots (2026-09-22): address grid 14 fields, classifier header/code, flag chips, caller selects, call timer, light reaction bar, Дата/Время columns, mobile service-dock fix; 22+15 green.
 - [ ] Review Maxim `ml/scoring-experiment` after UI branches are stable; preserve `ML_MODE=mock` as regression path.

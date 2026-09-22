@@ -1,5 +1,50 @@
 # Протокол Проверки
 
+## 22.09.2026 — полный UI-аудит: сходство с АРМ, мобильная версия, мелкие баги
+
+Объект: проход по всему React UI сверке со скриншотами заказчика
+(`СКРИНШОТ ДДСГСИ.docx`, `СКРИНШОТ КАРТОЧКИ 112ГСИ.docx`, `СЛУЖБЫ 112.docx`,
+`КАРТОЧКА 112.docx`, памятка АРМ-112), проверка консоли, desktop/mobile.
+
+Найденные дефекты и правки:
+
+| Дефект | Источник сравнения | Правка |
+|---|---|---|
+| Мобильный service-dock сжимал плитки служб в вертикальный текст | mobile 390px vs `СЛУЖБЫ 112` | `arm.css`: min-width 148px, flex-basis, перенос строк |
+| «Занятие завершено» переносилось по буквам на десктопе | desktop service bar | `arm-lock-note`: `flex: none`, min-width 118px |
+| Адресная сетка без Объект/Стр/сокр/Квартира/Этаж/Код | Card-112 image1 (14 полей) | `addressParts()` расширен до 14 полей |
+| Заголовок класса без «Класс.:» и «;» | DDS image10 | `Класс.: {type} ;` |
+| Заголовок типа полным именем вместо кода | DDS image10 «Происшествие 101» | `Происшествие {external_code}` |
+| Признаки без завершающей « .» | DDS image10 features | join + trailing `.` |
+| Флаги Пострадавшие/Отказ/Заблокированные как жёлтые кнопки | DDS image10 — серые текстовые | `.arm-flag-text` |
+| ЧП без оранжевого акцента | DDS image10 | `.arm-flag-emergency` |
+| Нет карандаша редактирования признаков | DDS image10 | disabled pencil + tooltip |
+| Нет select «Выберите статус»/«Итог обращения» у заявителя | DDS image10 | 2 disabled Select + tooltip |
+| Нет таймера вызова/просрочки в identity-блоке | DDS image10 red/black timer | `.arm-timer-box` (call/late >30s) |
+| Редактор статуса тёмно-синий | DDS image11/13/14 — светлый | reaction modal `#d5d8da`, белые inputs |
+| Оператор дублировался в форме статуса | DDS image11 — без operator field | Form.Item «Оператор» удалён |
+| Список: одна колонка «Поступило» | DDS image5 «Дата» + «Время» | split columns, scroll x=1100 |
+| История службы без «оп. ДДС ·» | DDS image10 «оп. 0 ·» | ServiceDock history prefix |
+| Описательный адрес без отдельной строки bold | DDS image10 | `.arm-description b` block |
+
+| Проверка | Фактический результат |
+|---|---|
+| `npm run typecheck` | Passed |
+| `npm run build` | Passed (vendor >500 kB warning as before) |
+| `E2E_BASE_URL=http://127.0.0.1:4173 npx playwright test` | 22 passed (desktop+mobile), 1.6m |
+| `.venv\Scripts\python.exe -m pytest -q` | 15 passed |
+| Консоль браузера (login/list/card/training/results, desktop+mobile) | 0 errors |
+| `git diff --check` | Passed |
+
+Скриншоты до/после: `docs/images/ui-audit-*.png`,
+`docs/images/arm-reference-{desktop,mobile}.png`,
+`docs/images/workspace-{desktop,mobile}.png`,
+`docs/images/arm-reaction-{desktop,mobile}.png`.
+
+Ограничения (намеренно не трогали): login остался учебным брендом ДДС, а не
+городским экраном «112»; ЧС/ЧП/передача служб — disabled/справочные, т.к. API
+этих признаков нет;VoIP/SMS/аудио не подключены; ML по-прежнему mock.
+
 ## 22.09.2026 — offline GIS map: prod/preview fix
 
 Объект: фикс загрузки OSM/PMTiles-карты в production-бандле (preview :4173).

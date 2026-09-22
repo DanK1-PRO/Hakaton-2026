@@ -50,7 +50,7 @@ export function ServiceDock({ card, own, locked, busy, onReact, onRoutes, onHist
           <div className="arm-service-events">
             {events.map((event) => (
               <div className="arm-service-event" key={event.id}>
-                <span>{date(event.created_at)}</span>
+                <span>оп. ДДС · {date(event.created_at)}</span>
                 <b>
                   {event.kind === 'reaction'
                     ? labels[event.payload.status] || event.payload.status
