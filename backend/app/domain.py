@@ -77,6 +77,8 @@ def react(db, incident, user, request):
         raise HTTPException(409, "Недопустимый переход статуса")
     if request.status in {"rejected", "refused"} and not request.comment:
         raise HTTPException(422, "Укажите причину отказа и сведения о передаче информации")
+    if request.status == "completed" and not request.comment:
+        raise HTTPException(422, "Укажите итог выполненных работ")
     if request.status in {"accepted", "rejected"} and not incident.acknowledged_at:
         incident.acknowledged_at = utcnow()
     incident.response_status = request.status

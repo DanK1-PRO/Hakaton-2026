@@ -198,7 +198,10 @@ export function History({ events }: { events: Event[] }) {
                   ? phone[e.payload.action]
                   : names[e.kind] || e.kind}
             </b>
-            <div className="muted">{date(e.created_at)}</div>
+            <div className="muted">
+              {e.actor_name ? `оп. ${e.actor_name} · ` : ''}
+              {date(e.created_at)}
+            </div>
             {e.payload.comment ? <p>{e.payload.comment}</p> : null}
           </>
         ),

@@ -1,5 +1,54 @@
 # Протокол Проверки
 
+## 22.09.2026 (late evening) — закрытие C1 + снятие EPERM-блокировки билда
+
+Объект: доведение вечернего прохода — справочник профиля ДДС на экране
+«Учебные задания» (C1) и восстановление production-сборки после EPERM на
+`frontend/dist/assets`.
+
+Правки:
+
+| Пробел | Изменения |
+|---|---|
+| C1 | `pages.tsx` `Training()`: импорт `DDS_PROFILES`/`DEFAULT_PROFILE_ID`, хелперы `loadProfileId`/`saveProfileId` (localStorage `dds_profile_id`), `<section data-testid="dds-profile-band">` с `<Select data-testid="dds-profile-select" aria-label="Выбрать профиль ДДС">`, панелью (зона/реагирование/отказ/на что обратить внимание) и сноской «Справочник вариантов · TEAM_PROPOSAL»; `styles.css` `.profile-band*` + адаптив ≤1100px/≤700px |
+| EPERM | Найдены блокирующие процессы (`vite preview` PID 8868, npm preview PID 9560); dev-сервер 5173 (PID 17104) сохранён. Остановка сняла блокировку, `tsc -b && vite build` снова проходит |
+| Тест | `flow.spec.ts`: `dds-profile-band` visible + `dds-profile-select` visible (локатор через testid — `getByLabel` давал strict mode violation из-за дубля aria-label на обёртке Ant Select и inner input) |
+
+| Проверка | Фактический результат |
+|---|---|
+| `pytest` (backend, `.venv`) | 16 passed |
+| Playwright (desktop+mobile) | 22 passed |
+| `tsc --noEmit` | Passed |
+| `vite build` | Passed (vendor >500 kB warning as before) |
+| OPEN_QUESTIONS C1 | → `CLOSED` |
+| PROJECT_STATE / TASK_QUEUE / SIMULATION_PLAYBOOK | Обновлены, расхождение PLAYBOOK:31/191 с кодом устранено |
+
+## 22.09.2026 — закрытие пробелов B9/B10/C2/C3/C4 (команда без заказчика)
+
+Объект: вертикальный проход по API/React после UI-аудита. Заказчик больше не
+предоставляет материалы; пробелы A1–A19, B1–B13, C1–C8, D*, E* переведены в
+`TEAM_DECISION`/`CLOSED` в `docs/OPEN_QUESTIONS.md` (без выдуманных официальных
+правил).
+
+Правки:
+
+| Пробел | Изменения |
+|---|---|
+| B9 | `views.py`: `event_view`/`feedback_view` + `actor_names` resolve; `incident_view`/`session_view` резолвят имена. Frontend `types.ts` `actor_name`/`author_name`, `ServiceDock` «оп. {name}», History, Alert «Комментарий преподавателя · {author}» |
+| B10 | `domain.py` 422 «Укажите итог выполненных работ» для `completed`; правило формы в `workspace.tsx` включает `completed` |
+| C2 | `api.py` `EXPECTED_HINTS` → `expected_hint` на `/scenarios` (список); `pages.tsx` блок `scenario-expected-hint` «Методподсказка · ожидаемая линия»; `styles.css` `.scenario-hint` |
+| C3 | `ServiceDock`: «справочник · без оповещения», Tooltip, aria-label «Справочник маршрутов»; `workspace` Alert/заголовок drawer справочника |
+| C4 | `workspace`: Tooltip на Select ЧС/ЧП и «Статус/Итог обращения» — «учебный контур vs боевая АРМ» |
+
+| Проверка | Фактический результат |
+|---|---|
+| `pytest` (backend) | 16 passed |
+| Playwright (desktop+mobile) | 22 passed |
+| `tsc --noEmit` | Passed |
+| `vite build` | Passed (vendor >500 kB warning as before) |
+| `python scripts/export_contracts.py` | Exported OpenAPI + 4 JSON schemas |
+| Тесты обновлены | `test_flow.py` (422 completed, expected_hint, actor_name), `arm.spec.ts` (новые атрибуты) |
+
 ## 22.09.2026 — полный UI-аудит: сходство с АРМ, мобильная версия, мелкие баги
 
 Объект: проход по всему React UI сверке со скриншотами заказчика
@@ -32,7 +81,7 @@
 | `npm run typecheck` | Passed |
 | `npm run build` | Passed (vendor >500 kB warning as before) |
 | `E2E_BASE_URL=http://127.0.0.1:4173 npx playwright test` | 22 passed (desktop+mobile), 1.6m |
-| `.venv\Scripts\python.exe -m pytest -q` | 15 passed |
+| `.venv\Scripts\python.exe -m pytest -q` | 15 passed → 16 after B10/C2/B9 tests |
 | Консоль браузера (login/list/card/training/results, desktop+mobile) | 0 errors |
 | `git diff --check` | Passed |
 
@@ -42,8 +91,8 @@
 `docs/images/arm-reaction-{desktop,mobile}.png`.
 
 Ограничения (намеренно не трогали): login остался учебным брендом ДДС, а не
-городским экраном «112»; ЧС/ЧП/передача служб — disabled/справочные, т.к. API
-этих признаков нет;VoIP/SMS/аудио не подключены; ML по-прежнему mock.
+городским экраном «112»; ЧС/ЧП/передача служб — disabled/справочные (C3/C4 закрыты
+тултипами/подписями, API признаков нет);VoIP/SMS/аудио не подключены; ML по-прежнему mock.
 
 ## 22.09.2026 — offline GIS map: prod/preview fix
 

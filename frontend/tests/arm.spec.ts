@@ -97,9 +97,9 @@ test('ARM source layout, service history and training context remain accessible'
     page.getByRole('button', { name: 'локальный OSM-слой', exact: true }),
   ).toBeDisabled();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
-  await page.getByRole('button', { name: 'Список оповещения', exact: true }).click();
+  await page.getByRole('button', { name: 'Справочник маршрутов', exact: true }).click();
   await expect(
-    page.getByText('Справочник маршрутизации. Фактическая передача другим службам не выполняется.'),
+    page.getByText('Справочник маршрутов ЕКП. Фактическая передача другим службам не выполняется.'),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.screenshot({

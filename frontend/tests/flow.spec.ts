@@ -92,6 +92,8 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
   await page.getByRole('button', { name: /Начать занятие$/ }).click();
   await expect(page.getByRole('heading', { name: 'Учебные задания' })).toBeVisible();
+  await expect(page.getByTestId('dds-profile-band')).toBeVisible();
+  await expect(page.getByTestId('dds-profile-select')).toBeVisible();
   if (testInfo.project.name === 'desktop')
     await page.screenshot({ path: '../docs/images/training.png', fullPage: true });
   expect(

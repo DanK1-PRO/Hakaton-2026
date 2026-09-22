@@ -168,9 +168,22 @@ def communication(id: str, data: CommunicationInput, db: Session = Depends(get_d
     return incident_view(db, incident, True)
 
 
+EXPECTED_HINTS = {
+    "accepted": "Принять",
+    "rejected": "Не принимать",
+}
+
+
 @router.get("/scenarios")
 def scenarios(db: Session = Depends(get_db), user=Depends(current_user)):
-    return [scenario_view(s) for s in db.scalars(select(Scenario).order_by(Scenario.id))]
+    items = []
+    for s in db.scalars(select(Scenario).order_by(Scenario.id)):
+        view = scenario_view(s)
+        expected = (s.data.get("reference") or {}).get("expected_actions") or []
+        first = expected[0] if expected else None
+        view["expected_hint"] = EXPECTED_HINTS.get(first)
+        items.append(view)
+    return items
 
 
 @router.post("/simulation/sessions", status_code=201)

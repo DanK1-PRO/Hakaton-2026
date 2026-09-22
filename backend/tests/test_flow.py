@@ -73,6 +73,24 @@ def test_refusal_comment_and_recovery(client):
     assert card["allowed_statuses"] == ["accepted"]
     card = reaction(client, headers, card, "accepted").json()
     assert reaction(client, headers, card, "rejected", "reason").status_code == 409
+    assert reaction(client, headers, card, "completed", "").status_code == 422
+    done = reaction(client, headers, card, "completed", "Ликвидировано, бригада снята с объекта")
+    assert done.status_code == 200
+    history = done.json()["events"]
+    reaction_events = [e for e in history if e["kind"] == "reaction" and e["payload"]["status"] == "completed"]
+    assert reaction_events and reaction_events[-1]["actor_name"]
+
+
+def test_scenarios_expose_expected_hint_without_reference(client):
+    headers = login(client)
+    scenarios = client.get(API + "/scenarios", headers=headers).json()
+    by_id = {s["id"]: s for s in scenarios}
+    assert by_id["water"]["expected_hint"] == "Принять"
+    assert by_id["elevator"]["expected_hint"] == "Не принимать"
+    assert "reference" not in by_id["water"]
+    card = start(client, headers, "water")
+    assert "expected_hint" not in card["scenario"]
+    assert "reference" not in card["scenario"]
 
 
 def test_optimistic_lock_and_final_state(client):

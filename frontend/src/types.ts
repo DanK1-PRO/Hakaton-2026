@@ -14,6 +14,7 @@ export type Scenario = {
   service: string;
   briefing: string[];
   source: Source;
+  expected_hint?: string | null;
 };
 export type Evaluation = {
   schema_version: string;
@@ -34,8 +35,15 @@ export type Event = {
   payload: Record<string, string>;
   created_at: string;
   actor_id: string;
+  actor_name?: string | null;
 };
-export type Feedback = { id: string; comment: string; verdict: string; created_at: string };
+export type Feedback = {
+  id: string;
+  comment: string;
+  verdict: string;
+  created_at: string;
+  author_name?: string | null;
+};
 export type Incident = {
   id: string;
   number: string;

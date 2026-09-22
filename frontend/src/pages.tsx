@@ -27,9 +27,28 @@ import {
 } from '@ant-design/icons';
 import { api } from './store';
 import { CardFields, ErrorPanel, Status, date, errorText } from './components';
+import { DDS_PROFILES, DEFAULT_PROFILE_ID, type DdsProfile } from './domain/ddsProfiles';
 import type { Incident, Scenario } from './types';
 export { Workspace } from './workspace';
 export { Results, Users } from './results';
+
+const PROFILE_STORAGE_KEY = 'dds_profile_id';
+
+function loadProfileId(): string {
+  try {
+    return localStorage.getItem(PROFILE_STORAGE_KEY) || DEFAULT_PROFILE_ID;
+  } catch {
+    return DEFAULT_PROFILE_ID;
+  }
+}
+
+function saveProfileId(id: string) {
+  try {
+    localStorage.setItem(PROFILE_STORAGE_KEY, id);
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
 export function IncidentList() {
   const navigate = useNavigate();
   const { message } = App.useApp();
@@ -362,6 +381,9 @@ export function Training() {
   const [start, { isLoading: starting }] = api.useStartMutation();
   const navigate = useNavigate();
   const { message } = App.useApp();
+  const [profileId, setProfileId] = useState<string>(loadProfileId);
+  const profile: DdsProfile | undefined =
+    DDS_PROFILES.find((p) => p.id === profileId) ?? DDS_PROFILES[0];
   return (
     <>
       <div className="page-heading">
@@ -371,6 +393,52 @@ export function Training() {
         </div>
         <Tag color="gold">Синтетические учебные данные</Tag>
       </div>
+      <section className="profile-band" data-testid="dds-profile-band" aria-label="Профиль моей ДДС">
+        <div className="profile-band__head">
+          <span className="profile-band__label">Профиль моей ДДС</span>
+          <Select
+            aria-label="Выбрать профиль ДДС"
+            data-testid="dds-profile-select"
+            value={profileId}
+            style={{ minWidth: 280 }}
+            options={DDS_PROFILES.map((p) => ({ value: p.id, label: p.title }))}
+            onChange={(value: string) => {
+              setProfileId(value);
+              saveProfileId(value);
+            }}
+          />
+        </div>
+        {profile ? (
+          <div className="profile-band__grid">
+            <div className="profile-band__cell">
+              <div className="profile-band__key">Зона ответственности</div>
+              <div className="profile-band__val">{profile.zoneDefault}</div>
+              <ul className="profile-band__zones">
+                {profile.zones.map((z) => (
+                  <li key={z}>{z}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="profile-band__cell">
+              <div className="profile-band__key">Наше реагирование</div>
+              <div className="profile-band__val">{profile.ownReaction}</div>
+              <div className="profile-band__key">Типичный отказ</div>
+              <div className="profile-band__val">{profile.typicalReject}</div>
+            </div>
+            <div className="profile-band__cell">
+              <div className="profile-band__key">На что обратить внимание в опросе</div>
+              <ul className="profile-band__focus">
+                {profile.clarifyFocus.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ) : null}
+        <div className="profile-band__note">
+          Справочник вариантов · TEAM_PROPOSAL · не является приказом заказчика
+        </div>
+      </section>
       {error ? <ErrorPanel error={error} retry={refetch} /> : null}
       {isLoading ? <Spin /> : null}
       {data && data.length === 0 ? (
@@ -393,6 +461,11 @@ export function Training() {
               <div className="scenario-meta">
                 <ClockCircleOutlined /> Подтверждение карточки: 30 с
               </div>
+              {s.expected_hint ? (
+                <div className="scenario-meta scenario-hint" data-testid="scenario-expected-hint">
+                  Методподсказка · ожидаемая линия: <b>{s.expected_hint}</b>
+                </div>
+              ) : null}
               <Button
                 type="primary"
                 icon={<PlayCircleOutlined />}

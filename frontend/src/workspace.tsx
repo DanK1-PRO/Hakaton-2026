@@ -484,23 +484,27 @@ export function Workspace() {
               <small>Фамилия и имя заявителя</small>
               <b>{card.name || 'Не указано'}</b>
               <span className="arm-caller-status">очевидец</span>
-              <Tooltip title="Учебный контур: статусы обращения не подключены">
-                <Select
-                  className="arm-caller-select"
-                  size="small"
-                  disabled
-                  placeholder="Выберите статус"
-                  aria-label="Статус обращения"
-                />
+              <Tooltip title="Учебный контур: статусы обращения не подключены. В боевой АРМ здесь выбирают характер обращения заявителя.">
+                <span>
+                  <Select
+                    className="arm-caller-select"
+                    size="small"
+                    disabled
+                    placeholder="Выберите статус"
+                    aria-label="Статус обращения"
+                  />
+                </span>
               </Tooltip>
-              <Tooltip title="Учебный контур: итог обращения не подключён">
-                <Select
-                  className="arm-caller-select"
-                  size="small"
-                  disabled
-                  placeholder="Итог обращения"
-                  aria-label="Итог обращения"
-                />
+              <Tooltip title="Учебный контур: итог обращения не подключён. В боевой АРМ здесь фиксируют результат обращения.">
+                <span>
+                  <Select
+                    className="arm-caller-select"
+                    size="small"
+                    disabled
+                    placeholder="Итог обращения"
+                    aria-label="Итог обращения"
+                  />
+                </span>
               </Tooltip>
             </div>
             <div className="arm-field arm-address-card">
@@ -544,14 +548,14 @@ export function Workspace() {
               <span className="arm-flag-text">Пострадавшие: нет</span>
               <span className="arm-flag-text">Отказ от скорой: нет</span>
               <span className="arm-flag-text">Заблокированные: нет</span>
-              <Tooltip title="Признак ЧС не передаётся текущим API">
+              <Tooltip title="Учебный контур: признак ЧС не передаётся API. В боевой АРМ признак повышает приоритет карточки в ЕДДС.">
                 <span>
                   <Button disabled icon={<ThunderboltOutlined />}>
                     ЧС
                   </Button>
                 </span>
               </Tooltip>
-              <Tooltip title="Признак ЧП не передаётся текущим API">
+              <Tooltip title="Учебный контур: признак ЧП не передаётся API. В боевой АРМ признак помечает происшествие как чрезвычайное.">
                 <span>
                   <Button disabled className="arm-flag-emergency" icon={<WarningOutlined />}>
                     ЧП
@@ -608,7 +612,11 @@ export function Workspace() {
             <Alert
               key={f.id}
               type="info"
-              message="Комментарий преподавателя"
+              message={
+                f.author_name
+                  ? `Комментарий преподавателя · ${f.author_name}`
+                  : 'Комментарий преподавателя'
+              }
               description={f.comment}
             />
           ))}
@@ -641,7 +649,7 @@ export function Workspace() {
           panel === 'history'
             ? 'История действий'
             : panel === 'routes'
-              ? 'Список оповещения и условия классификатора'
+              ? 'Справочник маршрутов и условия классификатора'
               : panel === 'map'
                 ? 'Карта и адрес'
                 : 'Сведения о занятии'
@@ -657,7 +665,7 @@ export function Workspace() {
           <>
             <Alert
               type="info"
-              message="Справочник маршрутизации. Фактическая передача другим службам не выполняется."
+              message="Справочник маршрутов ЕКП. Фактическая передача другим службам не выполняется."
             />
             <Table
               size="small"
@@ -706,9 +714,10 @@ export function Workspace() {
                     </p>
                     <h3>Статус и комментарий</h3>
                     <p>
-                      Отказ требует причины; сведения о передаче информации указываются при наличии.
-                      «Работы завершены» и «Отказ от выполнения работ» закрывают редактирование.
-                      История сохраняется после каждого действия.
+                      Отказ и завершение работ требуют комментария: причину отказа и сведения о
+                      передаче — при отказе, итог работ — при завершении. «Работы завершены» и «Отказ
+                      от выполнения работ» закрывают редактирование. История сохраняется после
+                      каждого действия.
                     </p>
                     <h3>Учебная связь</h3>
                     <p>
@@ -849,9 +858,12 @@ export function Workspace() {
                 label="Комментарий"
                 rules={[
                   {
-                    required: ['rejected', 'refused'].includes(getFieldValue('status')),
+                    required: ['rejected', 'refused', 'completed'].includes(getFieldValue('status')),
                     whitespace: true,
-                    message: 'Укажите причину отказа; передачу информации укажите при наличии',
+                    message:
+                      getFieldValue('status') === 'completed'
+                        ? 'Укажите итог выполненных работ'
+                        : 'Укажите причину отказа; передачу информации укажите при наличии',
                   },
                 ]}
               >
