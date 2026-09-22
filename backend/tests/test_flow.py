@@ -1,6 +1,7 @@
-from datetime import timedelta
+from datetime import timedelta, timezone
 from sqlalchemy import select
 from conftest import login
+from app.domain import seconds_since
 from app.models import Incident, TrainingSession
 from app.settings import settings
 
@@ -149,3 +150,19 @@ def test_start_is_idempotent_and_communication_order(client):
         assert client.post(endpoint, headers=headers, json={"action": action}).status_code == 200
     with client.test_sessions() as db:
         assert len(db.scalars(select(TrainingSession)).all()) == 1
+
+
+def test_seconds_since_handles_non_utc_tz():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    msk = ZoneInfo("Europe/Moscow")
+    start = datetime(2026, 9, 22, 21, 0, 0, tzinfo=msk)  # 18:00 UTC
+    end_utc = datetime(2026, 9, 22, 18, 30, 0, tzinfo=timezone.utc)
+    assert seconds_since(start, end_utc) == 1800
+
+    start_naive = datetime(2026, 9, 22, 18, 0, 0)
+    end_utc2 = datetime(2026, 9, 22, 18, 30, 0, tzinfo=timezone.utc)
+    assert seconds_since(start_naive, end_utc2) == 1800
+
+    assert seconds_since(start, datetime(2026, 9, 22, 17, 0, 0, tzinfo=timezone.utc)) == 0
