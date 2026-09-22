@@ -1,6 +1,6 @@
 # Project State
 
-Updated: 2026-09-21. Version: 0.1.0 + Danil UI integration branch.
+Updated: 2026-09-22. Version: 0.1.0 + Danil UI integration branch + offline GIS pack.
 
 ## Actual State
 
@@ -42,7 +42,9 @@ Additional non-UI branches seen on origin: `LocalAPI`, `hht`, updated `ml/scorin
 
 Nikita branch `origin/ui/nikita-card-flow` has been integrated manually into Danil's UI branch. The ARM workspace remains the source-like base; compatible loading/empty states, Timeline colors and locked-state tests were carried forward. Old card visual styles were rejected.
 
-Before ML, useful non-ML work is tracked in `docs/team/PRE_ML_WORKLIST.ru.md`: UI branch cleanup is complete for Danil/Sanya/Nikita; remaining pre-ML items are ML input/output contracts and optional local map-pack import after team sync.
+Offline GIS pack is live in `MapPanel`: local `frontend/public/maps/moscow.pmtiles` (75.9 MB, planetiler bounds Moscow, ODbL attribution), MapLibre + pmtiles protocol, Vite range middleware for dev/preview, glyphs under `public/maps/fonts`. Verified 2026-09-22: preview prod-bundle green after copying `maplibre-gl-shared.mjs` alongside worker (missing shared made worker import HTML via SPA fallback and tiles stuck in loading). `map-gis.spec.ts` covers OSM/PMTiles tag, ODbL and large 206 tile response on both 5173 and 4173. Evidence: docs/VERIFICATION.md, docs/images/map-gis-check.png, docs/maps/OFFLINE_MAP_PLAN.ru.md.
+
+Before ML, useful non-ML work is tracked in `docs/team/PRE_ML_WORKLIST.ru.md`: UI branch cleanup is complete for Danil/Sanya/Nikita; remaining pre-ML items are ML input/output contracts. Local map pack is done; only team-level map packaging decisions remain if needed.
 
 ## Important Boundaries
 

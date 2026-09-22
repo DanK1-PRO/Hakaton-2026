@@ -1,5 +1,27 @@
 # Протокол Проверки
 
+## 22.09.2026 — offline GIS map: prod/preview fix
+
+Объект: фикс загрузки OSM/PMTiles-карты в production-бандле (preview :4173).
+
+Корень: Vite-плагин `maplibreWorkerAsset` копировал только `maplibre-gl-worker.mjs`,
+но воркер импортирует `./maplibre-gl-shared.mjs`. На preview отсутствующий shared
+отдавался SPA-fallback (`index.html`, `text/html`), воркер падал, тайлы оставались
+`loading` без range-запросов; через 12s срабатывал SVG-fallback и тест
+`map-gis.spec.ts` падал по `content-length > 17000`. На dev (5173) shared брался
+из `node_modules`, поэтому dev был зелёным.
+
+| Проверка | Фактический результат |
+|---|---|
+| `frontend/vite.config.ts` `closeBundle` | Копирует `maplibre-gl-worker.mjs` и `maplibre-gl-shared.mjs` в `dist/assets` |
+| `window.__ddsMap` | Только при `import.meta.env.DEV` (диагностика prod убрана) |
+| `npm run build` | Passed |
+| `npm run typecheck` | Passed |
+| `E2E_BASE_URL=http://127.0.0.1:4173 npx playwright test map-gis --project=desktop` | 1 passed, 1.7s |
+| `npm test` (полный desktop+mobile) | 22 passed, 1.7m |
+| `python -m pytest -q` | 15 passed |
+| `git diff --check` | Passed |
+
 ## 21.09.2026 — ветка `ui/danil-integration-review`
 
 Объект: интеграционная UI-ветка Даниила с приближением рабочего места ДДС к

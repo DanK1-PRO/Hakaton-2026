@@ -781,6 +781,17 @@
   flex-wrap: wrap;
   gap: 8px;
 }
+.arm-map-local > .arm-map-gis {
+  position: absolute;
+  inset: 0;
+}
+.arm-map-gis .maplibregl-ctrl-group button {
+  width: 30px;
+  height: 30px;
+}
+.arm-map-gis .maplibregl-ctrl-attrib {
+  font-size: 10px;
+}
 @media (max-width: 1100px) {
   .arm-phone {
     grid-template-columns: minmax(210px, 1fr) repeat(2, minmax(110px, 1fr));

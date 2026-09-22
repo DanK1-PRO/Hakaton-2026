@@ -14,4 +14,6 @@ data_derived/raw/
 Данные заказчика/
 *.log
 .runtime/
+runtime/
+frontend/public/maps/*.pmtiles
 *.tsbuildinfo
