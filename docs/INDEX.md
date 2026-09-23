@@ -24,3 +24,4 @@
 | [Аудит программы-минимум](COMPLETION_AUDIT.md) | Проверка пунктов 34-35 исходного ТЗ |
 | [Воспроизведение материалов](REPRODUCING_ARTIFACTS.md) | Данные, схемы, скриншоты и PDF |
 | [Комплект PDF](delivery/DDS-2026-Manual.pdf) | Рабочая эксплуатационная редакция |
+| [Handoff: opencode UI part](ai/HANDOFF_OPENCODE_UI.md) | Что сделал opencode в UI (без ML) — точка входа для Codex |

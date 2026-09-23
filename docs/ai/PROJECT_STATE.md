@@ -68,3 +68,5 @@ Conditional classifier routing is preserved as reference data, not silently inte
 Read TASK_QUEUE, DECISIONS and docs/ML_INTEGRATION.md. Preserve working APIs.
 Only inspect relevant source pages and files. Do not re-scaffold or rebuild the architecture.
 OPEN_QUESTIONS is now mostly TEAM_DECISION/CLOSED; do not reopen gaps without new customer materials.
+
+If Danil mentions opencode / UI part, start from HANDOFF_OPENCODE_UI.md (scope, commits, file map, evidence).
