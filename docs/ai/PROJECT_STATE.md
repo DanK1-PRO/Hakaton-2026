@@ -44,7 +44,7 @@ Sanya branch `origin/ui/sanya-results-admin` has been integrated into Danil's UI
 
 Branch integration stitches are tracked in `docs/team/INTEGRATION_STITCHES.ru.md` (all stitches resolved).
 
-Additional non-UI branches seen on origin: `LocalAPI`, `hht`, updated `ml/scoring-experiment`. Treat them as unreviewed until inspected.
+Additional non-UI branches seen on origin: `LocalAPI`, `hht`, updated `ml/scoring-experiment`. Treat them as unreviewed until inspected. When Danil asks to start ML branch review, inspect all non-UI branches, not only `ml/scoring-experiment`, because Kirill may create extra working branches for convenience. Current snapshot on 2026-09-27: `origin/LocalAPI`, `origin/hht`, `origin/ml/scoring-experiment`, plus `origin/main`; UI branches are already separate and should not be re-reviewed as ML work.
 
 Nikita branch `origin/ui/nikita-card-flow` has been integrated manually into Danil's UI branch. The ARM workspace remains the source-like base; compatible loading/empty states, Timeline colors and locked-state tests were carried forward. Old card visual styles were rejected.
 
