@@ -187,6 +187,79 @@ small {
 .incident-table .ant-table {
   border: 1px solid #dce3e5;
 }
+.filter-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fbfcfc;
+  border: 1px dashed #c8d5d7;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+.filter-bar-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #566c70;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-bar .ant-tag {
+  margin-inline-end: 0;
+}
+.filter-bar .ant-btn-link {
+  padding-left: 4px;
+}
+.result-blocks > section {
+  margin-bottom: 20px;
+}
+.result-blocks > section:last-child {
+  margin-bottom: 0;
+}
+.password-strength {
+  margin: -4px 0 16px;
+}
+.password-strength-label {
+  display: block;
+  margin: 4px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.password-checks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.password-checks li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #8a989c;
+}
+.password-checks li.done {
+  color: #338453;
+}
+.password-hint {
+  margin: -4px 0 16px;
+  font-size: 12.5px;
+  color: #75858a;
+}
+.password-hint.generated {
+  color: #167786;
+  background: #f0f7f8;
+  border: 1px dashed #b7d7db;
+  border-radius: 4px;
+  padding: 7px 9px;
+}
+.password-hint.generated strong {
+  font-family: Consolas, monospace;
+  font-size: 13px;
+  user-select: all;
+}
 .ant-table-wrapper .ant-table-cell {
   overflow-wrap: anywhere;
 }
@@ -415,6 +488,72 @@ small {
   color: #617c83;
   margin-top: 9px;
 }
+.scenario-hint {
+  color: #8a6d3b;
+  background: #fff7e6;
+  border: 1px dashed #d8bf8a;
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin-top: 12px;
+}
+.profile-band {
+  background: #fff;
+  border: 1px solid #d9e2e4;
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin-bottom: 22px;
+}
+.profile-band__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.profile-band__label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #2c454b;
+}
+.profile-band__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.profile-band__cell {
+  min-width: 0;
+}
+.profile-band__key {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #718b91;
+  margin-bottom: 6px;
+}
+.profile-band__cell .profile-band__key:not(:first-child) {
+  margin-top: 12px;
+}
+.profile-band__val {
+  font-size: 13px;
+  color: #2c454b;
+  line-height: 1.5;
+}
+.profile-band__zones,
+.profile-band__focus {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: #4d646a;
+  line-height: 1.55;
+}
+.profile-band__note {
+  margin-top: 14px;
+  font-size: 11px;
+  color: #8aa0a6;
+}
 .scenario > .ant-btn {
   margin-top: 22px;
   align-self: flex-start;
@@ -507,6 +646,18 @@ small {
   display: grid;
   place-items: center;
 }
+.workspace-loading {
+  min-height: 55vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #63777c;
+}
+.workspace-empty {
+  padding: 40px 16px;
+}
 .ant-alert-description,
 .ant-descriptions-item-content {
   overflow-wrap: anywhere;
@@ -544,6 +695,9 @@ small {
   }
   .scenario-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .profile-band__grid {
+    grid-template-columns: 1fr 1fr;
   }
   .operator {
     max-width: 190px;
@@ -602,6 +756,12 @@ small {
     width: 100% !important;
     min-width: 100%;
   }
+  .filter-bar-label {
+    width: 100%;
+  }
+  .page-heading .ant-input-affix-wrapper {
+    width: 100% !important;
+  }
   .work-grid {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -629,6 +789,22 @@ small {
   }
   .scenario-grid {
     grid-template-columns: 1fr;
+  }
+  .profile-band {
+    padding: 14px 16px;
+  }
+  .profile-band__grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .profile-band__head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .profile-band__head .ant-select {
+    width: 100% !important;
+    min-width: 100% !important;
   }
   .scenario {
     padding: 20px;

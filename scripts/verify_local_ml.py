@@ -1,4 +1,4 @@
-"""Verify real HTTP synchronization with the example ML service and its failure path."""
+"""Verify real HTTP synchronization with the local ML evaluator service and its failure path."""
 
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -43,7 +43,7 @@ def launch(module, port):
 
 
 try:
-    ml = launch("ml.example_service:app", 8090)
+    ml = launch("ml.evaluator_service:app", 8090)
     launch("app.main:app", 8001)
     with httpx.Client(base_url="http://127.0.0.1:8001/api/v1", timeout=15) as client:
         admin = client.post("/auth/login", data={"username": "administrator@dds.local", "password": "DdsDemo2026!"})

@@ -5,8 +5,8 @@ import {
   Alert,
   App,
   Button,
-  Collapse,
   Descriptions,
+  Drawer,
   Empty,
   Form,
   Input,
@@ -17,7 +17,6 @@ import {
   Spin,
   Table,
   Tabs,
-  Tag,
   Tooltip,
 } from 'antd';
 import {
@@ -27,7 +26,12 @@ import {
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
+  EnvironmentOutlined,
+  InfoCircleOutlined,
   PhoneOutlined,
+  ReloadOutlined,
+  ThunderboltOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import { api, store, type RootState, type AppDispatch } from './store';
 import {
@@ -35,17 +39,50 @@ import {
   ErrorPanel,
   History,
   Result,
-  Status,
   date,
   errorText,
   labels,
   time,
 } from './components';
+import { ServiceDock } from './arm/ServiceDock';
+import { MapPanel } from './arm/MapPanel';
 import type { CardFields, Incident } from './types';
+
+function addressParts(address: string) {
+  const parts = address
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const value = (index: number, fallback = 'не указано') => parts[index] || fallback;
+  const district = parts.find((part) => /округ|район|юао|свао|цао|зао|вао|тао/i.test(part));
+  const street = parts.find((part) => /улица|проспект|проезд|переулок|шоссе|площадь/i.test(part));
+  const house = parts.find((part) => /\bд\.?\s*\d|дом\s*\d|\b\d+[а-я]?\b/i.test(part));
+  const entrance = parts.find((part) => /под\.?|подъезд/i.test(part));
+  const corpus = parts.find((part) => /к\.?\s*\d|корп/i.test(part));
+  const flat = parts.find((part) => /кв\.?\s*\d|квартира/i.test(part));
+  const floor = parts.find((part) => /этаж\s*\d|\b\d\s*этаж/i.test(part));
+  return [
+    ['Страна', value(0, 'Россия')],
+    ['Субъект', value(1, 'Москва')],
+    ['Населённый пункт', value(1, 'Москва')],
+    ['Объект', parts.find((part) => /объект|строение/i.test(part)) || 'не указано'],
+    ['Округ', district || 'не указано'],
+    ['Район', district || 'не указано'],
+    ['Улица', street || value(2)],
+    ['Дом/Вл', house || 'не указано'],
+    ['Корпус', corpus || 'не указано'],
+    ['Стр/сокр', 'не указано'],
+    ['Квартира/офис', flat || 'не указано'],
+    ['Подъезд', entrance || 'не указано'],
+    ['Этаж', floor || 'не указано'],
+    ['Код', 'не указано'],
+  ];
+}
+
 export function Workspace() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((s: RootState) => s.auth.user)!;
   const {
@@ -60,15 +97,20 @@ export function Workspace() {
   const [react, { isLoading: reacting }] = api.useReactMutation();
   const [communicate, { isLoading: calling }] = api.useCommunicateMutation();
   const [finish, { isLoading: finishing }] = api.useFinishMutation();
-  const [remove] = api.useRemoveMutation();
+  const [remove, { isLoading: removing }] = api.useRemoveMutation();
   const [editOpen, setEditOpen] = useState(false);
   const [reactionOpen, setReactionOpen] = useState(false);
+  const [panel, setPanel] = useState<'help' | 'history' | 'routes' | 'map' | null>(null);
   const [form] = Form.useForm<CardFields>();
-  const [reactionForm] = Form.useForm();
+  const [reactionForm] = Form.useForm<{ status: string; comment: string }>();
   const [editVersion, setEditVersion] = useState(0);
   const [reactionVersion, setReactionVersion] = useState(0);
+  const [writeError, setWriteError] = useState<unknown>();
+  const [dirty, setDirty] = useState(false);
   const [now, setNow] = useState(Date.now());
   const pendingPhone = useRef<Promise<Incident> | null>(null);
+  const opening = useRef(false);
+  const writePending = useRef(false);
   const synchronizeCard = useCallback(
     (updated: Incident) => {
       dispatch(
@@ -84,11 +126,21 @@ export function Workspace() {
     return () => clearInterval(timer);
   }, []);
   useEffect(() => {
-    if (card?.status === 'added' && card.owner_id === user.id && card.session_status !== 'finished')
+    if (
+      card?.status === 'added' &&
+      card.owner_id === user.id &&
+      card.session_status !== 'finished' &&
+      !opening.current
+    ) {
+      opening.current = true;
       openCard(id)
         .unwrap()
         .then(synchronizeCard)
-        .catch((e) => message.error(errorText(e)));
+        .catch((e) => message.error(errorText(e)))
+        .finally(() => {
+          opening.current = false;
+        });
+    }
   }, [
     card?.status,
     card?.owner_id,
@@ -99,16 +151,32 @@ export function Workspace() {
     synchronizeCard,
     message,
   ]);
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
   if (isLoading)
     return (
-      <div className="full-loading">
-        <Spin />
+      <div className="workspace-loading">
+        <Spin size="large" />
+        <span>Загрузка карточки происшествия...</span>
       </div>
     );
-  if (!card) return <ErrorPanel error={error} retry={refetch} />;
+  if (!card)
+    return (
+      <div className="workspace-empty">
+        <ErrorPanel error={error} retry={refetch} />
+      </div>
+    );
   const own = card.owner_id === user.id;
   const locked =
     ['completed', 'refused'].includes(card.status) || card.session_status === 'finished';
+  const busy = calling || reacting || saving || finishing || removing;
   const elapsed =
     card.acknowledged_at || card.session_status === 'finished'
       ? card.acknowledgement_seconds
@@ -116,7 +184,27 @@ export function Workspace() {
   const communications = (card.events || []).filter((e) => e.kind === 'communication');
   const last = communications.at(-1);
   const callState = last?.payload.action || 'hangup';
+  const routes = card.classification?.routes || [];
+  const addressGrid = addressParts(card.address);
+  const typeCode = types.find((t) => t.id === card.incident_type_id)?.external_code;
+  const callSeconds = last ? Math.max(0, (now - new Date(last.created_at).getTime()) / 1000) : 0;
+  const firstTextReaction = (card.events || []).find(
+    (event) => event.kind === 'reaction' && event.payload.comment?.trim(),
+  );
+  const firstRecordSeconds = firstTextReaction
+    ? Math.max(
+        0,
+        (new Date(firstTextReaction.created_at).getTime() - new Date(card.created_at).getTime()) /
+          1000,
+      )
+    : Math.max(0, (now - new Date(card.created_at).getTime()) / 1000);
+  const firstRecordDone = Boolean(firstTextReaction);
+  const currentCard = async () => {
+    if (pendingPhone.current) await pendingPhone.current;
+    return api.endpoints.incident.select(id)(store.getState()).data || card;
+  };
   const phoneAction = async (action: string) => {
+    if (pendingPhone.current || writePending.current) return;
     const operation = communicate({ id, action }).unwrap();
     pendingPhone.current = operation;
     try {
@@ -127,23 +215,13 @@ export function Workspace() {
       if (pendingPhone.current === operation) pendingPhone.current = null;
     }
   };
-  const finishAction = async () => {
-    try {
-      await finish(card.session_id!).unwrap();
-      message.success('Занятие завершено');
-    } catch (e) {
-      message.error(errorText(e));
-    }
-  };
-  const currentCard = async () => {
-    if (pendingPhone.current) await pendingPhone.current;
-    return api.endpoints.incident.select(id)(store.getState()).data || card;
-  };
   const editModal = async () => {
     try {
       const latest = await currentCard();
       form.setFieldsValue(latest);
       setEditVersion(latest.version);
+      setWriteError(undefined);
+      setDirty(false);
       setEditOpen(true);
     } catch (e) {
       message.error(errorText(e));
@@ -154,49 +232,151 @@ export function Workspace() {
       const latest = await currentCard();
       reactionForm.resetFields();
       setReactionVersion(latest.version);
+      setWriteError(undefined);
+      setDirty(false);
       setReactionOpen(true);
     } catch (e) {
       message.error(errorText(e));
     }
   };
+  const closeEditor = () => {
+    if (busy) return;
+    const close = () => {
+      setEditOpen(false);
+      setReactionOpen(false);
+      setDirty(false);
+      setWriteError(undefined);
+    };
+    if (dirty)
+      modal.confirm({
+        title: 'Отменить несохранённые изменения?',
+        content: 'Введённые данные ещё не переданы в карточку.',
+        okText: 'Отменить изменения',
+        cancelText: 'Продолжить редактирование',
+        onOk: close,
+      });
+    else close();
+  };
+  const reloadEditor = () =>
+    modal.confirm({
+      title: 'Загрузить актуальную карточку?',
+      content: 'Черновик будет заменён сохранёнными на сервере данными.',
+      okText: 'Загрузить',
+      cancelText: 'Оставить черновик',
+      onOk: async () => {
+        try {
+          const latest = await refetch().unwrap();
+          if (editOpen) {
+            form.setFieldsValue(latest);
+            setEditVersion(latest.version);
+          } else {
+            reactionForm.resetFields();
+            setReactionVersion(latest.version);
+          }
+          setDirty(false);
+          setWriteError(undefined);
+        } catch (e) {
+          setWriteError(e);
+        }
+      },
+    });
+  const stale =
+    (editOpen && card.version !== editVersion) ||
+    (reactionOpen && card.version !== reactionVersion);
+  const editorNotice = (
+    <>
+      {stale ? (
+        <Alert
+          type="warning"
+          showIcon
+          message="Карточка обновилась. Черновик сохранён."
+          description="Перед повторной записью требуется сверка с актуальными данными."
+          action={
+            <Button
+              aria-label="Загрузить актуальные данные"
+              onClick={reloadEditor}
+              icon={<ReloadOutlined />}
+            >
+              Загрузить актуальные данные
+            </Button>
+          }
+        />
+      ) : null}
+      {writeError ? <ErrorPanel error={writeError} /> : null}
+      {locked ? (
+        <Alert type="warning" message="Редактирование закрыто: карточка или занятие завершены." />
+      ) : null}
+    </>
+  );
   const acknowledgementLabel = card.acknowledged_at
     ? 'Получение подтверждено'
     : locked
       ? 'Получение не подтверждено'
       : 'Подтвердите получение';
-  const routes = card.classification?.routes || [];
-  const direct = routes.filter(
-    (r) => !r.condition && !r.variant && r.value.toLowerCase() !== 'нет реагирования',
-  );
   return (
-    <>
-      <div className="workspace-heading">
-        <Space>
-          <Tooltip title="К списку">
+    <div className="arm-workspace">
+      <div className="arm-training-rail">
+        <Space wrap>
+          <Tooltip title="К списку происшествий">
             <Button
               aria-label="К списку"
               icon={<ArrowLeftOutlined />}
               onClick={() => navigate('/incidents')}
             />
           </Tooltip>
-          <div>
-            <div className="eyebrow">КАРТОЧКА ПРОИСШЕСТВИЯ</div>
-            <h1>№ {card.number}</h1>
-          </div>
+          <span className="arm-toolbar-title">Карточка происшествия</span>
+          <span
+            className={'arm-ack ' + (!card.acknowledged_at && elapsed > 30 ? 'arm-ack-late' : '')}
+            role="status"
+          >
+            <ClockCircleOutlined /> {acknowledgementLabel}: {elapsed.toFixed(1)} с / 30 с
+          </span>
+          <span
+            className={
+              'arm-ack ' + (!firstRecordDone && firstRecordSeconds > 180 ? 'arm-ack-late' : '')
+            }
+            role="status"
+          >
+            <ClockCircleOutlined /> Первая запись:{' '}
+            {firstRecordDone ? 'есть' : firstRecordSeconds.toFixed(1) + ' с'} / 3 мин
+          </span>
         </Space>
         <Space wrap>
-          <Status value={card.status} />
+          <Tooltip title="Сведения о занятии и действии">
+            <Button
+              className="arm-help-button"
+              aria-label="Сведения о занятии"
+              icon={<InfoCircleOutlined />}
+              onClick={() => setPanel('help')}
+            />
+          </Tooltip>
           {card.session_id &&
           card.session_status === 'active' &&
           (own || user.role !== 'trainee') ? (
             <Popconfirm
               title="Завершить учебное занятие?"
-              description="Действия будут переданы на проверку."
-              onConfirm={finishAction}
+              description="История будет передана на проверку, редактирование закроется."
               okText="Завершить"
               cancelText="Продолжить"
+              onConfirm={async () => {
+                if (writePending.current) return;
+                writePending.current = true;
+                try {
+                  await finish(card.session_id!).unwrap();
+                  message.success('Занятие завершено');
+                } catch (e) {
+                  message.error(errorText(e));
+                } finally {
+                  writePending.current = false;
+                }
+              }}
             >
-              <Button type="primary" icon={<CheckOutlined />} loading={finishing}>
+              <Button
+                className="arm-finish-button"
+                icon={<CheckOutlined />}
+                loading={finishing}
+                disabled={busy || editOpen || reactionOpen}
+              >
                 Завершить занятие
               </Button>
             </Popconfirm>
@@ -204,39 +384,97 @@ export function Workspace() {
         </Space>
       </div>
       {error ? <ErrorPanel error={error} retry={refetch} /> : null}
-      <section className="phone-strip">
-        <div className="phone-state">
-          <PhoneOutlined />
-          <div>
-            <b>
-              {callState === 'answer'
-                ? 'Разговор'
-                : callState === 'ring'
-                  ? 'Входящий вызов'
-                  : 'Телефон'}
-            </b>
-            <small>Учебная связь</small>
+      <div className="arm-scene" data-testid="arm-scene">
+        <section className="arm-phone" aria-label="Телефонная панель">
+          <div className="arm-phone-state">
+            <PhoneOutlined />
+            <div>
+              <b>
+                {callState === 'answer'
+                  ? 'Разговор'
+                  : callState === 'ring'
+                    ? 'Входящий вызов'
+                    : 'Отключение'}
+              </b>
+              {callState === 'answer' && last ? (
+                <span className="timer">
+                  {' '}
+                  {time(Math.max(0, (now - new Date(last.created_at).getTime()) / 1000))}
+                </span>
+              ) : null}
+              <div className="arm-phone-links">
+                <Tooltip title="Аудиозаписи не подключены">
+                  <span>
+                    <Button size="small" disabled>
+                      записи звонков
+                    </Button>
+                  </span>
+                </Tooltip>
+                <Tooltip title="SMS не подключены">
+                  <span>
+                    <Button size="small" disabled>
+                      список SMS
+                    </Button>
+                  </span>
+                </Tooltip>
+              </div>
+            </div>
           </div>
-          {callState === 'answer' && last ? (
-            <span className="timer">
-              {time((now - new Date(last.created_at).getTime()) / 1000)}
-            </span>
-          ) : null}
-        </div>
-        <div>
-          <small>АОН</small>
-          <b>{card.caller_number || 'Не определён'}</b>
-        </div>
-        <div>
-          <small>Заявитель</small>
-          <b>{card.name || 'Не указан'}</b>
-        </div>
+          <div className="arm-phone-field">
+            <small>АОН</small>
+            <b>{card.caller_number || 'Не определён'}</b>
+          </div>
+          <div className="arm-phone-field">
+            <small>предоставленный</small>
+            <span>Нет данных</span>
+          </div>
+          <div className="arm-phone-field">
+            <small>телефон на место</small>
+            <span>Нет данных</span>
+          </div>
+          <div className="arm-identity">
+            <div className="arm-identity-main">
+              <h1>{card.number}</h1>
+              <small>сохр. {date(card.updated_at)}</small>
+              <small>оп. {user.name}</small>
+            </div>
+            {callState === 'answer' || callState === 'ring' ? (
+              <div className="arm-timer-box" role="timer" aria-label="Таймер вызова">
+                <b>{time(callSeconds)}</b>
+                <small>минут секунд</small>
+              </div>
+            ) : !card.acknowledged_at && !locked && elapsed > 30 ? (
+              <div
+                className="arm-timer-box arm-timer-late"
+                role="timer"
+                aria-label="Таймер подтверждения"
+              >
+                <b>{time(elapsed)}</b>
+                <small>минут секунд</small>
+              </div>
+            ) : null}
+          </div>
+          <div className="arm-mode">
+            <span>просмотр</span>
+            {own && !locked ? (
+              <Tooltip title="Дополнение данных происшествия">
+                <Button aria-label="Редактировать карточку" onClick={editModal} disabled={busy}>
+                  дополнение
+                </Button>
+              </Tooltip>
+            ) : (
+              <span className="arm-readonly">только чтение</span>
+            )}
+          </div>
+        </section>
         {own && !locked ? (
-          <Space>
+          <div className="arm-call-actions">
+            <span>Связь</span>
             {callState === 'hangup' ? (
               <Button
                 icon={<PhoneOutlined />}
                 loading={calling}
+                disabled={busy && !calling}
                 onClick={() => phoneAction('ring')}
               >
                 Учебный вызов
@@ -246,7 +484,7 @@ export function Workspace() {
                 <Button type="primary" loading={calling} onClick={() => phoneAction('answer')}>
                   Принять вызов
                 </Button>
-                <Button danger loading={calling} onClick={() => phoneAction('hangup')}>
+                <Button danger disabled={calling} onClick={() => phoneAction('hangup')}>
                   Отклонить
                 </Button>
               </>
@@ -260,248 +498,375 @@ export function Workspace() {
                 Завершить вызов
               </Button>
             )}
-          </Space>
+          </div>
         ) : null}
-      </section>
-      <div className="work-grid">
-        <section className="incident-info">
-          <div className="section-heading">
-            <h2>Информация о происшествии</h2>
-            {own && !locked ? (
-              <Tooltip title="Редактировать карточку">
-                <Button
-                  aria-label="Редактировать карточку"
-                  icon={<EditOutlined />}
-                  onClick={editModal}
-                  disabled={calling || reacting || saving || finishing}
-                />
-              </Tooltip>
-            ) : null}
-          </div>
-          <div className="address-block">
-            <small>МЕСТО ПРОИСШЕСТВИЯ</small>
-            <h3>{card.address}</h3>
-          </div>
-          <div className="description-block">
-            <div className="muted">{date(card.created_at)} · Система-112 · учебное сообщение</div>
-            <p>{card.comments || 'Описание не заполнено'}</p>
-          </div>
-          {card.scenario ? (
-            <Collapse
-              ghost
-              items={[
-                {
-                  key: 'briefing',
-                  label: 'Информация от реагирующей службы',
-                  children: (
-                    <ul className="briefing">
-                      {card.scenario.briefing.map((s, i) => (
-                        <li key={i}>{s}</li>
-                      ))}
-                    </ul>
-                  ),
-                },
-              ]}
-            />
-          ) : null}
-        </section>
-        <section className="classification">
-          <div className="section-heading">
-            <h2>Классификация</h2>
-            <Tag>ЕКП</Tag>
-          </div>
-          <h3>{card.incident_type}</h3>
-          <Space wrap>
-            {card.classification?.features.map((v, i) => (
-              <Tag key={i}>{v}</Tag>
-            ))}
-          </Space>
-          <div className="source-line">
-            Классификатор v046_24 · строка {card.classification?.source.row}
-          </div>
-          <div className={'ack-box ' + (elapsed > 30 ? 'late' : '')}>
-            <ClockCircleOutlined />
-            <div>
-              <b>{acknowledgementLabel}</b>
-              <small>{elapsed.toFixed(1)} с / 30 с</small>
-            </div>
-            {card.acknowledged_at ? <CheckOutlined /> : null}
-          </div>
-        </section>
-      </div>
-      <section className="service-section">
-        <div className="section-heading">
-          <h2>Реагирование службы</h2>
-          <span className="muted">{card.scenario?.service || 'ДДС учебного района'}</span>
-        </div>
-        <div className="service-current">
-          <div>
-            <Status value={card.status} />
-            <span className="muted">{date(card.updated_at)}</span>
-          </div>
-          {own && !locked ? (
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={reactionModal}
-              disabled={calling || reacting || saving || finishing}
-            >
-              Изменить статус
-            </Button>
-          ) : (
-            <Tag>
-              {card.session_status === 'finished'
-                ? 'Занятие завершено'
-                : own
-                  ? 'Редактирование закрыто'
-                  : 'Просмотр преподавателя'}
-            </Tag>
-          )}
-        </div>
-        <Collapse
-          ghost
-          items={[
-            {
-              key: 'services',
-              label: 'Список оповещения и условия классификатора',
-              children: (
-                <>
-                  <Space wrap>
-                    {direct.map((r, i) => (
-                      <Tag key={i}>{r.service}</Tag>
-                    ))}
-                  </Space>
-                  <Table
+        <div className="arm-details" data-testid="arm-details">
+          <section className="arm-left" aria-label="Информация о происшествии">
+            <div className="arm-field arm-caller">
+              <small>Фамилия и имя заявителя</small>
+              <b>{card.name || 'Не указано'}</b>
+              <span className="arm-caller-status">очевидец</span>
+              <Tooltip title="Учебный контур: статусы обращения не подключены. В боевой АРМ здесь выбирают характер обращения заявителя.">
+                <span>
+                  <Select
+                    className="arm-caller-select"
                     size="small"
-                    pagination={{ pageSize: 6, showSizeChanger: false }}
-                    rowKey="column"
-                    dataSource={routes}
-                    scroll={{ x: 650 }}
-                    columns={[
-                      { title: 'Служба', dataIndex: 'service' },
-                      {
-                        title: 'Условие / вариант',
-                        render: (_, r) => r.condition || r.variant || 'Без дополнительного условия',
-                      },
-                      { title: 'Значение', dataIndex: 'value' },
-                    ]}
+                    disabled
+                    placeholder="Выберите статус"
+                    aria-label="Статус обращения"
                   />
-                </>
-              ),
-            },
-          ]}
+                </span>
+              </Tooltip>
+              <Tooltip title="Учебный контур: итог обращения не подключён. В боевой АРМ здесь фиксируют результат обращения.">
+                <span>
+                  <Select
+                    className="arm-caller-select"
+                    size="small"
+                    disabled
+                    placeholder="Итог обращения"
+                    aria-label="Итог обращения"
+                  />
+                </span>
+              </Tooltip>
+            </div>
+            <div className="arm-field arm-address-card">
+              <div className="arm-address-head">
+                <div>
+                  <small>Адрес:</small>
+                  <b>{card.address}</b>
+                </div>
+                <Tooltip title="Открыть учебную карту адреса">
+                  <Button
+                    aria-label="Открыть карту"
+                    size="small"
+                    icon={<EnvironmentOutlined />}
+                    onClick={() => setPanel('map')}
+                  >
+                    карта
+                  </Button>
+                </Tooltip>
+              </div>
+              <div className="arm-address-grid">
+                {addressGrid.map(([label, value]) => (
+                  <div key={label}>
+                    <small>{label}</small>
+                    <span>{value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="arm-address-descriptive">
+                <small>Описательный адрес:</small>
+                <span>{card.address}</span>
+              </div>
+            </div>
+            <div className="arm-field arm-description">
+              <small>Описание со слов заявителя</small>
+              <b>{date(card.created_at)} · Система-112 · учебное сообщение</b>
+              <p>{card.comments || 'Описание не заполнено'}</p>
+            </div>
+          </section>
+          <section className="arm-right" aria-label="Классификация">
+            <div className="arm-flags">
+              <span className="arm-flag-text">Пострадавшие: нет</span>
+              <span className="arm-flag-text">Отказ от скорой: нет</span>
+              <span className="arm-flag-text">Заблокированные: нет</span>
+              <Tooltip title="Учебный контур: признак ЧС не передаётся API. В боевой АРМ признак повышает приоритет карточки в ЕДДС.">
+                <span>
+                  <Button disabled icon={<ThunderboltOutlined />}>
+                    ЧС
+                  </Button>
+                </span>
+              </Tooltip>
+              <Tooltip title="Учебный контур: признак ЧП не передаётся API. В боевой АРМ признак помечает происшествие как чрезвычайное.">
+                <span>
+                  <Button disabled className="arm-flag-emergency" icon={<WarningOutlined />}>
+                    ЧП
+                  </Button>
+                </span>
+              </Tooltip>
+              <Tooltip title="Учебный контур: редактирование признаков не подключено">
+                <span>
+                  <Button disabled aria-label="Редактировать признаки" icon={<EditOutlined />} />
+                </span>
+              </Tooltip>
+            </div>
+            <h2 className="arm-type">
+              Происшествие{typeCode ? ' ' + typeCode : ': ' + card.incident_type}
+            </h2>
+            <div className="arm-field arm-features">
+              <small>Признаки происшествия</small>
+              {card.classification?.features.length
+                ? card.classification.features.join(' . ') + ' .'
+                : 'Признаки не указаны'}
+            </div>
+            <div className="arm-field">
+              <small>Класс.:</small>
+              <b>{card.incident_type} ;</b>
+            </div>
+            <div className="arm-field">
+              <Tooltip title="Классификация внешней информационной системы не подключена">
+                <span>
+                  <small>[ВИС] Класс.</small>
+                  нет данных
+                </span>
+              </Tooltip>
+            </div>
+            <div className="arm-field arm-training-note">
+              <small>Учебное расширение</small>
+              ДДС фиксирует статусы и комментарии; исходная карта заявителя остаётся зоной 112.
+              Подсказки и результаты доступны через «?».
+            </div>
+          </section>
+        </div>
+        <ServiceDock
+          card={card}
+          own={own}
+          locked={locked}
+          busy={busy}
+          onReact={reactionModal}
+          onRoutes={() => setPanel('routes')}
+          onHistory={() => setPanel('history')}
         />
-      </section>
-      <section className="bottom-section">
-        <Tabs
-          items={[
-            {
-              key: 'history',
-              label: 'История действий',
-              children: <History events={card.events || []} />,
-            },
-            {
-              key: 'source',
-              label: 'Учебный материал',
-              children: card.scenario ? (
-                <Descriptions
-                  column={1}
-                  items={[
-                    { key: 's', label: 'Источник', children: card.scenario.source.file },
-                    { key: 'p', label: 'Страница', children: card.scenario.source.page },
-                    { key: 'n', label: 'Статус эталона', children: card.scenario.source.note },
-                  ]}
-                />
-              ) : (
-                <Empty description="Карточка создана вручную" />
-              ),
-            },
-          ]}
-        />
-      </section>
+      </div>
       {card.evaluation ? (
-        <div className="result-shortcut">
+        <section className="result-shortcut" aria-label="Итоги занятия">
           <Result result={card.evaluation} />
           {card.feedback?.map((f) => (
             <Alert
               key={f.id}
               type="info"
-              message="Комментарий преподавателя"
+              message={
+                f.author_name
+                  ? `Комментарий преподавателя · ${f.author_name}`
+                  : 'Комментарий преподавателя'
+              }
               description={f.comment}
             />
           ))}
-        </div>
+        </section>
       ) : null}
       {own && !card.session_id ? (
-        <Popconfirm
-          title="Удалить учебную карточку?"
-          onConfirm={async () => {
-            try {
-              await remove(id).unwrap();
-              navigate('/incidents');
-            } catch (e) {
-              message.error(errorText(e));
-            }
-          }}
-          okText="Удалить"
-          cancelText="Отмена"
-        >
-          <Button danger icon={<DeleteOutlined />}>
-            Удалить карточку
-          </Button>
-        </Popconfirm>
+        <div className="arm-delete">
+          <Popconfirm
+            title="Удалить учебную карточку?"
+            okText="Удалить"
+            cancelText="Отмена"
+            onConfirm={async () => {
+              try {
+                await remove(id).unwrap();
+                navigate('/incidents');
+              } catch (e) {
+                message.error(errorText(e));
+              }
+            }}
+          >
+            <Button danger icon={<DeleteOutlined />} loading={removing}>
+              Удалить карточку
+            </Button>
+          </Popconfirm>
+        </div>
       ) : null}
+      <Drawer
+        width={620}
+        title={
+          panel === 'history'
+            ? 'История действий'
+            : panel === 'routes'
+              ? 'Справочник маршрутов и условия классификатора'
+              : panel === 'map'
+                ? 'Карта и адрес'
+                : 'Сведения о занятии'
+        }
+        open={panel !== null}
+        onClose={() => setPanel(null)}
+      >
+        {panel === 'history' ? (
+          <History events={card.events || []} />
+        ) : panel === 'map' ? (
+          <MapPanel address={card.address} />
+        ) : panel === 'routes' ? (
+          <>
+            <Alert
+              type="info"
+              message="Справочник возможных получателей. Для ДДС бригады выбираются вручную по району обслуживания и подчинённости; фактическая передача другим службам не выполняется."
+            />
+            <Table
+              size="small"
+              rowKey="column"
+              dataSource={routes}
+              scroll={{ x: 480 }}
+              pagination={{ pageSize: 8, showSizeChanger: false }}
+              columns={[
+                { title: 'Служба', dataIndex: 'service' },
+                {
+                  title: 'Условие / вариант',
+                  render: (_, r) =>
+                    [r.condition, r.variant].filter(Boolean).join(' / ') ||
+                    'Без дополнительного условия',
+                },
+                { title: 'Значение', dataIndex: 'value' },
+              ]}
+            />
+            <p>
+              Классификатор v046_24 · строка {card.classification?.source.row ?? 'не определена'}
+            </p>
+          </>
+        ) : (
+          <Tabs
+            items={[
+              {
+                key: 'context',
+                label: 'Занятие',
+                children: (
+                  <>
+                    <Alert
+                      type="info"
+                      message={
+                        own
+                          ? locked
+                            ? 'Редактирование закрыто'
+                            : 'Ваше рабочее место ДДС'
+                          : 'Просмотр преподавателя'
+                      }
+                      description="В этой сессии фиксируются действия одной ДДС. Маршруты и службы показаны как справочник; бригады ДДС выбираются вручную по району обслуживания и подчинённости."
+                    />
+                    <h3>Подтверждение получения</h3>
+                    <p>
+                      «Получена службой» регистрируется при открытии своей карточки. «Принята»
+                      подтверждает её принятие. Контрольный срок: 30 секунд с поступления карточки в
+                      строку сообщений.
+                    </p>
+                    <h3>Статус и комментарий</h3>
+                    <p>
+                      Универсальный цикл ДДС: «Принята / Не принята», «Начало реагирования»,
+                      «Прибытие», «Проведение работ», «Работы завершены» или «Отказ». Первая запись
+                      статуса с текстом должна появиться в течение 3 минут. Отказ и завершение работ
+                      требуют комментария: причину отказа и сведения о передаче — при отказе, итог
+                      работ — при завершении. «Работы завершены» и «Отказ от выполнения работ»
+                      закрывают редактирование. История сохраняется после каждого действия.
+                    </p>
+                    <h3>Учебная связь</h3>
+                    <p>
+                      Вызов, ответ и завершение фиксируются в журнале. В MVP телефонная эмуляция
+                      представляет связь ДДС с руководителем/старшим группы реагирования; при
+                      необходимости диспетчер может связаться с заявителем по номеру из карточки, но
+                      это не основной маршрут MVP. Реальные звонки, аудиозаписи и SMS не подключены.
+                    </p>
+                    <p className="muted">
+                      Памятка АРМ-112 для ДДС, стр. 21–26, 32. Учебные пояснения дополняют рабочее
+                      место.
+                    </p>
+                  </>
+                ),
+              },
+              {
+                key: 'source',
+                label: 'Учебный материал',
+                children: card.scenario ? (
+                  <>
+                    <h3>{card.scenario.title}</h3>
+                    <p>{card.scenario.prompt}</p>
+                    <h3>Информация от реагирующей службы</h3>
+                    <ul className="briefing">
+                      {card.scenario.briefing.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ul>
+                    <Descriptions
+                      column={1}
+                      items={[
+                        { key: 'file', label: 'Источник', children: card.scenario.source.file },
+                        { key: 'page', label: 'Страница', children: card.scenario.source.page },
+                        {
+                          key: 'note',
+                          label: 'Статус эталона',
+                          children: card.scenario.source.note,
+                        },
+                      ]}
+                    />
+                  </>
+                ) : (
+                  <Empty description="Карточка создана вручную" />
+                ),
+              },
+            ]}
+          />
+        )}
+      </Drawer>
       <Modal
         title="Редактирование карточки"
+        className="arm-edit-modal"
         open={editOpen}
-        onCancel={() => setEditOpen(false)}
+        onCancel={closeEditor}
+        maskClosable={false}
         onOk={() => form.submit()}
         okText="Сохранить"
         cancelText="Отмена"
         confirmLoading={saving}
-        width={660}
+        okButtonProps={{ disabled: locked || stale }}
+        width={700}
       >
+        {editorNotice}
         <Form
           form={form}
           layout="vertical"
+          onValuesChange={() => setDirty(true)}
           onFinish={async (v) => {
+            if (writePending.current || locked || stale) return;
+            writePending.current = true;
+            setWriteError(undefined);
             try {
               synchronizeCard(await edit({ ...v, id, version: editVersion }).unwrap());
               setEditOpen(false);
+              setDirty(false);
               message.success('Карточка сохранена');
             } catch (e) {
-              message.error(errorText(e));
+              setWriteError(e);
+              if ((e as { status?: number }).status === 409) void refetch();
+            } finally {
+              writePending.current = false;
             }
           }}
         >
-          <CardFieldsForm types={types} />
+          <CardFieldsForm types={types} ddsMode={Boolean(card.session_id)} />
         </Form>
       </Modal>
       <Modal
         title="Статус реагирования"
+        className="arm-reaction-modal"
         open={reactionOpen}
-        onCancel={() => setReactionOpen(false)}
-        onOk={() => reactionForm.submit()}
-        okText="Сохранить статус"
-        cancelText="Отмена"
-        confirmLoading={reacting}
+        onCancel={closeEditor}
+        maskClosable={false}
+        width={980}
+        footer={null}
       >
+        {editorNotice}
         <Form
           form={reactionForm}
           layout="vertical"
+          className="arm-reaction-form"
+          onValuesChange={() => setDirty(true)}
           onFinish={async (v) => {
+            if (writePending.current || locked || stale) return;
+            writePending.current = true;
+            setWriteError(undefined);
             try {
-              const updated = await react({
-                id,
-                version: reactionVersion,
-                status: v.status,
-                comment: v.comment || '',
-              }).unwrap();
-              synchronizeCard(updated);
+              synchronizeCard(
+                await react({
+                  id,
+                  version: reactionVersion,
+                  status: v.status,
+                  comment: v.comment || '',
+                }).unwrap(),
+              );
               setReactionOpen(false);
+              setDirty(false);
               message.success('Статус сохранён');
             } catch (e) {
-              message.error(errorText(e));
+              setWriteError(e);
+              if ((e as { status?: number }).status === 409) void refetch();
+            } finally {
+              writePending.current = false;
             }
           }}
         >
@@ -521,18 +886,43 @@ export function Workspace() {
                 label="Комментарий"
                 rules={[
                   {
-                    required: ['rejected', 'refused'].includes(getFieldValue('status')),
+                    required: ['rejected', 'refused', 'completed'].includes(
+                      getFieldValue('status'),
+                    ),
                     whitespace: true,
-                    message: 'Укажите причину отказа и сведения о передаче информации',
+                    message:
+                      getFieldValue('status') === 'completed'
+                        ? 'Укажите итог выполненных работ'
+                        : 'Укажите причину отказа; передачу информации укажите при наличии',
                   },
                 ]}
               >
-                <Input.TextArea rows={4} maxLength={2048} showCount />
+                <Input.TextArea autoSize={{ minRows: 1, maxRows: 4 }} maxLength={2048} />
               </Form.Item>
             )}
           </Form.Item>
+          <div className="arm-reaction-actions">
+            <Tooltip title="Сохранить статус">
+              <Button
+                type="primary"
+                aria-label="Сохранить статус"
+                htmlType="submit"
+                icon={<CheckOutlined />}
+                loading={reacting}
+                disabled={locked || stale}
+              />
+            </Tooltip>
+            <Tooltip title="Отмена">
+              <Button
+                aria-label="Отмена"
+                icon={<CloseOutlined />}
+                onClick={closeEditor}
+                disabled={reacting}
+              />
+            </Tooltip>
+          </div>
         </Form>
       </Modal>
-    </>
+    </div>
   );
 }

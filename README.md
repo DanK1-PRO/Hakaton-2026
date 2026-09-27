@@ -38,6 +38,25 @@ docker compose up --build -d --wait
 Интерфейс: **http://localhost:8080**. API: **http://localhost:8000/docs**.
 Запуск без Docker на Windows описан в [инструкции](docs/DEPLOYMENT.md).
 
+### Локальный запуск через виртуальное окружение
+
+Для проверки без Docker используйте `.venv`; само окружение не коммитится, но создаётся на машине проверяющего:
+
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
+.\.venv\Scripts\python.exe scripts\init_local.py
+powershell -ExecutionPolicy Bypass -File scripts\windows\start-app.ps1
+```
+
+Для ML-оценщика дополнительно:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r ml\requirements.txt
+$env:PYTHONPATH='backend'
+.\.venv\Scripts\python.exe -m uvicorn ml.evaluator_service:app --host 127.0.0.1 --port 8090
+```
+
 | Роль | Почта | Начальный пароль |
 |---|---|---|
 | Обучающийся | trainee@dds.local | DdsDemo2026! |

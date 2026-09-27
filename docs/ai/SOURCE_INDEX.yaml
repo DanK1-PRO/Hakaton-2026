@@ -1,4 +1,4 @@
-generated_at: "2026-09-20"
+generated_at: "2026-09-21"
 project_root: "D:/Хакатон (2026)"
 notes:
   - "Original customer files must remain immutable."
@@ -80,6 +80,20 @@ sources:
     sha256_prefix: "ea9903a74031a8e8"
     priority: P4_ui
     role: "Card-112 screenshot notes and embedded images; useful for UI fields and timing visual behavior."
+    status: present
+
+  - id: card112_docx
+    path: "Данные заказчика/КАРТОЧКА 112.docx"
+    sha256_prefix: "49037e9a2a90760b"
+    priority: P4_ui
+    role: "Additional Card-112 embedded screenshots; use for address grid, orange action bar, feature chips and card layout fidelity."
+    status: present
+
+  - id: services112_docx
+    path: "Данные заказчика/СЛУЖБЫ 112.docx"
+    sha256_prefix: "3f736a75014d4ae9"
+    priority: P4_ui
+    role: "Additional Service-112 embedded screenshots; use for service dock, service history/status editor variants and visual states."
     status: present
 
   - id: customer_final_tz_docx

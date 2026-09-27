@@ -17,6 +17,12 @@ def deterministic_evaluate(request: EvaluationRequest, mode="mock"):
         critical.append("Получение карточки не подтверждено")
     elif request.timing["acknowledgement_seconds"] > 30:
         critical.append("Превышено время подтверждения карточки: 30 секунд")
+    first_response_seconds = request.timing.get("first_response_seconds")
+    first_response_deadline = request.timing.get("first_response_deadline_seconds", 180)
+    if first_response_seconds is None:
+        critical.append("Не добавлена первая запись статуса с комментарием")
+    elif first_response_seconds > first_response_deadline:
+        critical.append("Превышено время первой записи статуса: 3 минуты")
     return EvaluationResult(
         session_id=request.session_id,
         model_version="deterministic-demo-1",

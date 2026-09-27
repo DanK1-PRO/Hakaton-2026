@@ -47,25 +47,37 @@ export function ErrorPanel({ error, retry }: { error: unknown; retry?: () => voi
   );
 }
 export function Status({ value }: { value: string }) {
-  return (
-    <Tag
-      color={
-        value === 'completed'
-          ? 'success'
-          : ['refused', 'rejected'].includes(value)
-            ? 'error'
-            : ['added', 'received'].includes(value)
-              ? 'warning'
-              : 'processing'
-      }
-    >
-      {labels[value] || value}
-    </Tag>
-  );
+  const statusConfig: Record<string, { color: string; icon?: string }> = {
+    added: { color: 'warning' },
+    received: { color: 'warning' },
+    accepted: { color: 'processing' },
+    rejected: { color: 'error' },
+    responding: { color: 'processing' },
+    arrived: { color: 'blue' },
+    working: { color: 'processing' },
+    completed: { color: 'success' },
+    refused: { color: 'error' },
+  };
+  const config = statusConfig[value] || { color: 'default' };
+  return <Tag color={config.color}>{labels[value] || value}</Tag>;
 }
-export function CardFields({ types }: { types: IncidentType[] }) {
+export function CardFields({
+  types,
+  ddsMode = false,
+}: {
+  types: IncidentType[];
+  ddsMode?: boolean;
+}) {
   return (
     <>
+      {ddsMode ? (
+        <Alert
+          type="info"
+          showIcon
+          message="Учебное дополнение ДДС"
+          description="По уточнению заказчика диспетчер ДДС не контролирует правильность карты заявителя: это зона 112. В MVP основная работа ДДС — статусы, комментарии и телефонная связь; эти поля оставлены как учебная корректировка только для тренажёра."
+        />
+      ) : null}
       <div className="form-pair">
         <Form.Item name="caller_number" label="Телефон заявителя" rules={[{ max: 30 }]}>
           <Input maxLength={30} />
@@ -130,6 +142,15 @@ export function Result({ result }: { result: Evaluation }) {
           </strong>
           <span>подтверждение</span>
         </div>
+        <div>
+          <strong>
+            {result.timing.first_response_seconds === undefined ||
+            result.timing.first_response_seconds === null
+              ? 'Нет'
+              : result.timing.first_response_seconds + ' с'}
+          </strong>
+          <span>первая запись</span>
+        </div>
       </div>
       {problems === 0 ? (
         <Alert type="success" message="По проверяемым критериям замечаний нет" showIcon />
@@ -176,10 +197,21 @@ export function History({ events }: { events: Event[] }) {
     answer: 'Вызов принят',
     hangup: 'Вызов завершён',
   };
+  const kindColors: Record<string, string> = {
+    incoming: 'blue',
+    opened: 'green',
+    updated: 'orange',
+    created: 'gray',
+    finished: 'green',
+    deleted: 'red',
+    reaction: 'blue',
+    communication: 'cyan',
+  };
   return (
     <Timeline
       items={[...events].reverse().map((e) => ({
         key: e.id,
+        color: kindColors[e.kind] || 'gray',
         children: (
           <>
             <b>
@@ -189,7 +221,10 @@ export function History({ events }: { events: Event[] }) {
                   ? phone[e.payload.action]
                   : names[e.kind] || e.kind}
             </b>
-            <div className="muted">{date(e.created_at)}</div>
+            <div className="muted">
+              {e.actor_name ? `оп. ${e.actor_name} · ` : ''}
+              {date(e.created_at)}
+            </div>
             {e.payload.comment ? <p>{e.payload.comment}</p> : null}
           </>
         ),

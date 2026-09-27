@@ -1,6 +1,7 @@
-from datetime import timedelta
+from datetime import timedelta, timezone
 from sqlalchemy import select
 from conftest import login
+from app.domain import seconds_since
 from app.models import Incident, TrainingSession
 from app.settings import settings
 
@@ -36,6 +37,8 @@ def test_complete_training_and_instructor_correction(client):
     assert r.status_code == 200, r.text
     result = r.json()
     assert not result["critical_errors"] and not result["missing_information"]
+    assert result["timing"]["first_response_seconds"] is not None
+    assert result["timing"]["first_response_deadline_seconds"] == 180
     assert result["score"] is None
     assert client.post(API + f"/simulation/sessions/{card['session_id']}/finish", headers=headers).json() == result
     teacher = login(client, "instructor")
@@ -73,6 +76,24 @@ def test_refusal_comment_and_recovery(client):
     assert card["allowed_statuses"] == ["accepted"]
     card = reaction(client, headers, card, "accepted").json()
     assert reaction(client, headers, card, "rejected", "reason").status_code == 409
+    assert reaction(client, headers, card, "completed", "").status_code == 422
+    done = reaction(client, headers, card, "completed", "Ликвидировано, бригада снята с объекта")
+    assert done.status_code == 200
+    history = done.json()["events"]
+    reaction_events = [e for e in history if e["kind"] == "reaction" and e["payload"]["status"] == "completed"]
+    assert reaction_events and reaction_events[-1]["actor_name"]
+
+
+def test_scenarios_expose_expected_hint_without_reference(client):
+    headers = login(client)
+    scenarios = client.get(API + "/scenarios", headers=headers).json()
+    by_id = {s["id"]: s for s in scenarios}
+    assert by_id["water"]["expected_hint"] == "Принять"
+    assert by_id["elevator"]["expected_hint"] == "Не принимать"
+    assert "reference" not in by_id["water"]
+    card = start(client, headers, "water")
+    assert "expected_hint" not in card["scenario"]
+    assert "reference" not in card["scenario"]
 
 
 def test_optimistic_lock_and_final_state(client):
@@ -101,7 +122,22 @@ def test_late_acknowledgement_and_ml_failure(client, monkeypatch):
     assert result["mode"] == "fallback"
     assert result["critical_errors"]
     assert result["timing"]["acknowledgement_seconds"] >= 40
+    assert result["timing"]["first_response_deadline_seconds"] == 180
     assert client.get(API + "/incidents", headers=headers).status_code == 200
+
+
+def test_first_response_comment_deadline_is_reported(client):
+    headers = login(client)
+    card = start(client, headers)
+    with client.test_sessions() as db:
+        stored = db.get(Incident, card["id"])
+        stored.created_at -= timedelta(seconds=181)
+        db.commit()
+    card = reaction(client, headers, card, "accepted", "").json()
+    card = reaction(client, headers, card, "responding", "Первая запись после звонка старшему группы").json()
+    result = client.post(API + f"/simulation/sessions/{card['session_id']}/finish", headers=headers).json()
+    assert result["timing"]["first_response_seconds"] >= 181
+    assert "Превышено время первой записи статуса: 3 минуты" in result["critical_errors"]
 
 
 def test_manual_crud_and_classifier_validation(client):
@@ -131,3 +167,19 @@ def test_start_is_idempotent_and_communication_order(client):
         assert client.post(endpoint, headers=headers, json={"action": action}).status_code == 200
     with client.test_sessions() as db:
         assert len(db.scalars(select(TrainingSession)).all()) == 1
+
+
+def test_seconds_since_handles_non_utc_tz():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    msk = ZoneInfo("Europe/Moscow")
+    start = datetime(2026, 9, 22, 21, 0, 0, tzinfo=msk)  # 18:00 UTC
+    end_utc = datetime(2026, 9, 22, 18, 30, 0, tzinfo=timezone.utc)
+    assert seconds_since(start, end_utc) == 1800
+
+    start_naive = datetime(2026, 9, 22, 18, 0, 0)
+    end_utc2 = datetime(2026, 9, 22, 18, 30, 0, tzinfo=timezone.utc)
+    assert seconds_since(start_naive, end_utc2) == 1800
+
+    assert seconds_since(start, datetime(2026, 9, 22, 17, 0, 0, tzinfo=timezone.utc)) == 0

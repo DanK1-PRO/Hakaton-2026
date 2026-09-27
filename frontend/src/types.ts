@@ -14,6 +14,7 @@ export type Scenario = {
   service: string;
   briefing: string[];
   source: Source;
+  expected_hint?: string | null;
 };
 export type Evaluation = {
   schema_version: string;
@@ -25,7 +26,12 @@ export type Evaluation = {
   critical_errors: string[];
   field_errors: { field: string; expected: unknown; actual: unknown }[];
   missing_information: string[];
-  timing: { elapsed_seconds: number; acknowledgement_seconds: number | null };
+  timing: {
+    elapsed_seconds: number;
+    acknowledgement_seconds: number | null;
+    first_response_seconds?: number | null;
+    first_response_deadline_seconds?: number;
+  };
   explanation: string;
 };
 export type Event = {
@@ -34,8 +40,15 @@ export type Event = {
   payload: Record<string, string>;
   created_at: string;
   actor_id: string;
+  actor_name?: string | null;
 };
-export type Feedback = { id: string; comment: string; verdict: string; created_at: string };
+export type Feedback = {
+  id: string;
+  comment: string;
+  verdict: string;
+  created_at: string;
+  author_name?: string | null;
+};
 export type Incident = {
   id: string;
   number: string;

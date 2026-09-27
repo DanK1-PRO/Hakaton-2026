@@ -3,14 +3,23 @@ from .models import Action, Feedback, IncidentType, TrainingSession, Scenario, U
 from .domain import TRANSITIONS, STATUS_LABELS, seconds_since
 
 
-def event_view(item):
+def event_view(item, actor_name=None):
     return {
         "id": item.id,
         "kind": item.kind,
         "payload": item.payload,
         "created_at": item.created_at.isoformat(),
         "actor_id": item.actor_id,
+        "actor_name": actor_name,
     }
+
+
+def actor_names(db, items, field="actor_id"):
+    ids = {getattr(item, field) for item in items}
+    if not ids:
+        return {}
+    users = db.scalars(select(User).where(User.id.in_(ids))).all()
+    return {user.id: user.name for user in users}
 
 
 def incident_view(db, item, detail=False):
@@ -44,29 +53,30 @@ def incident_view(db, item, detail=False):
         events = db.scalars(
             select(Action).where(Action.incident_id == item.id).order_by(Action.created_at, Action.id)
         ).all()
-        result["events"] = [event_view(e) for e in events]
+        names = actor_names(db, events)
+        result["events"] = [event_view(e, names.get(e.actor_id)) for e in events]
         result["classification"] = kind.data
         result["evaluation"] = session.evaluation if session else None
         result["scenario"] = scenario_view(db.get(Scenario, session.scenario_id)) if session else None
-        result["feedback"] = (
-            [
-                feedback_view(f)
-                for f in db.scalars(
-                    select(Feedback).where(Feedback.session_id == item.session_id).order_by(Feedback.created_at)
-                )
-            ]
+        feedbacks = (
+            db.scalars(
+                select(Feedback).where(Feedback.session_id == item.session_id).order_by(Feedback.created_at)
+            ).all()
             if session
             else []
         )
+        feedback_names = actor_names(db, feedbacks, "author_id")
+        result["feedback"] = [feedback_view(f, feedback_names.get(f.author_id)) for f in feedbacks]
     return result
 
 
-def feedback_view(item):
+def feedback_view(item, author_name=None):
     return {
         "id": item.id,
         "comment": item.comment,
         "verdict": item.verdict,
         "author_id": item.author_id,
+        "author_name": author_name,
         "created_at": item.created_at.isoformat(),
     }
 
@@ -88,6 +98,8 @@ def session_view(db, s):
 
     incident = db.scalar(select(Incident).where(Incident.session_id == s.id))
     user = db.get(User, s.user_id)
+    feedbacks = db.scalars(select(Feedback).where(Feedback.session_id == s.id).order_by(Feedback.created_at)).all()
+    feedback_names = actor_names(db, feedbacks, "author_id")
     return {
         "id": s.id,
         "trainee": user.name,
@@ -97,8 +109,5 @@ def session_view(db, s):
         "started_at": s.started_at.isoformat(),
         "incident_id": incident.id if incident else None,
         "evaluation": s.evaluation,
-        "feedback": [
-            feedback_view(f)
-            for f in db.scalars(select(Feedback).where(Feedback.session_id == s.id).order_by(Feedback.created_at))
-        ],
+        "feedback": [feedback_view(f, feedback_names.get(f.author_id)) for f in feedbacks],
     }

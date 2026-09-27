@@ -31,7 +31,12 @@ TRANSITIONS = {
 def seconds_since(start, end=None):
     from datetime import timezone
 
-    return max(0, ((end or utcnow()).replace(tzinfo=timezone.utc) - start.replace(tzinfo=timezone.utc)).total_seconds())
+    def to_utc(dt):
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+
+    return max(0, (to_utc(end or utcnow()) - to_utc(start)).total_seconds())
 
 
 def incident_for(db, id, user, write=False):
@@ -77,6 +82,8 @@ def react(db, incident, user, request):
         raise HTTPException(409, "Недопустимый переход статуса")
     if request.status in {"rejected", "refused"} and not request.comment:
         raise HTTPException(422, "Укажите причину отказа и сведения о передаче информации")
+    if request.status == "completed" and not request.comment:
+        raise HTTPException(422, "Укажите итог выполненных работ")
     if request.status in {"accepted", "rejected"} and not incident.acknowledged_at:
         incident.acknowledged_at = utcnow()
     incident.response_status = request.status

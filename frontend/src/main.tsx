@@ -7,6 +7,7 @@ import ruRU from 'antd/locale/ru_RU';
 import { store } from './store';
 import App from './App';
 import './styles.css';
+import './arm/arm.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
