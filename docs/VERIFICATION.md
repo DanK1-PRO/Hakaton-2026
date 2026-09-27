@@ -1,5 +1,45 @@
 # Протокол Проверки
 
+## 27.09.2026 — интеграция ML-веток и release `modelURL`
+
+Объект: проверка завершённых ML-веток Кирилла/Максима и безопасное подключение
+runtime-части к текущему UI/API-контуру. Проверены `origin/ml/scoring-experiment`,
+`origin/ml_end`, `origin/model`, `origin/LocalAPI`, `origin/hht` и GitHub release
+`vModel` / tag `modelURL`.
+
+Решение по merge:
+
+| Источник | Решение |
+|---|---|
+| `ml/scoring-experiment` / `ml_end` | Взят runtime ML-модуль: evaluator service, generator scripts, prompt/setup docs, classifier-derived scenarios. Старое frontend/backend дерево не мержилось, чтобы не удалить текущую UI-сборку. |
+| `LocalAPI` | Не включён в runtime: отдельный мини-FastAPI с in-memory auth и `501 Not implemented` для incident CRUD. |
+| `hht` | Не включён в runtime: отдельный ML-скелет, ключевые `src/*` файлы являются stub. |
+| Release `modelURL` | Зафиксирован как внешний локальный model artifact: 7 GGUF parts GigaChat 3.1, около 6.03 GB. В Git checkout не скачивался. |
+
+Правки:
+
+| Область | Изменения |
+|---|---|
+| ML runtime | Добавлен `ml/evaluator_service.py` с `/health` и `/v1/evaluate`, `ml/scenario_generator.py`, launch/import scripts и `ml/requirements.txt` |
+| Contract | `backend/tests/test_ml_evaluator_service.py` проверяет совместимость результата с `app.schemas.EvaluationResult`, `mode=local`, `schema_version=1.0`, `session_id` и 3-минутный норматив первой записи |
+| Gateway evidence | `scripts/verify_local_ml.py` теперь запускает `ml.evaluator_service:app`, затем проверяет потерю сервиса и fallback |
+| Docs | README: `.venv` local run; `docs/ML_INTEGRATION.md`: evaluator service и model release; `docs/team/ML_BRANCH_REVIEW.ru.md`: разбор всех ML/non-UI веток |
+
+| Проверка | Фактический результат |
+|---|---|
+| `git fetch --all --tags --prune` | Получены `origin/ml_end`, `origin/model`, tag `modelURL`; список веток обновлён |
+| GitHub release API `modelURL` | Pre-release `vModel`, 7 assets `GigaChat3.1-10B-A1.8B-q4_K_M.part01..part07.gguf` |
+| `ruff check backend ml scripts` | Passed после hygiene-правок ML scripts |
+| `PYTHONPATH=backend pytest backend/tests/test_ml_evaluator_service.py -q` | 2 passed |
+| `PYTHONPATH=backend pytest backend/tests -q` | 20 passed, 2 warnings Starlette/httpx/AnyIO |
+| `PYTHONPATH=backend python scripts/verify_local_ml.py` | Passed: `observed_modes=["local", "fallback"]`, concurrent finish idempotent |
+
+Ограничения: GGUF-веса не скачивались и не запускались в этом проходе; проверен
+локальный evaluator service и contract/fallback path. Автоматически сгенерированные
+`classifier_scenarios.json` требуют методического отбора перед демонстрацией как
+официального сценарного корпуса. Балльная методика остаётся командной формулой,
+не утверждённой заказчиком.
+
 ## 27.09.2026 — интеграция неформальных ответов заказчика по ДДС
 
 Объект: перенос уточнений заказчика из сообщения Даниила в UI/backend-контур без

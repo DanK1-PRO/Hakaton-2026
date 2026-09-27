@@ -15,6 +15,7 @@
 | [Мастер-ТЗ UI-команды](team/DANIL_NIKITA_SANYA_UI_MASTER_SPEC.ru.md) | Даниил, Никита, Саня: зоны UI-работы и ограничения |
 | [Мастер-ТЗ ML-команды RU](team/KIRILL_MAXIM_ML_INTEGRATION_MASTER_SPEC.ru.md) | Кирилл и Максим: интеграция моделей на русском |
 | [Master spec for ML team EN](team/KIRILL_MAXIM_ML_INTEGRATION_MASTER_SPEC.en.md) | Kirill and Maxim: model integration in English |
+| [Проверка ML-веток](team/ML_BRANCH_REVIEW.ru.md) | Что вошло из веток Кирилла/Максима, release модели и ограничения merge |
 | [Трассировка](REQUIREMENTS_TRACEABILITY.md) | Источник → код → проверка |
 | [Источники](SOURCE_OF_TRUTH.md) | Приоритеты и достоверность |
 | [Неформальные ответы заказчика 27.09](customer/CUSTOMER_INFORMAL_ANSWERS_2026_09_27.ru.md) | Уточнения по ДДС: статусы, 30 секунд, 3 минуты, связь, ручной выбор служб |
