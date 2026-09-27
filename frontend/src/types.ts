@@ -26,7 +26,12 @@ export type Evaluation = {
   critical_errors: string[];
   field_errors: { field: string; expected: unknown; actual: unknown }[];
   missing_information: string[];
-  timing: { elapsed_seconds: number; acknowledgement_seconds: number | null };
+  timing: {
+    elapsed_seconds: number;
+    acknowledgement_seconds: number | null;
+    first_response_seconds?: number | null;
+    first_response_deadline_seconds?: number;
+  };
   explanation: string;
 };
 export type Event = {

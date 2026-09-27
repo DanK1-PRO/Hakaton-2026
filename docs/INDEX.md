@@ -17,6 +17,7 @@
 | [Master spec for ML team EN](team/KIRILL_MAXIM_ML_INTEGRATION_MASTER_SPEC.en.md) | Kirill and Maxim: model integration in English |
 | [Трассировка](REQUIREMENTS_TRACEABILITY.md) | Источник → код → проверка |
 | [Источники](SOURCE_OF_TRUTH.md) | Приоритеты и достоверность |
+| [Неформальные ответы заказчика 27.09](customer/CUSTOMER_INFORMAL_ANSWERS_2026_09_27.ru.md) | Уточнения по ДДС: статусы, 30 секунд, 3 минуты, связь, ручной выбор служб |
 | [Демонстрация](DEMO.md) | Показы системы |
 | [Открытые вопросы](OPEN_QUESTIONS.md) | Согласование с командой |
 | [Открытые источники: ДДС/АРМ-112](OPEN_SOURCE_RESEARCH.ru.md) | Исследование 10 тем по НПА и методрекомендациям |

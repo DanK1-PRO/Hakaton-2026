@@ -51,7 +51,8 @@ export function ServiceDock({ card, own, locked, busy, onReact, onRoutes, onHist
             {events.map((event) => (
               <div className="arm-service-event" key={event.id}>
                 <span>
-                  {event.actor_name ? `оп. ${event.actor_name}` : 'оп. ДДС'} · {date(event.created_at)}
+                  {event.actor_name ? `оп. ${event.actor_name}` : 'оп. ДДС'} ·{' '}
+                  {date(event.created_at)}
                 </span>
                 <b>
                   {event.kind === 'reaction'
@@ -101,17 +102,17 @@ export function ServiceDock({ card, own, locked, busy, onReact, onRoutes, onHist
           </div>
         </div>
         {referenceServices.map((name) => (
-          <Tooltip title="Справочник маршрутов ЕКП. Клик открывает условия классификатора; оповещение другой службе не отправляется.">
+          <Tooltip title="Справочник возможных получателей по району обслуживания и подчинённости. Для ДДС бригады выбираются вручную; оповещение другой службе не отправляется.">
             <div className="arm-service-tile arm-service-reference" key={name}>
               <button type="button" aria-label={'Справочная служба ' + name} onClick={onRoutes}>
                 {name}
               </button>
-              <span>справочник · без оповещения</span>
+              <span>ручной выбор · без оповещения</span>
             </div>
           </Tooltip>
         ))}
         <div className="arm-service-tools">
-          <Tooltip title="Справочник маршрутов ЕКП и условия классификатора (без фактического оповещения)">
+          <Tooltip title="Справочник служб по району/подчинённости и условия классификатора (без фактического оповещения)">
             <Button
               aria-label="Справочник маршрутов"
               icon={<UnorderedListOutlined />}

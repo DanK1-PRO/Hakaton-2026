@@ -16,6 +16,7 @@ Arrays:
 - classifier features[] contain source strings; routes[] preserve service/variant/condition/value/column.
 - action events are chronological records, not UI-only timers.
 - evaluation critical_errors[], field_errors[], missing_information[] remain separate.
+- evaluation timing includes `acknowledgement_seconds` / `acknowledgement_deadline_seconds=30` and `first_response_seconds` / `first_response_deadline_seconds=180`. The 180-second rule comes from the 2026-09-27 informal customer clarification: first status record with text should be added within 3 minutes.
 - instructor feedback[] is append-only history.
 - scenario expected_actions[] is a TEAM_PROPOSAL educational reference; do not treat as legislation. expected_hint is list-only UI guidance (C2), never shown in scenario card view.
 

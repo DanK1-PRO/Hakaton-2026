@@ -12,6 +12,7 @@ Customer documents define domain correctness. The captain/master spec defines st
 | P4 | СКРИНШОТ ДДСГСИ.docx | Inspected embedded images5,10: list and workstation |
 | P4 | Инструкция_по_заведению_карточки_2507ГСИ.docx; СКРИНШОТ КАРТОЧКИ 112ГСИ.docx | Auxiliary card fields |
 | P5 | context_customer_answers_civil_defense.md | VoIP logs promised; most oral answers unresolved |
+| P5 update | docs/customer/CUSTOMER_INFORMAL_ANSWERS_2026_09_27.ru.md | Informal customer clarifications: DDS status cycle, 30s/3min timing, DDS vs 112 responsibility, phone-only MVP, manual DDS brigade choice |
 | Implementation | HACKATHON_2026_MASTER_SPEC_CODEX.md | §§6-18,28,34-35 |
 
 The standalone ARM EDDS guide is absent. Present DDS memo/screenshots provide direct evidence. Full pixel-identical reproduction is not claimed.

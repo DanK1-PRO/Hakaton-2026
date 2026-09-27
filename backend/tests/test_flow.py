@@ -37,6 +37,8 @@ def test_complete_training_and_instructor_correction(client):
     assert r.status_code == 200, r.text
     result = r.json()
     assert not result["critical_errors"] and not result["missing_information"]
+    assert result["timing"]["first_response_seconds"] is not None
+    assert result["timing"]["first_response_deadline_seconds"] == 180
     assert result["score"] is None
     assert client.post(API + f"/simulation/sessions/{card['session_id']}/finish", headers=headers).json() == result
     teacher = login(client, "instructor")
@@ -120,7 +122,22 @@ def test_late_acknowledgement_and_ml_failure(client, monkeypatch):
     assert result["mode"] == "fallback"
     assert result["critical_errors"]
     assert result["timing"]["acknowledgement_seconds"] >= 40
+    assert result["timing"]["first_response_deadline_seconds"] == 180
     assert client.get(API + "/incidents", headers=headers).status_code == 200
+
+
+def test_first_response_comment_deadline_is_reported(client):
+    headers = login(client)
+    card = start(client, headers)
+    with client.test_sessions() as db:
+        stored = db.get(Incident, card["id"])
+        stored.created_at -= timedelta(seconds=181)
+        db.commit()
+    card = reaction(client, headers, card, "accepted", "").json()
+    card = reaction(client, headers, card, "responding", "Первая запись после звонка старшему группы").json()
+    result = client.post(API + f"/simulation/sessions/{card['session_id']}/finish", headers=headers).json()
+    assert result["timing"]["first_response_seconds"] >= 181
+    assert "Превышено время первой записи статуса: 3 минуты" in result["critical_errors"]
 
 
 def test_manual_crud_and_classifier_validation(client):

@@ -222,12 +222,23 @@ def finish(id: str, db: Session = Depends(get_db), user=Depends(current_user)):
     close_call(db, incident, user)
     reference = db.get(Scenario, session.scenario_id).data["reference"]
     detail = incident_view(db, incident, True)
+    reaction_actions = db.scalars(
+        select(Action).where(Action.incident_id == incident.id, Action.kind == "reaction").order_by(Action.created_at)
+    ).all()
+    first_response = next(
+        (action for action in reaction_actions if action.payload.get("comment", "").strip()),
+        None,
+    )
     timing = {
         "elapsed_seconds": round(seconds_since(session.started_at, now), 1),
         "acknowledgement_seconds": round(seconds_since(incident.created_at, incident.acknowledged_at), 1)
         if incident.acknowledged_at
         else None,
         "acknowledgement_deadline_seconds": 30,
+        "first_response_seconds": round(seconds_since(incident.created_at, first_response.created_at), 1)
+        if first_response
+        else None,
+        "first_response_deadline_seconds": 180,
     }
     request = EvaluationRequest(
         session_id=id, card=detail, actions=detail["events"], reference=reference, timing=timing

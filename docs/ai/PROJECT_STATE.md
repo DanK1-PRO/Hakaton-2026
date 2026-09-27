@@ -1,6 +1,6 @@
 # Project State
 
-Updated: 2026-09-27. Version: 0.1.0 + Danil UI integration branch + offline GIS pack + gap-closure B9/B10/C2/C3/C4 + C1 profile reference.
+Updated: 2026-09-27. Version: 0.1.0 + Danil UI integration branch + offline GIS pack + customer DDS clarifications.
 
 ## Actual State
 
@@ -72,3 +72,5 @@ OPEN_QUESTIONS is now mostly TEAM_DECISION/CLOSED; do not reopen gaps without ne
 If Danil mentions opencode / UI part, start from HANDOFF_OPENCODE_UI.md (scope, commits, file map, evidence).
 
 Codex follow-up on 2026-09-27 reviewed the opencode UI handoff without touching ML branches. Local verification on the current `ui/danil-integration-review` head: `npm run build` passed, backend pytest 17/17 passed, `scripts/windows/start-app.ps1` brought up DB/API/UI, repeated frontend `npm test` passed 22/22 including `map-gis.spec.ts`, and `git diff --check` passed. The first Playwright attempt failed only because local API/UI were stopped (`ECONNREFUSED 127.0.0.1:5173`). Fresh screenshots were regenerated in `docs/images/*`; `ML_MODE=mock` remains the regression path until Kirill/Maxim ML branches are ready.
+
+New informal customer clarifications from Danil on 2026-09-27 are captured in `docs/customer/CUSTOMER_INFORMAL_ANSWERS_2026_09_27.ru.md`. Applied to the UI/backend slice: 30s from message/card appearance to open/acknowledge remains; 3 minutes to first status record with text is now tracked as `first_response_seconds` / `first_response_deadline_seconds=180` and scored by mock/fallback evaluator; DDS status cycle and help copy are updated; edit modal now clarifies that DDS does not validate the original 112 applicant card; service reference copy now says DDS brigades are selected manually by service area/subordination. Verification: backend pytest 18/18, frontend `npm test` 22/22, build passed, contracts exported. ML branches were not touched.

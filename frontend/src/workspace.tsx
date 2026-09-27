@@ -187,9 +187,18 @@ export function Workspace() {
   const routes = card.classification?.routes || [];
   const addressGrid = addressParts(card.address);
   const typeCode = types.find((t) => t.id === card.incident_type_id)?.external_code;
-  const callSeconds = last
-    ? Math.max(0, (now - new Date(last.created_at).getTime()) / 1000)
-    : 0;
+  const callSeconds = last ? Math.max(0, (now - new Date(last.created_at).getTime()) / 1000) : 0;
+  const firstTextReaction = (card.events || []).find(
+    (event) => event.kind === 'reaction' && event.payload.comment?.trim(),
+  );
+  const firstRecordSeconds = firstTextReaction
+    ? Math.max(
+        0,
+        (new Date(firstTextReaction.created_at).getTime() - new Date(card.created_at).getTime()) /
+          1000,
+      )
+    : Math.max(0, (now - new Date(card.created_at).getTime()) / 1000);
+  const firstRecordDone = Boolean(firstTextReaction);
   const currentCard = async () => {
     if (pendingPhone.current) await pendingPhone.current;
     return api.endpoints.incident.select(id)(store.getState()).data || card;
@@ -322,6 +331,15 @@ export function Workspace() {
           >
             <ClockCircleOutlined /> {acknowledgementLabel}: {elapsed.toFixed(1)} с / 30 с
           </span>
+          <span
+            className={
+              'arm-ack ' + (!firstRecordDone && firstRecordSeconds > 180 ? 'arm-ack-late' : '')
+            }
+            role="status"
+          >
+            <ClockCircleOutlined /> Первая запись:{' '}
+            {firstRecordDone ? 'есть' : firstRecordSeconds.toFixed(1) + ' с'} / 3 мин
+          </span>
         </Space>
         <Space wrap>
           <Tooltip title="Сведения о занятии и действии">
@@ -426,7 +444,11 @@ export function Workspace() {
                 <small>минут секунд</small>
               </div>
             ) : !card.acknowledged_at && !locked && elapsed > 30 ? (
-              <div className="arm-timer-box arm-timer-late" role="timer" aria-label="Таймер подтверждения">
+              <div
+                className="arm-timer-box arm-timer-late"
+                role="timer"
+                aria-label="Таймер подтверждения"
+              >
                 <b>{time(elapsed)}</b>
                 <small>минут секунд</small>
               </div>
@@ -591,7 +613,8 @@ export function Workspace() {
             </div>
             <div className="arm-field arm-training-note">
               <small>Учебное расширение</small>
-              Подсказки и результаты доступны через «?». Основные поля расположены как в АРМ.
+              ДДС фиксирует статусы и комментарии; исходная карта заявителя остаётся зоной 112.
+              Подсказки и результаты доступны через «?».
             </div>
           </section>
         </div>
@@ -665,7 +688,7 @@ export function Workspace() {
           <>
             <Alert
               type="info"
-              message="Справочник маршрутов ЕКП. Фактическая передача другим службам не выполняется."
+              message="Справочник возможных получателей. Для ДДС бригады выбираются вручную по району обслуживания и подчинённости; фактическая передача другим службам не выполняется."
             />
             <Table
               size="small"
@@ -705,24 +728,29 @@ export function Workspace() {
                             : 'Ваше рабочее место ДДС'
                           : 'Просмотр преподавателя'
                       }
-                      description="В этой сессии фиксируются действия одной ДДС. Отображение маршрута не означает, что другие службы уже оповещены."
+                      description="В этой сессии фиксируются действия одной ДДС. Маршруты и службы показаны как справочник; бригады ДДС выбираются вручную по району обслуживания и подчинённости."
                     />
                     <h3>Подтверждение получения</h3>
                     <p>
                       «Получена службой» регистрируется при открытии своей карточки. «Принята»
-                      подтверждает её принятие. Контрольный срок: 30 секунд с поступления.
+                      подтверждает её принятие. Контрольный срок: 30 секунд с поступления карточки в
+                      строку сообщений.
                     </p>
                     <h3>Статус и комментарий</h3>
                     <p>
-                      Отказ и завершение работ требуют комментария: причину отказа и сведения о
-                      передаче — при отказе, итог работ — при завершении. «Работы завершены» и «Отказ
-                      от выполнения работ» закрывают редактирование. История сохраняется после
-                      каждого действия.
+                      Универсальный цикл ДДС: «Принята / Не принята», «Начало реагирования»,
+                      «Прибытие», «Проведение работ», «Работы завершены» или «Отказ». Первая запись
+                      статуса с текстом должна появиться в течение 3 минут. Отказ и завершение работ
+                      требуют комментария: причину отказа и сведения о передаче — при отказе, итог
+                      работ — при завершении. «Работы завершены» и «Отказ от выполнения работ»
+                      закрывают редактирование. История сохраняется после каждого действия.
                     </p>
                     <h3>Учебная связь</h3>
                     <p>
-                      Вызов, ответ и завершение фиксируются в журнале. Реальные звонки, аудиозаписи
-                      и SMS не подключены.
+                      Вызов, ответ и завершение фиксируются в журнале. В MVP телефонная эмуляция
+                      представляет связь ДДС с руководителем/старшим группы реагирования; при
+                      необходимости диспетчер может связаться с заявителем по номеру из карточки, но
+                      это не основной маршрут MVP. Реальные звонки, аудиозаписи и SMS не подключены.
                     </p>
                     <p className="muted">
                       Памятка АРМ-112 для ДДС, стр. 21–26, 32. Учебные пояснения дополняют рабочее
@@ -800,7 +828,7 @@ export function Workspace() {
             }
           }}
         >
-          <CardFieldsForm types={types} />
+          <CardFieldsForm types={types} ddsMode={Boolean(card.session_id)} />
         </Form>
       </Modal>
       <Modal
@@ -858,7 +886,9 @@ export function Workspace() {
                 label="Комментарий"
                 rules={[
                   {
-                    required: ['rejected', 'refused', 'completed'].includes(getFieldValue('status')),
+                    required: ['rejected', 'refused', 'completed'].includes(
+                      getFieldValue('status'),
+                    ),
                     whitespace: true,
                     message:
                       getFieldValue('status') === 'completed'

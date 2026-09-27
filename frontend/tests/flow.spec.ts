@@ -106,6 +106,7 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
     .click();
   await expect(page.getByRole('button', { name: 'Изменить статус' })).toBeVisible();
   await expect(page.getByText('Получена службой', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText(/Первая запись:/)).toBeVisible();
   const id = page.url().split('/').at(-1)!;
   const setStatus = async (label: string, comment: string) => {
     await page.getByRole('button', { name: 'Изменить статус' }).click();
@@ -131,6 +132,7 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   });
   await page.getByRole('button', { name: 'Завершить вызов' }).click();
   await page.getByRole('button', { name: 'Редактировать карточку', exact: true }).click();
+  await expect(page.getByText('Учебное дополнение ДДС', { exact: true })).toBeVisible();
   await page
     .getByLabel('Описание происшествия', { exact: true })
     .fill('В подъезде прорвало трубу. Бригада уведомлена.');

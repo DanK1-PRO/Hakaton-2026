@@ -5,7 +5,7 @@
 | STACK | Agreed stack, ML-independent boot | master §§6-7,18 | backend/frontend/compose; build and tests |
 | AUTH | Roles, own trainee data | master §12; SoW roles | auth.py; ownership tests |
 | DDS-OPEN | Received on opening | memo p.21 | open route; flow test |
-| DDS-TIME | Acknowledgement within 30s | memo pp.5,21 | timestamps; late acknowledgement test |
+| DDS-TIME | Acknowledgement within 30s; first status+text record within 3 minutes | memo pp.5,21; informal customer answers 2026-09-27 | timestamps; late acknowledgement test; first_response_seconds timing/test |
 | DDS-REFUSE | Mandatory refusal comment | memo pp.21-26 | domain.react; refusal test |
 | DDS-RECOVER | Rejected → accepted | memo p.25 | TRANSITIONS; recovery test |
 | DDS-LOCK | Terminal edit lock | memo pp.22,32 | editable; final-state test |

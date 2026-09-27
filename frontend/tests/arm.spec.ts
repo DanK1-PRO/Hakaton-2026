@@ -98,9 +98,7 @@ test('ARM source layout, service history and training context remain accessible'
   ).toBeDisabled();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.getByRole('button', { name: 'Справочник маршрутов', exact: true }).click();
-  await expect(
-    page.getByText('Справочник маршрутов ЕКП. Фактическая передача другим службам не выполняется.'),
-  ).toBeVisible();
+  await expect(page.getByText(/Для ДДС бригады выбираются вручную/)).toBeVisible();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
   await page.screenshot({
     path: '../docs/images/arm-reference-' + info.project.name + '.png',

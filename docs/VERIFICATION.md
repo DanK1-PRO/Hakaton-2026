@@ -1,5 +1,33 @@
 # Протокол Проверки
 
+## 27.09.2026 — интеграция неформальных ответов заказчика по ДДС
+
+Объект: перенос уточнений заказчика из сообщения Даниила в UI/backend-контур без
+касания ML-веток. Новый рабочий источник сохранён в
+`docs/customer/CUSTOMER_INFORMAL_ANSWERS_2026_09_27.ru.md`.
+
+Правки:
+
+| Область | Изменения |
+|---|---|
+| Нормативы | Добавлен `first_response_seconds` и `first_response_deadline_seconds=180` в evaluation timing; mock/fallback evaluator даёт критическое замечание при отсутствии первой статусной записи с текстом или превышении 3 минут |
+| UI ДДС | На карточке добавлен индикатор «Первая запись … / 3 мин»; help-дrawer описывает цикл ДДС, 30с/3мин, телефонный маршрут через руководителя/старшего группы реагирования |
+| ДДС vs 112 | В модальном «Редактирование карточки» добавлено пояснение: диспетчер ДДС не контролирует исходную карту заявителя 112; главная работа MVP — статусы, комментарии, телефонная связь |
+| Службы | Справочник служб описан как ручной выбор по району обслуживания и подчинённости, без фактического оповещения |
+| Документы | Обновлены SOURCE_OF_TRUTH, REQUIREMENTS_TRACEABILITY, OPEN_QUESTIONS, DATA_CONTRACT |
+
+| Проверка | Фактический результат |
+|---|---|
+| `.\.venv\Scripts\ruff.exe check backend\app\routers\api.py backend\app\ml_gateway\gateway.py backend\tests\test_flow.py` | Passed |
+| `.\.venv\Scripts\pytest.exe backend\tests` | 18 passed, 2 warnings Starlette/httpx/AnyIO |
+| `npm run build` в `frontend` | Passed; Vite warning о крупных MapLibre/vendor chunks сохраняется |
+| `scripts/windows/start-app.ps1` + `/health` | DB/API/UI подняты; `ml_mode=mock`, UI HTTP 200 |
+| `npm test` в `frontend` | 22 passed, 1.8m; ARM/flow/admin/results/mobile + offline GIS |
+| `PYTHONPATH=backend python scripts/export_contracts.py` | Exported OpenAPI and four JSON schemas |
+
+Ограничения: официальный классификатор/назначение получателей/источник правильных данных
+заказчик ещё уточняет. ML-модели Кирилла/Максима не подключались и не ревьюились.
+
 ## 27.09.2026 — Codex review после opencode UI handoff
 
 Объект: проверка прохода opencode на `ui/danil-integration-review` по

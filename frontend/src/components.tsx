@@ -61,9 +61,23 @@ export function Status({ value }: { value: string }) {
   const config = statusConfig[value] || { color: 'default' };
   return <Tag color={config.color}>{labels[value] || value}</Tag>;
 }
-export function CardFields({ types }: { types: IncidentType[] }) {
+export function CardFields({
+  types,
+  ddsMode = false,
+}: {
+  types: IncidentType[];
+  ddsMode?: boolean;
+}) {
   return (
     <>
+      {ddsMode ? (
+        <Alert
+          type="info"
+          showIcon
+          message="Учебное дополнение ДДС"
+          description="По уточнению заказчика диспетчер ДДС не контролирует правильность карты заявителя: это зона 112. В MVP основная работа ДДС — статусы, комментарии и телефонная связь; эти поля оставлены как учебная корректировка только для тренажёра."
+        />
+      ) : null}
       <div className="form-pair">
         <Form.Item name="caller_number" label="Телефон заявителя" rules={[{ max: 30 }]}>
           <Input maxLength={30} />
@@ -127,6 +141,15 @@ export function Result({ result }: { result: Evaluation }) {
               : result.timing.acknowledgement_seconds + ' с'}
           </strong>
           <span>подтверждение</span>
+        </div>
+        <div>
+          <strong>
+            {result.timing.first_response_seconds === undefined ||
+            result.timing.first_response_seconds === null
+              ? 'Нет'
+              : result.timing.first_response_seconds + ' с'}
+          </strong>
+          <span>первая запись</span>
         </div>
       </div>
       {problems === 0 ? (
