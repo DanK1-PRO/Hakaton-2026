@@ -1,5 +1,26 @@
 # Протокол Проверки
 
+## 27.09.2026 — Codex review после opencode UI handoff
+
+Объект: проверка прохода opencode на `ui/danil-integration-review` по
+`docs/ai/HANDOFF_OPENCODE_UI.md`. ML-ветки и `ml/scoring-experiment` не трогались;
+проверялся текущий UI/backend/mock-контур Даниила.
+
+| Проверка | Фактический результат |
+|---|---|
+| `git fetch origin --prune` + статус ветки | `ui/danil-integration-review` синхронизирована с `origin/ui/danil-integration-review` |
+| `rg` по конфликт-маркерам/debug/Yandex/API key | Конфликт-маркеров, `console.log`, `debugger`, живого Yandex/key-flow в UI не найдено; оставшиеся упоминания только в docs/history |
+| `npm run build` в `frontend` | Passed; Vite warning о крупных chunks сохраняется из-за MapLibre/vendor bundle |
+| `.\.venv\Scripts\pytest.exe backend\tests` | 17 passed, 2 warnings Starlette/httpx/AnyIO |
+| Первый `npm test` | 22 failed из-за остановленного локального API/UI (`ECONNREFUSED 127.0.0.1:5173`), не дефект приложения |
+| `scripts/windows/start-app.ps1` | Поднял PostgreSQL/API/UI; `/health` вернул `status=ok`, `database=ok`, `ml_mode=mock`, UI вернул HTTP 200 |
+| Повторный `npm test` в `frontend` | 22 passed, 1.7m; ARM/flow/results/admin/mobile + `map-gis.spec.ts` для локального PMTiles |
+| `git diff --check` | Passed |
+
+Итог: opencode UI pass принят как рабочая основа. Свежие Playwright screenshots
+пересняты и сохранены в `docs/images/*`. Реальная ML-интеграция по-прежнему ожидает
+ветки Максима/Кирилла; регрессионный режим `ML_MODE=mock` сохранён.
+
 ## 22.09.2026 (late evening) — закрытие C1 + снятие EPERM-блокировки билда
 
 Объект: доведение вечернего прохода — справочник профиля ДДС на экране

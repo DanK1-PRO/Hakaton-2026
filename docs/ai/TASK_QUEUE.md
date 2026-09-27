@@ -1,6 +1,6 @@
 # Task Queue
 
-Updated: 2026-09-22 (late evening).
+Updated: 2026-09-27.
 
 ## Implementation Pass
 
@@ -40,4 +40,5 @@ Do not auto-implement real telephony, scoring weights, full ticket OCR, encrypti
 - [x] Full UI audit vs customer screenshots (2026-09-22): address grid 14 fields, classifier header/code, flag chips, caller selects, call timer, light reaction bar, Дата/Время columns, mobile service-dock fix; 22+15 green.
 - [x] Gap-closure pass (2026-09-22 evening, team decision without customer): B9 actor/author names, B10 required comment on completed, C2 expected_hint + Методподсказка UI, C3 reference-only service tile copy, C4 educational-vs-combat tooltips; OPEN_QUESTIONS reclassified with TEAM_DECISION/CLOSED; DATA_CONTRACT + VERIFICATION updated; contracts regenerated; pytest 16 + Playwright 22 + typecheck/build green.
 - [x] C1 DDS profile reference on Training screen (2026-09-22 late evening): connect `frontend/src/domain/ddsProfiles.ts`, Select + zone/reacton/focus panel, localStorage persistence; OPEN_QUESTIONS C1 → CLOSED; flow.spec cover; rebuild after stopping vite preview that locked dist/assets.
+- [x] Codex review of opencode UI handoff (2026-09-27): build passed, backend pytest 17/17, local DB/API/UI restarted, repeated Playwright 22/22 including offline GIS map; ML branches untouched, `ML_MODE=mock` preserved.
 - [ ] Review Maxim `ml/scoring-experiment` after UI branches are stable; preserve `ML_MODE=mock` as regression path.

@@ -1,6 +1,6 @@
 # Project State
 
-Updated: 2026-09-22 (late evening). Version: 0.1.0 + Danil UI integration branch + offline GIS pack + gap-closure B9/B10/C2/C3/C4 + C1 profile reference.
+Updated: 2026-09-27. Version: 0.1.0 + Danil UI integration branch + offline GIS pack + gap-closure B9/B10/C2/C3/C4 + C1 profile reference.
 
 ## Actual State
 
@@ -70,3 +70,5 @@ Only inspect relevant source pages and files. Do not re-scaffold or rebuild the 
 OPEN_QUESTIONS is now mostly TEAM_DECISION/CLOSED; do not reopen gaps without new customer materials.
 
 If Danil mentions opencode / UI part, start from HANDOFF_OPENCODE_UI.md (scope, commits, file map, evidence).
+
+Codex follow-up on 2026-09-27 reviewed the opencode UI handoff without touching ML branches. Local verification on the current `ui/danil-integration-review` head: `npm run build` passed, backend pytest 17/17 passed, `scripts/windows/start-app.ps1` brought up DB/API/UI, repeated frontend `npm test` passed 22/22 including `map-gis.spec.ts`, and `git diff --check` passed. The first Playwright attempt failed only because local API/UI were stopped (`ECONNREFUSED 127.0.0.1:5173`). Fresh screenshots were regenerated in `docs/images/*`; `ML_MODE=mock` remains the regression path until Kirill/Maxim ML branches are ready.
