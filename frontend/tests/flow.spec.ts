@@ -57,8 +57,9 @@ test('administrator creates user and instructor reviews a result', async ({
   await expect(page.locator('.ant-message-notice')).toHaveCount(0);
   if (testInfo.project.name === 'desktop')
     await page.screenshot({ path: '../docs/images/instructor.png', fullPage: true });
-  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click();
-  await expect(page.getByRole('dialog')).toBeHidden();
+  const resultDialog = page.getByRole('dialog', { name: 'Результат занятия' });
+  await resultDialog.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(resultDialog).toBeHidden({ timeout: 15000 });
   await expect(row.getByText('Подтверждено', { exact: true })).toBeVisible({ timeout: 15000 });
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: /Отчёт CSV$/ }).click();
