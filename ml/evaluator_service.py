@@ -10,6 +10,8 @@ from pydantic import BaseModel, Field
 import json
 from pathlib import Path
 from typing import Literal, Optional
+import os
+from ml.comment_assessor import assess
 
 app = FastAPI(title="DDS ML Evaluator", version="1.0")
 
@@ -264,7 +266,7 @@ def evaluate_dispatcher_response(request: EvaluationRequest) -> dict:
         "field_errors": errors,
         "missing_information": missing,
         "timing": timing,
-        "routing_assessment": {"status": "scored"},
+        "routing_assessment": {"status": "not_scored"},
         "comment_quality": {"status": "requires_instructor_review"}
     }
 
@@ -279,12 +281,13 @@ def health():
         "status": "ok",
         "capabilities": ["evaluator", "difficulty_scorer"],
         "model_version": "ml-evaluator-v1.0",
-        "difficulty_formula": "weighted_factors_v1"
+        "difficulty_formula": "weighted_factors_v1",
+        "llm_configured": bool(os.getenv("DDS_LLM_URL")),
     }
 
 
 @app.post("/v1/evaluate", response_model=EvaluationResult)
-def evaluate(request: EvaluationRequest):
+async def evaluate(request: EvaluationRequest):
     """
     Оценка ответа диспетчера.
 
@@ -299,12 +302,25 @@ def evaluate(request: EvaluationRequest):
 
     # Оцениваем ответ диспетчера
     evaluation = evaluate_dispatcher_response(request)
+    assessment = await assess(request)
+    mode = "local"
+    model_version = "formula-evaluator-v1.0"
+    if assessment:
+        evaluation["comment_quality"] = assessment
+        if assessment["status"] == "unavailable":
+            mode = "fallback"
+        else:
+            model_version += "+" + assessment["model"]
 
     # Формируем объяснение
     explanation_parts = [
+        "Экспериментальная командная формула; методика не утверждена заказчиком.",
         f"Сложность сценария: {difficulty['difficulty_level']} ({difficulty['difficulty_score']}/10)",
         f"Оценка ответа: {evaluation['score']}/10",
     ]
+
+    if assessment:
+        explanation_parts.append(assessment.get("explanation", "Нейросеть недоступна: применена резервная формула."))
 
     if evaluation["critical_errors"]:
         explanation_parts.append(f"Критические ошибки: {', '.join(evaluation['critical_errors'])}")
@@ -320,9 +336,9 @@ def evaluate(request: EvaluationRequest):
 
     return EvaluationResult(
         session_id=request.session_id,
-        model_version="ml-evaluator-v1.0",
+        model_version=model_version,
         reference_version=request.reference.get("version", "1.0"),
-        mode="local",
+        mode=mode,
         score=evaluation["score"],
         critical_errors=evaluation["critical_errors"],
         field_errors=evaluation["field_errors"],

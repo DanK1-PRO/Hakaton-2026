@@ -1,5 +1,11 @@
 # DDS Training Workstation
 
+The 2026-09-28 integration pass connects the team's local GGUF release for comment
+assessment, validates ML responses and preserves deterministic fallback. See the
+[final audit](docs/FINAL_INTEGRATION_AUDIT.ru.md), [offline model launch](docs/LOCAL_ML_RUN.ru.md)
+and [submission packet](docs/SUBMISSION.ru.md). Speech recognition/synthesis and
+automatic retraining are not included; instructor-reviewed feedback is exportable.
+
 [Русский](README.md) · [Documentation](docs/INDEX.md) · [Deployment](docs/DEPLOYMENT.md) · [ML integration](docs/ML_INTEGRATION.md)
 
 [![Quality and integration](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml/badge.svg)](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml)

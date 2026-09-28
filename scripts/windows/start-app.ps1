@@ -1,4 +1,10 @@
+param([switch]$LocalML)
 $ErrorActionPreference = 'Stop'
+if ($LocalML) {
+    $env:ML_MODE = 'local'
+    $env:ML_URL = 'http://127.0.0.1:8090'
+    $env:ML_TIMEOUT = '45'
+}
 $root = Split-Path (Split-Path $PSScriptRoot)
 Set-Location $root
 & .\.venv\Scripts\python.exe scripts\init_local.py

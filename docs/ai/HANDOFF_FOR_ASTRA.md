@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-09-28 update
+
+The Astra integration pass has been performed on main. Start with the current
+checkpoint in PROJECT_STATE and docs/FINAL_INTEGRATION_AUDIT.ru.md, not the old
+implementation-pass tasks below. Real GGUF inference evidence is in
+docs/evidence/real-ml-integration.json. Model files and runtime stay in .runtime.
+Submission material index: docs/SUBMISSION.ru.md. Do not claim real voice/ASR/TTS,
+automatic fine-tuning, exact address geocoding or full customer load acceptance.
+
 Updated: 2026-09-20. The implementation pass has already built the application.
 Do not treat this repository as an empty scaffold.
 

@@ -18,7 +18,7 @@ ROOT = Path(__file__).parent.parent
 PY = sys.executable
 
 
-def wait_for_server(url="http://localhost:8080/health", timeout=120):
+def wait_for_server(url="http://127.0.0.1:8091/v1/models", timeout=120):
     """Ждёт пока сервер поднимется."""
     start = time.time()
     while time.time() - start < timeout:
@@ -59,7 +59,7 @@ def main():
 
     gen_proc = subprocess.run(
         [PY, str(ROOT / "ml" / "run_generator.py"),
-         "--api-url", "http://localhost:8080/v1",
+         "--api-url", "http://127.0.0.1:8091/v1",
          "--api-key", "local",
          "--model", "local-model",
          "--ids", "5", "100", "200",

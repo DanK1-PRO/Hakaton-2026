@@ -1,6 +1,9 @@
 __pycache__/
 *.py[cod]
 .venv/
+.venv-ml/
+models/
+*.gguf
 node_modules/
 dist/
 .env

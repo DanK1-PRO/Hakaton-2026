@@ -309,10 +309,10 @@ export function Workspace() {
     </>
   );
   const acknowledgementLabel = card.acknowledged_at
-    ? 'Получение подтверждено'
+    ? 'Карточка открыта'
     : locked
-      ? 'Получение не подтверждено'
-      : 'Подтвердите получение';
+      ? 'Открытие не зафиксировано'
+      : 'Открытие карточки';
   return (
     <div className="arm-workspace">
       <div className="arm-training-rail">
@@ -535,7 +535,7 @@ export function Workspace() {
                   <small>Адрес:</small>
                   <b>{card.address}</b>
                 </div>
-                <Tooltip title="Открыть учебную карту адреса">
+                <Tooltip title={panel === 'map' ? null : 'Открыть учебную карту адреса'}>
                   <Button
                     aria-label="Открыть карту"
                     size="small"
@@ -562,7 +562,13 @@ export function Workspace() {
             <div className="arm-field arm-description">
               <small>Описание со слов заявителя</small>
               <b>{date(card.created_at)} · Система-112 · учебное сообщение</b>
-              <p>{card.comments || 'Описание не заполнено'}</p>
+              <p>{card.scenario?.prompt || card.comments || 'Описание не заполнено'}</p>
+              {card.scenario && card.comments !== card.scenario.prompt ? (
+                <>
+                  <small>Дополнение ДДС</small>
+                  <p>{card.comments}</p>
+                </>
+              ) : null}
             </div>
           </section>
           <section className="arm-right" aria-label="Классификация">

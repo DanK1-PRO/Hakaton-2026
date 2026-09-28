@@ -634,19 +634,23 @@ export function MapPanel({ address }: { address: string }) {
           <span>{address || 'Адрес не заполнен'}</span>
         </div>
         <Space>
-          <Tag color="green">offline</Tag>
+          <Tag color="green">Локально</Tag>
           <Tag color="blue">Москва</Tag>
-          {gis ? <Tag color="geekblue">OSM · PMTiles</Tag> : <Tag color="default">open-data ready</Tag>}
+          {gis ? (
+            <Tag color="geekblue">OSM · PMTiles</Tag>
+          ) : (
+            <Tag color="default">Учебная схема</Tag>
+          )}
         </Space>
       </div>
       <Alert
-        type="success"
+        type="warning"
         showIcon
         message="Локальная карта Москвы"
         description={
           gis
-            ? 'Внешние API не используются. Загружен локальный OSM-пакет Москвы (PMTiles): улицы, здания и границы районов из OpenStreetMap, сборка пакета описана в docs/maps/OFFLINE_MAP_PLAN.ru.md.'
-            : 'Внешние API не используются. Сейчас отображается встроенная учебная схема; позднее сюда можно положить локальный OSM/PMTiles/MBTiles-пакет без изменения рабочего места диспетчера.'
+            ? 'Загружен локальный OSM-пакет Москвы (PMTiles). Точка, база и линия маршрута условные: точное определение координат по адресу не подключено.'
+            : 'Отображается учебная схема Москвы. Точка, база и линия маршрута условные: точное определение координат по адресу не подключено.'
         }
       />
       <div
@@ -656,11 +660,7 @@ export function MapPanel({ address }: { address: string }) {
         aria-label={gis ? undefined : 'Локальная учебная карта Москвы'}
       >
         {gis ? (
-          <MoscowGisMap
-            address={address}
-            point={point}
-            onFallback={handleFallback}
-          />
+          <MoscowGisMap address={address} point={point} onFallback={handleFallback} />
         ) : (
           <svg className="arm-map-svg" viewBox="0 0 940 620" aria-hidden="true">
             <defs>
@@ -691,7 +691,13 @@ export function MapPanel({ address }: { address: string }) {
               rx="190"
               ry="128"
             />
-            <ellipse className="arm-map-ring arm-map-ring-inner" cx="485" cy="325" rx="92" ry="64" />
+            <ellipse
+              className="arm-map-ring arm-map-ring-inner"
+              cx="485"
+              cy="325"
+              rx="92"
+              ry="64"
+            />
             {radials.map((road) => (
               <line
                 key={road.name}
@@ -718,16 +724,16 @@ export function MapPanel({ address }: { address: string }) {
             ))}
           </svg>
         )}
-        <div className="arm-map-card">
-          <b>
-            <EnvironmentOutlined /> Точка происшествия
-          </b>
-          <span>{address || 'Адрес будет подставлен из карточки'}</span>
-          <small>
-            Район: {point.district}; опорная служба: {point.serviceBase.name}. Данные не покидают
-            локальный контур.
-          </small>
-        </div>
+      </div>
+      <div className="arm-map-card">
+        <b>
+          <EnvironmentOutlined /> Условная учебная точка
+        </b>
+        <span>{address || 'Адрес будет подставлен из карточки'}</span>
+        <small>
+          Учебная зона: {point.district}; условная база: {point.serviceBase.name}. Данные не
+          покидают локальный контур.
+        </small>
       </div>
       <div className="arm-map-actions">
         <Button disabled>маршрут служб</Button>

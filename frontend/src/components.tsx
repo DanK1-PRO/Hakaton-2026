@@ -75,15 +75,15 @@ export function CardFields({
           type="info"
           showIcon
           message="Учебное дополнение ДДС"
-          description="По уточнению заказчика диспетчер ДДС не контролирует правильность карты заявителя: это зона 112. В MVP основная работа ДДС — статусы, комментарии и телефонная связь; эти поля оставлены как учебная корректировка только для тренажёра."
+          description="Исходные данные заявителя, адрес и тип происшествия заполняет оператор 112. ДДС добавляет собственное описание, статусы и комментарии. Об ошибках исходной карты сообщают в 112 по телефону."
         />
       ) : null}
       <div className="form-pair">
         <Form.Item name="caller_number" label="Телефон заявителя" rules={[{ max: 30 }]}>
-          <Input maxLength={30} />
+          <Input maxLength={30} disabled={ddsMode} />
         </Form.Item>
         <Form.Item name="name" label="ФИО заявителя" rules={[{ max: 150 }]}>
-          <Input maxLength={150} />
+          <Input maxLength={150} disabled={ddsMode} />
         </Form.Item>
       </div>
       <Form.Item
@@ -91,7 +91,7 @@ export function CardFields({
         label="Адрес происшествия"
         rules={[{ required: true, whitespace: true, message: 'Укажите адрес' }]}
       >
-        <Input maxLength={500} />
+        <Input maxLength={500} disabled={ddsMode} />
       </Form.Item>
       <Form.Item
         name="incident_type_id"
@@ -99,6 +99,7 @@ export function CardFields({
         rules={[{ required: true, message: 'Выберите тип из классификатора' }]}
       >
         <Select
+          disabled={ddsMode}
           showSearch
           optionFilterProp="label"
           options={types.map((t) => ({ value: t.id, label: t.name + ' · ' + t.external_code }))}
@@ -119,7 +120,7 @@ export function Result({ result }: { result: Evaluation }) {
         <h3>Результат занятия</h3>
         <Tag color={result.mode === 'local' ? 'green' : 'gold'}>
           {result.mode === 'local'
-            ? 'Локальная модель'
+            ? 'Локальная проверка'
             : result.mode === 'fallback'
               ? 'Резервная проверка'
               : 'Учебная проверка'}
@@ -140,7 +141,7 @@ export function Result({ result }: { result: Evaluation }) {
               ? 'Нет'
               : result.timing.acknowledgement_seconds + ' с'}
           </strong>
-          <span>подтверждение</span>
+          <span>открытие карточки</span>
         </div>
         <div>
           <strong>

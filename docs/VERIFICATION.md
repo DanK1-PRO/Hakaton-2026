@@ -1,5 +1,41 @@
 # Протокол Проверки
 
+## 28.09.2026 — финальный интеграционный проход Astra
+
+Этот раздел описывает текущую сборку; сведения ниже сохранены как история.
+UI-ветки и выбранные ML runtime-модули уже объединены в `main`.
+
+| Проверка | Фактический результат |
+|---|---|
+| `ruff check backend ml scripts` | Passed |
+| `pytest backend/tests -q` | 33 passed; 2 upstream warnings |
+| `npm run build` (frontend) | Passed; предупреждение о размере vendor/MapLibre chunks |
+| `npm test` (frontend, mock regression) | 22 passed, desktop + mobile, 1.8m |
+| `python scripts/export_contracts.py` | OpenAPI и JSON schemas обновлены |
+| `python scripts/verify_local_ml.py` | Local evaluator, concurrent finish и fallback passed |
+| `python scripts/verify_local_ml.py --real-llm` | Реальный GGUF: local + fallback passed, model_assessed; 10.42s весь проверочный цикл |
+| Windows `start-ml.ps1` / `stop-ml.ps1` | Отдельная `.venv-ml`, model 8091 + evaluator 8090; запуск и освобождение портов проверены |
+| Генератор с локальным GGUF, тип 681 | Создан 1 сценарий; dry-run импортера прошёл; в БД не импортирован без проверки преподавателем |
+| Офлайн GIS | Локальные PMTiles/glyphs; тест блокирует внешние HTTP-запросы; desktop/mobile passed |
+
+Release `modelURL` скачан, части проверены по опубликованным SHA-256 и собраны.
+Файл: 6 474 702 976 байт, SHA-256
+`68a8732fb5cee04f83ebffd7924e15c534d4442c5a43d2ba9e2041fe310b8deb`.
+Фактический стенд: Windows, RTX 4060 8 GB, RAM 16 GB, llama.cpp b11223.
+Это подтверждение работы на одном стенде, не гарантия задержек на другом оборудовании.
+
+Доказательства: [реальный ML](evidence/real-ml-integration.json),
+[локальный evaluator/fallback](evidence/ml-integration.json),
+[аудит исправлений и остаточных ограничений](FINAL_INTEGRATION_AUDIT.ru.md),
+[воспроизводимый запуск](LOCAL_ML_RUN.ru.md).
+GitHub CI нового коммита проверяется после публикации; старые зелёные запуски
+не считаются доказательством этой ревизии.
+
+Не заявляются: автоматическое дообучение по JSONL, полноценный ASR/TTS/VoIP,
+точный адресный геокодер/роутинг, утверждённая заказчиком балльная методика,
+нагрузочная или нормативная сертификация. Первая установка зависимостей и
+модельных артефактов требует подготовки до переноса в закрытый контур.
+
 ## 27.09.2026 — интеграция ML-веток и release `modelURL`
 
 Объект: проверка завершённых ML-веток Кирилла/Максима и безопасное подключение

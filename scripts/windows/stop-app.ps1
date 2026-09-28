@@ -6,7 +6,7 @@ if (Test-Path $path) {
     foreach ($id in @($ids.api, $ids.ui)) {
         $process = Get-CimInstance Win32_Process -Filter "ProcessId = $id" -ErrorAction SilentlyContinue
         if ($process -and ($process.CommandLine -match 'uvicorn app.main:app|vite/bin/vite.js')) {
-            Stop-Process -Id $id
+            & taskkill.exe /PID $id /T /F | Out-Null
         }
     }
 }

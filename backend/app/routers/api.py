@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 import anyio
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.security import OAuth2PasswordRequestForm
@@ -112,6 +113,7 @@ def open_card(id: str, db: Session = Depends(get_db), user=Depends(current_user)
     if incident.response_status == "added":
         editable(db, incident)
         incident.response_status = "received"
+        incident.acknowledged_at = utcnow()
         record(db, incident, user, "opened", {"status": "received"})
         db.commit()
     return incident_view(db, incident, True)
@@ -121,6 +123,11 @@ def open_card(id: str, db: Session = Depends(get_db), user=Depends(current_user)
 def edit(id: str, data: IncidentEdit, db: Session = Depends(get_db), user=Depends(current_user)):
     incident = incident_for(db, id, user, True)
     editable(db, incident, data.version)
+    if incident.session_id and any(
+        getattr(data, field) != getattr(incident, field)
+        for field in ("caller_number", "name", "address", "incident_type_id")
+    ):
+        raise HTTPException(403, "Исходные поля карточки 112 доступны ДДС только для чтения")
     if not db.get(IncidentType, data.incident_type_id):
         raise HTTPException(422, "Тип происшествия отсутствует в классификаторе")
     for key, value in data.model_dump(exclude={"version"}).items():
@@ -293,6 +300,45 @@ def report(db: Session = Depends(get_db), user=Depends(staff)):
         "\ufeff" + stream.getvalue(),
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'attachment; filename="training-report.csv"'},
+    )
+
+
+@router.get("/instructor/dataset.jsonl")
+def reviewed_dataset(db: Session = Depends(get_db), user=Depends(staff)):
+    rows = []
+    for session in db.scalars(select(TrainingSession).where(TrainingSession.status == "finished")):
+        reviews = db.scalars(
+            select(Feedback).where(Feedback.session_id == session.id).order_by(Feedback.created_at, Feedback.id)
+        ).all()
+        if not reviews or reviews[-1].verdict == "review_required":
+            continue
+        incident = db.scalar(select(Incident).where(Incident.session_id == session.id))
+        actions = db.scalars(
+            select(Action)
+            .where(Action.incident_id == incident.id, Action.kind == "reaction")
+            .order_by(Action.created_at, Action.id)
+        ).all()
+        rows.append(
+            json.dumps(
+                {
+                    "schema_version": "1.0",
+                    "session_id": session.id,
+                    "scenario_id": session.scenario_id,
+                    "actions": [action.payload for action in actions],
+                    "evaluation": session.evaluation,
+                    "instructor_feedback": [
+                        {"verdict": f.verdict, "comment": f.comment, "created_at": f.created_at.isoformat()}
+                        for f in reviews
+                    ],
+                    "purpose": "reviewed_feedback_for_future_training",
+                },
+                ensure_ascii=False,
+            )
+        )
+    return Response(
+        "\n".join(rows) + ("\n" if rows else ""),
+        media_type="application/x-ndjson",
+        headers={"Content-Disposition": 'attachment; filename="reviewed-feedback.jsonl"'},
     )
 
 

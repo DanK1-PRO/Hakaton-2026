@@ -134,6 +134,8 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   await page.getByRole('button', { name: 'Завершить вызов' }).click();
   await page.getByRole('button', { name: 'Редактировать карточку', exact: true }).click();
   await expect(page.getByText('Учебное дополнение ДДС', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('Адрес происшествия', { exact: true })).toBeDisabled();
+  await expect(page.getByLabel('Телефон заявителя', { exact: true })).toBeDisabled();
   await page
     .getByLabel('Описание происшествия', { exact: true })
     .fill('В подъезде прорвало трубу. Бригада уведомлена.');

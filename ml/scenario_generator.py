@@ -8,8 +8,8 @@ ML Scenario Generator & Evaluator v1
 """
 
 import json
-import random
-import hashlib
+from uuid import uuid4
+from urllib.parse import urlsplit
 from pathlib import Path
 from typing import Optional
 from dataclasses import dataclass, field, asdict
@@ -377,7 +377,16 @@ def build_generation_prompt(
     example_scenarios: list[dict] = None,
 ) -> list[dict]:
     """Формирует промпт для генерации сценария."""
-    messages = [{"role": "system", "content": GENERATION_SYSTEM_PROMPT}]
+    messages = [{"role": "system", "content": (
+        "Создай синтетическое учебное задание для диспетчера ДДС, не оператора 112. "
+        "Исходная карточка уже заполнена оператором 112. ДДС фиксирует статусы с комментариями, "
+        "выбирает бригаду вручную и получает доклад старшего группы по телефону. "
+        "Не требуй опроса заявителя. 30 секунд до открытия, 180 секунд до первой записи статуса с текстом. "
+        "Верни только JSON: prompt (сообщение карточки или доклад старшего), card (address, comments), "
+        "briefing (массив строк), reference (expected_actions, key_information, routing_rules). "
+        "Нормальный цикл: accepted, responding, arrived, working, completed; "
+        "обоснованное непринятие: rejected. Не выдавай придуманные правила за официальные."
+    )}]
 
     context_parts = [
         f"Тип происшествия: {incident.get('name', 'неизвестно')}",
@@ -395,7 +404,7 @@ def build_generation_prompt(
         context_parts.append(f"Целевая сложность: {target_difficulty}")
 
     user_content = (
-        "Сгенерируй учебный сценарий звонка на 112 для этого типа происшествия:\n\n"
+        "Сгенерируй учебный сценарий работы ДДС для этого типа происшествия:\n\n"
         + "\n".join(context_parts)
     )
 
@@ -473,6 +482,7 @@ class GeneratedScenario:
     source: dict
     ml_metadata: dict
     difficulty_factors: list[str] = field(default_factory=list)
+    schema_version: str = "1.0"
 
 
 @dataclass
@@ -496,6 +506,9 @@ class LLMClient:
     """Клиент для любого OpenAI-совместимого API."""
 
     def __init__(self, api_url: str, api_key: str, model: str):
+        parsed = urlsplit(api_url)
+        if parsed.scheme != "http" or parsed.hostname not in {"127.0.0.1", "localhost", "::1"} or parsed.username or parsed.password:
+            raise ValueError("Only local loopback LLM endpoints are supported")
         self.api_url = api_url
         self.api_key = api_key
         self.model = model
@@ -512,7 +525,7 @@ class LLMClient:
             "temperature": temperature,
             "max_tokens": 2048,
         }
-        with httpx.Client(timeout=120.0) as client:
+        with httpx.Client(timeout=120.0, trust_env=False, follow_redirects=False) as client:
             resp = client.post(f"{self.api_url}/chat/completions", json=payload, headers=headers)
             resp.raise_for_status()
             return resp.json()["choices"][0]["message"]["content"]
@@ -559,15 +572,26 @@ class ScenarioGenerator:
             return None
 
         parsed = LLMClient.parse_json(raw)
-        if not parsed:
+        if not isinstance(parsed, dict) or not isinstance(parsed.get("card"), dict):
             print(f"Failed to parse LLM response for {incident.get('name')}")
             return None
 
         card = parsed.get("card", {})
+        if not isinstance(card.get("address"), str) or not card["address"].strip():
+            return None
+        if not isinstance(parsed.get("prompt"), str) or not parsed["prompt"].strip():
+            return None
+        reference = parsed.get("reference", {})
+        if not isinstance(reference, dict):
+            return None
+        expected = reference.get("expected_actions", ["accepted", "responding", "arrived", "working", "completed"])
+        allowed = {"accepted", "rejected", "responding", "arrived", "working", "completed", "refused"}
+        if not isinstance(expected, list) or not expected or any(not isinstance(s, str) or s not in allowed for s in expected):
+            return None
         card["incident_type_id"] = incident.get("id")
         difficulty = calculate_difficulty(card, self.classifier)
 
-        scenario_id = hashlib.md5(f"{incident.get('id')}_{random.randint(1000,9999)}".encode()).hexdigest()[:12]
+        scenario_id = "generated_" + uuid4().hex
 
         return GeneratedScenario(
             id=scenario_id,
@@ -578,7 +602,7 @@ class ScenarioGenerator:
             prompt=parsed.get("prompt", ""),
             briefing=parsed.get("briefing", []),
             card={
-                "caller_number": f"+7{random.randint(9000000000, 9999999999)}",
+                "caller_number": "+70000000000",
                 "name": f"Заявитель {scenario_id[:6]}",
                 "address": card.get("address", "г. Москва"),
                 "incident_type_id": incident.get("id"),
@@ -588,7 +612,7 @@ class ScenarioGenerator:
                 "version": "1.0-generated",
                 "address": card.get("address", "г. Москва"),
                 "incident_type_id": incident.get("id"),
-                "expected_actions": parsed.get("reference", {}).get("expected_actions", ["accepted", "responding", "completed"]),
+                "expected_actions": expected,
                 "key_information": parsed.get("reference", {}).get("key_information", []),
                 "routing_rules": parsed.get("reference", {}).get("routing_rules", []),
             },

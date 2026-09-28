@@ -1,5 +1,6 @@
 # ML Evaluator Service dependencies
-fastapi>=0.104.0
-uvicorn[standard]>=0.24.0
-pydantic>=2.5.0
-httpx>=0.25.0
+fastapi==0.141.1
+starlette==1.6.0
+uvicorn[standard]==0.34.3
+pydantic>=2.5.0,<3
+httpx==0.28.1

@@ -91,7 +91,9 @@ test('ARM source layout, service history and training context remain accessible'
   await page.getByRole('button', { name: 'Открыть карту', exact: true }).click();
   await expect(page.getByTestId('arm-map-panel')).toBeVisible();
   await expect(page.getByText('Локальная карта Москвы', { exact: true })).toBeVisible();
-  await expect(page.getByText(/Внешние API не используются/)).toBeVisible();
+  await expect(
+    page.getByText(/точное определение координат по адресу не подключено/),
+  ).toBeVisible();
   await expect(page.getByTestId('arm-offline-map')).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'локальный OSM-слой', exact: true }),
@@ -102,9 +104,13 @@ test('ARM source layout, service history and training context remain accessible'
     page.locator('.ant-drawer').getByText(/Для ДДС бригады выбираются вручную/),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Закрыть', exact: true }).click();
+  await expect(page.locator('.ant-drawer-content:visible')).toHaveCount(0);
+  if (info.project.name === 'desktop') await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.mouse.move(0, 0);
   await page.screenshot({
     path: '../docs/images/arm-reference-' + info.project.name + '.png',
     fullPage: true,
+    animations: 'disabled',
   });
 });
 

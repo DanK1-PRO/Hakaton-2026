@@ -1,4 +1,5 @@
 import httpx
+import json
 import pytest
 from conftest import login
 from test_flow import start, reaction, API
@@ -6,7 +7,10 @@ from app.ml_gateway import gateway
 from app.settings import settings
 
 
-@pytest.mark.parametrize("kind", ["valid", "wrong_session", "invalid_shape", "timeout", "http_error"])
+@pytest.mark.parametrize(
+    "kind",
+    ["valid", "wrong_session", "wrong_reference", "mock_mode", "bad_score", "invalid_shape", "timeout", "http_error"],
+)
 def test_local_adapter_contract(client, monkeypatch, kind):
     headers = login(client)
     card = start(client, headers)
@@ -23,10 +27,13 @@ def test_local_adapter_contract(client, monkeypatch, kind):
             200,
             json={
                 "schema_version": "1.0",
-                "session_id": card["session_id"] if kind == "valid" else "other",
+                "session_id": "other" if kind == "wrong_session" else card["session_id"],
                 "model_version": "contract-test-1",
-                "reference_version": "1.0",
-                "mode": "local",
+                "reference_version": "other"
+                if kind == "wrong_reference"
+                else json.loads(request.content)["reference"]["version"],
+                "mode": "mock" if kind == "mock_mode" else "local",
+                "score": 100 if kind == "bad_score" else None,
                 "explanation": "Contract test",
                 "timing": {"elapsed_seconds": 1, "acknowledgement_seconds": None},
             },
@@ -40,6 +47,7 @@ def test_local_adapter_contract(client, monkeypatch, kind):
     assert result.status_code == 200
     assert result.json()["mode"] == ("local" if kind == "valid" else "fallback")
     assert result.json()["session_id"] == card["session_id"]
+    assert result.json()["timing"]["first_response_deadline_seconds"] == 180
 
 
 def test_terminal_reaction_hangs_up_call(client):

@@ -1,6 +1,20 @@
 # Task Queue
 
-Updated: 2026-09-27.
+Updated: 2026-09-28.
+
+## Current Final Gate
+
+The historical integration queue below must not trigger repeated merges.
+
+- [x] Final timing/112 field ownership/ML validation fixes; instructor reviewed JSONL export.
+- [x] Real release GGUF verified and launched in separate ML environment; API local/fallback and concurrent finish passed.
+- [x] Local generation produced one case; reviewed-import dry validation passed without database writes.
+- [x] Backend 33 tests, Ruff, contract export, frontend build and 22 desktop/mobile tests passed.
+- [x] Native model/evaluator launcher start/stop verified; offline GIS external-request test passed.
+- [ ] Publish final audit commit and confirm both GitHub jobs on that exact revision.
+- [ ] Team: approve methodology/scenarios, prepare presentation/screencast and grant jury access before stop-code.
+
+Residual scope and evidence: docs/FINAL_INTEGRATION_AUDIT.ru.md and docs/VERIFICATION.md.
 
 ## Implementation Pass
 
@@ -43,4 +57,4 @@ Do not auto-implement real telephony, scoring weights, full ticket OCR, encrypti
 - [x] Codex review of opencode UI handoff (2026-09-27): build passed, backend pytest 17/17, local DB/API/UI restarted, repeated Playwright 22/22 including offline GIS map; ML branches untouched, `ML_MODE=mock` preserved.
 - [x] Integrated informal customer DDS clarifications (2026-09-27): source note saved, 3-minute first status+text timing added to evaluation, UI help/edit/service copy updated for DDS vs 112 boundaries, backend pytest 18/18, frontend Playwright 22/22, build green; ML untouched.
 - [x] ML/non-UI branch review started after Danil confirmed readiness: inspected `LocalAPI`, `hht`, `ml/scoring-experiment`, `ml_end`, `model`, tag/release `modelURL`; safely integrated runtime ML evaluator/generator from `ml/scoring-experiment`, documented why `LocalAPI`/`hht` are not direct runtime merges, preserved `ML_MODE=mock` and verified `local`/`fallback` gateway path.
-- [ ] Finish full combined branch gate after ML integration: frontend build/tests, contract export, Docker/Windows launch check, push/CI, then merge/push `main` only when green.
+- [x] Combined source integration into main completed before this audit; remaining final publication gate is tracked above.

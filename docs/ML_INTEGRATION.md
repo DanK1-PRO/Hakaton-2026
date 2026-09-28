@@ -1,5 +1,11 @@
 # Local ML integration / Подключение ML
 
+Update 2026-09-28: real release GGUF inference has been verified through the API.
+See [current offline launch instructions](LOCAL_ML_RUN.ru.md),
+[evidence](evidence/real-ml-integration.json) and [remaining limitations](FINAL_INTEGRATION_AUDIT.ru.md).
+The evaluator optionally calls a loopback-only LLM for comment feedback; numeric scoring
+remains an experimental formula. No ASR/TTS or automatic retraining is claimed.
+
 The main API has no PyTorch/Whisper dependency. Model packages run in separate local processes/containers. The React app calls only FastAPI.
 
 ## Executable evaluator contract v1

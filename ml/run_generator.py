@@ -8,15 +8,15 @@
    - ollama pull qwen2.5:7b
    - python ml/run_generator.py
 
-2. С OpenAI API:
-   - python ml/run_generator.py --api-key sk-... --model gpt-4o
+2. С подготовленным локальным llama.cpp:
+   - python -m ml.run_generator --api-url http://127.0.0.1:8091/v1 --model local-model
 
 3. С LM Studio:
    - Запустите LM Studio, загрузите модель, включите сервер
    - python ml/run_generator.py --api-url http://localhost:1234/v1 --model local
 
-4. С другими OpenAI-совместимыми API:
-   - python ml/run_generator.py --api-url http://your-server/v1 --model model-name
+Разрешены только HTTP API на loopback. Внешние сервисы не используются.
+Актуальная подготовка модели: docs/LOCAL_ML_RUN.ru.md.
 """
 
 import sys
@@ -50,6 +50,8 @@ def main():
     parser.add_argument("--dry-run", action="store_true",
                         help="Показать промпт без вызова LLM")
     args = parser.parse_args()
+    if args.count < 1:
+        parser.error("--count must be positive")
 
     gen = ScenarioGenerator(
         api_url=args.api_url,
@@ -89,6 +91,8 @@ def main():
         temperature=args.temperature,
     )
 
+    if not scenarios:
+        raise SystemExit("No valid scenarios generated; output file was not changed.")
     gen.save(scenarios, args.output)
 
     # Статистика

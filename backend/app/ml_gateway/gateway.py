@@ -1,4 +1,5 @@
 import httpx
+import asyncio
 from ..schemas import EvaluationRequest, EvaluationResult
 from ..settings import settings
 
@@ -43,13 +44,21 @@ async def evaluate(request: EvaluationRequest):
         return deterministic_evaluate(request)
     try:
         async with httpx.AsyncClient(timeout=settings.ml_timeout, trust_env=False) as client:
-            response = await client.post(settings.ml_url + "/v1/evaluate", json=request.model_dump())
+            response = await asyncio.wait_for(
+                client.post(settings.ml_url + "/v1/evaluate", json=request.model_dump()),
+                timeout=settings.ml_timeout,
+            )
             response.raise_for_status()
             result = EvaluationResult.model_validate(response.json())
             if result.session_id != request.session_id:
                 raise ValueError("ML session mismatch")
+            if result.reference_version != request.reference.get("version", "1.0"):
+                raise ValueError("ML reference mismatch")
+            if result.mode == "mock" or not result.model_version.strip():
+                raise ValueError("Invalid local model provenance")
+            result.timing = request.timing
             return result
-    except (httpx.HTTPError, ValueError):
+    except (httpx.HTTPError, ValueError, TimeoutError):
         return deterministic_evaluate(request, mode="fallback")
 
 

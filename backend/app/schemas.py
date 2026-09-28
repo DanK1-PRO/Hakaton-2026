@@ -61,7 +61,7 @@ class EvaluationResult(StrictModel):
     model_version: str
     reference_version: str
     mode: Literal["mock", "local", "fallback"]
-    score: float | None = None
+    score: float | None = Field(default=None, ge=0, le=10, allow_inf_nan=False)
     critical_errors: list[str] = Field(default_factory=list)
     field_errors: list[dict] = Field(default_factory=list)
     missing_information: list[str] = Field(default_factory=list)

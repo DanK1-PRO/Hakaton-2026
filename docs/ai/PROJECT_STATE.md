@@ -1,5 +1,24 @@
 # Project State
 
+## Current checkpoint: 2026-09-28 final integration pass
+
+Current branch is main, based on 1b1230e (previous main CI 36382982968 passed).
+UI and selected ML runtime modules are already integrated; do not repeat branch merges.
+Real Kirill GGUF release is downloaded, SHA-256 verified and assembled under ignored
+.runtime/models. Actual llama.cpp b11223 inference on RTX4060 passed the API/DB
+concurrent-finish and evaluator-outage test: docs/evidence/real-ml-integration.json.
+New changes fix opening timing, upstream 112 field permissions, ML reference/mode/score
+validation, authoritative timing, loopback comment LLM adapter, DDS generator prompt,
+reviewed scenario import and instructor JSONL export. Map geocoding remains approximate
+and is now explicitly labelled. New ML launchers use .venv-ml with no runtime installs.
+Read docs/FINAL_INTEGRATION_AUDIT.ru.md and docs/LOCAL_ML_RUN.ru.md for current details.
+Final local gate: 33 backend tests, Ruff, production build and 22 browser tests passed.
+Real generator produced one scenario; import dry validation passed without DB changes.
+Remaining delivery gate: push this audit revision and verify its GitHub CI, then record
+the exact commit/run in docs/VERIFICATION.md. Do not redownload model weights or rerun
+the full customer archive extraction on resume.
+Historical notes below are evidence of earlier states, not current completion claims.
+
 Updated: 2026-09-27. Version: 0.1.0 + Danil UI integration branch + offline GIS pack + customer DDS clarifications + local ML evaluator integration.
 
 ## Actual State

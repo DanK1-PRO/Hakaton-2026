@@ -749,6 +749,27 @@
         ]
       }
     },
+    "/api/v1/instructor/dataset.jsonl": {
+      "get": {
+        "summary": "Reviewed Dataset",
+        "operationId": "reviewed_dataset_api_v1_instructor_dataset_jsonl_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/ml/status": {
       "get": {
         "summary": "Ml Status",

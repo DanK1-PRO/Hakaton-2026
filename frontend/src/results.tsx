@@ -1,7 +1,20 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Alert, App, Button, Empty, Form, Input, Modal, Progress, Select, Space, Table, Tag } from 'antd';
+import {
+  Alert,
+  App,
+  Button,
+  Empty,
+  Form,
+  Input,
+  Modal,
+  Progress,
+  Select,
+  Space,
+  Table,
+  Tag,
+} from 'antd';
 import type { ColumnType, ColumnsType } from 'antd/es/table';
 import {
   CheckOutlined,
@@ -49,11 +62,7 @@ export function Results() {
         <>
           <Tag
             color={
-              f.verdict === 'confirmed'
-                ? 'success'
-                : f.verdict === 'corrected'
-                  ? 'gold'
-                  : 'warning'
+              f.verdict === 'confirmed' ? 'success' : f.verdict === 'corrected' ? 'gold' : 'warning'
             }
           >
             {verdicts[f.verdict]}
@@ -66,9 +75,7 @@ export function Results() {
     },
   };
   const columns: ColumnsType<Session> = [
-    ...(staff
-      ? [{ title: 'Обучающийся', dataIndex: 'trainee' }]
-      : []),
+    ...(staff ? [{ title: 'Обучающийся', dataIndex: 'trainee' }] : []),
     { title: 'Задание', dataIndex: 'scenario' },
     { title: 'Начало', dataIndex: 'started_at', render: date },
     {
@@ -110,16 +117,19 @@ export function Results() {
       ),
     },
   ];
-  const download = async () => {
+  const download = async (format: 'csv' | 'jsonl' = 'csv') => {
     try {
-      const r = await fetch('/api/v1/instructor/report.csv', {
-        headers: { Authorization: 'Bearer ' + store.getState().auth.token },
-      });
+      const r = await fetch(
+        format === 'csv' ? '/api/v1/instructor/report.csv' : '/api/v1/instructor/dataset.jsonl',
+        {
+          headers: { Authorization: 'Bearer ' + store.getState().auth.token },
+        },
+      );
       if (!r.ok) throw new Error();
       const url = URL.createObjectURL(await r.blob());
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'training-report.csv';
+      a.download = format === 'csv' ? 'training-report.csv' : 'reviewed-feedback.jsonl';
       a.click();
       URL.revokeObjectURL(url);
     } catch {
@@ -146,8 +156,13 @@ export function Results() {
             />
           ) : null}
           {staff ? (
-            <Button icon={<DownloadOutlined />} onClick={download}>
+            <Button icon={<DownloadOutlined />} onClick={() => download()}>
               Отчёт CSV
+            </Button>
+          ) : null}
+          {staff ? (
+            <Button icon={<DownloadOutlined />} onClick={() => download('jsonl')}>
+              Проверенные заключения
             </Button>
           ) : null}
           <Button icon={<ReloadOutlined spin={isFetching} />} onClick={refetch}>
@@ -274,10 +289,8 @@ export function Users() {
   const watchedPassword: string = Form.useWatch('password', form) || '';
   const [generatedPassword, setGeneratedPassword] = useState('');
   const strengthDone = strengthChecks.filter((c) => c.ok(watchedPassword)).length;
-  const strengthLabel =
-    strengthDone <= 1 ? 'Слабый' : strengthDone <= 3 ? 'Средний' : 'Надёжный';
-  const strengthColor =
-    strengthDone <= 1 ? '#cf1322' : strengthDone <= 3 ? '#d48806' : '#338453';
+  const strengthLabel = strengthDone <= 1 ? 'Слабый' : strengthDone <= 3 ? 'Средний' : 'Надёжный';
+  const strengthColor = strengthDone <= 1 ? '#cf1322' : strengthDone <= 3 ? '#d48806' : '#338453';
   const generatePassword = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&';
     let p = '';
@@ -399,8 +412,7 @@ export function Users() {
           </Form.Item>
           {generatedPassword && watchedPassword === generatedPassword ? (
             <div className="password-hint generated">
-              Пароль для передачи обучающемуся:{' '}
-              <strong>{generatedPassword}</strong>
+              Пароль для передачи обучающемуся: <strong>{generatedPassword}</strong>
             </div>
           ) : null}
           <Form.Item
