@@ -1,0 +1,12 @@
+{
+  "date": "2026-09-28",
+  "branch": "main",
+  "application_commit": "c55103c36751aa2a31da33bfd8a29574c3304e68",
+  "run_id": 36462902808,
+  "url": "https://github.com/DanK1-PRO/Hakaton-2026/actions/runs/36462902808",
+  "jobs": {"verify": "success", "containers": "success"},
+  "local_backend_tests": 34,
+  "local_browser_tests": 22,
+  "real_llm": "verified locally on RTX 4060; not exercised by GitHub CI",
+  "later_report_only_commit": "skip ci; no application changes"
+}

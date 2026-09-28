@@ -2,7 +2,9 @@
 
 ## Current checkpoint: 2026-09-28 final integration pass
 
-Current branch is main, based on 1b1230e (previous main CI 36382982968 passed).
+Current branch is main. Published application revision: c55103c36751aa2a31da33bfd8a29574c3304e68.
+GitHub CI 36462902808 passed both verify and containers. Final report-only commit
+uses [skip ci]; the application revision remains the one above.
 UI and selected ML runtime modules are already integrated; do not repeat branch merges.
 Real Kirill GGUF release is downloaded, SHA-256 verified and assembled under ignored
 .runtime/models. Actual llama.cpp b11223 inference on RTX4060 passed the API/DB
@@ -14,9 +16,12 @@ and is now explicitly labelled. New ML launchers use .venv-ml with no runtime in
 Read docs/FINAL_INTEGRATION_AUDIT.ru.md and docs/LOCAL_ML_RUN.ru.md for current details.
 Final local gate: 34 backend tests, Ruff, production build and 22 browser tests passed.
 Real generator produced one scenario; import dry validation passed without DB changes.
-Remaining delivery gate: push this audit revision and verify its GitHub CI, then record
-the exact commit/run in docs/VERIFICATION.md. Do not redownload model weights or rerun
-the full customer archive extraction on resume.
+Publication and integration verification are complete for this audited revision.
+Native UI 5173/API 8000/evaluator 8090/LLM 8091 were restarted and health-checked.
+Team follow-up: methodology/scenario review, presentation/screencast and jury access;
+see docs/SUBMISSION.ru.md. Voice, fine-tuning and exact geocoding remain explicit gaps,
+not automatically authorized new goals. Do not redownload weights, repeat merges or
+re-extract the full customer archive on resume.
 Historical notes below are evidence of earlier states, not current completion claims.
 
 Updated: 2026-09-27. Version: 0.1.0 + Danil UI integration branch + offline GIS pack + customer DDS clarifications + local ML evaluator integration.

@@ -11,7 +11,7 @@ The historical integration queue below must not trigger repeated merges.
 - [x] Local generation produced one case; reviewed-import dry validation passed without database writes.
 - [x] Backend 34 tests, Ruff, contract export, frontend build and 22 desktop/mobile tests passed.
 - [x] Native model/evaluator launcher start/stop verified; offline GIS external-request test passed.
-- [ ] Publish final audit commit and confirm both GitHub jobs on that exact revision.
+- [x] Published application c55103c; GitHub CI 36462902808 verify + containers passed. Later report-only commit uses [skip ci].
 - [ ] Team: approve methodology/scenarios, prepare presentation/screencast and grant jury access before stop-code.
 
 Residual scope and evidence: docs/FINAL_INTEGRATION_AUDIT.ru.md and docs/VERIFICATION.md.

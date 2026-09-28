@@ -29,8 +29,17 @@ Release `modelURL` скачан, части проверены по опубли
 [локальный evaluator/fallback](evidence/ml-integration.json),
 [аудит исправлений и остаточных ограничений](FINAL_INTEGRATION_AUDIT.ru.md),
 [воспроизводимый запуск](LOCAL_ML_RUN.ru.md).
-GitHub CI нового коммита проверяется после публикации; старые зелёные запуски
-не считаются доказательством этой ревизии.
+Опубликованная ревизия приложения: `c55103c36751aa2a31da33bfd8a29574c3304e68`.
+[GitHub Actions 36462902808](https://github.com/DanK1-PRO/Hakaton-2026/actions/runs/36462902808):
+`verify=success`, `containers=success`. Проверены Linux/Python 3.11, миграции,
+локальный evaluator/fallback, frontend build, браузерная интеграция и Compose smoke.
+Предыдущая основная ревизия `14f7c30` также прошла оба задания (36419912494).
+Последующая фиксация этого отчёта с `[skip ci]` меняет только документацию.
+
+После холодного перезапуска стенда: UI 5173, API 8000, evaluator 8090 и LLM 8091
+вернули HTTP 200; API сообщил `database=ok`, `ml_mode=local`, evaluator
+`llm_configured=true`. Полный учебный сеанс через основной API после исправления
+JSON-схемы завершился с `mode=local`, `comment_quality.status=model_assessed`.
 
 Не заявляются: автоматическое дообучение по JSONL, полноценный ASR/TTS/VoIP,
 точный адресный геокодер/роутинг, утверждённая заказчиком балльная методика,

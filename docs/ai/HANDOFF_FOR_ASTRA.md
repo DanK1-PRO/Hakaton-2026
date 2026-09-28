@@ -8,6 +8,8 @@ implementation-pass tasks below. Real GGUF inference evidence is in
 docs/evidence/real-ml-integration.json. Model files and runtime stay in .runtime.
 Submission material index: docs/SUBMISSION.ru.md. Do not claim real voice/ASR/TTS,
 automatic fine-tuning, exact address geocoding or full customer load acceptance.
+Published code: c55103c, both jobs green in CI 36462902808. No repeat integration
+is required. Remaining acceptance/submission actions and limits are in the documents above.
 
 Updated: 2026-09-20. The implementation pass has already built the application.
 Do not treat this repository as an empty scaffold.
