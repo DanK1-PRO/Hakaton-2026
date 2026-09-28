@@ -1,6 +1,21 @@
 # Project State
 
-## Current checkpoint: 2026-09-28 final integration pass
+## Current checkpoint: 2026-09-28 product delivery cleanup
+
+The product-facing cleanup pass removed development wording from visible UI labels and
+tooltips: no user-visible `TEAM_PROPOSAL`, `Методподсказка`, `не подключено`,
+`не передаётся API` or map `console.debug` remains in `frontend/src`. The ARM screen,
+service dock, map panel, training profile and footer now describe the simulator as a
+closed training product rather than unfinished wiring. Added
+`docs/FINAL_DELIVERY_CHECKLIST.ru.md` and linked it from README, docs index and submission
+packet so reviewers can launch the repository on Docker or a clean Windows/native VM.
+Verification after this cleanup: Ruff passed, backend pytest 34/34 passed, frontend
+production build passed, Playwright 22/22 desktop+mobile passed, local API health returned
+`status=ok`, `database=ok`, `ml_mode=local`, and UI returned HTTP 200. Screenshots in
+`docs/images` were refreshed by the browser suite. Do not reopen branch merges or ML
+integration unless Danil asks for a new feature pass.
+
+## Previous checkpoint: 2026-09-28 final integration pass
 
 Current branch is main. Published application revision: c55103c36751aa2a31da33bfd8a29574c3304e68.
 GitHub CI 36462902808 passed both verify and containers. Final report-only commit

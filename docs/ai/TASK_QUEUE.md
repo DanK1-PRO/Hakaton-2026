@@ -12,6 +12,7 @@ The historical integration queue below must not trigger repeated merges.
 - [x] Backend 34 tests, Ruff, contract export, frontend build and 22 desktop/mobile tests passed.
 - [x] Native model/evaluator launcher start/stop verified; offline GIS external-request test passed.
 - [x] Published application c55103c; GitHub CI 36462902808 verify + containers passed. Later report-only commit uses [skip ci].
+- [x] Product-facing cleanup before submission: removed development wording from visible UI, added final delivery checklist, refreshed screenshots, reran Ruff + 34 backend tests + frontend build + 22 browser tests.
 - [ ] Team: approve methodology/scenarios, prepare presentation/screencast and grant jury access before stop-code.
 
 Residual scope and evidence: docs/FINAL_INTEGRATION_AUDIT.ru.md and docs/VERIFICATION.md.

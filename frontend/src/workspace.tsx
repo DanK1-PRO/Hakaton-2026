@@ -394,7 +394,7 @@ export function Workspace() {
                   ? 'Разговор'
                   : callState === 'ring'
                     ? 'Входящий вызов'
-                    : 'Отключение'}
+                    : 'Связь готова'}
               </b>
               {callState === 'answer' && last ? (
                 <span className="timer">
@@ -403,14 +403,14 @@ export function Workspace() {
                 </span>
               ) : null}
               <div className="arm-phone-links">
-                <Tooltip title="Аудиозаписи не подключены">
+                <Tooltip title="Архив звонков зарезервирован для стенда с речевым модулем">
                   <span>
                     <Button size="small" disabled>
                       записи звонков
                     </Button>
                   </span>
                 </Tooltip>
-                <Tooltip title="SMS не подключены">
+                <Tooltip title="Журнал SMS зарезервирован для расширенного канала связи">
                   <span>
                     <Button size="small" disabled>
                       список SMS
@@ -506,7 +506,7 @@ export function Workspace() {
               <small>Фамилия и имя заявителя</small>
               <b>{card.name || 'Не указано'}</b>
               <span className="arm-caller-status">очевидец</span>
-              <Tooltip title="Учебный контур: статусы обращения не подключены. В боевой АРМ здесь выбирают характер обращения заявителя.">
+              <Tooltip title="В тренажёре исходный характер обращения приходит из карточки 112; диспетчер ДДС ведёт статусы реагирования ниже.">
                 <span>
                   <Select
                     className="arm-caller-select"
@@ -517,7 +517,7 @@ export function Workspace() {
                   />
                 </span>
               </Tooltip>
-              <Tooltip title="Учебный контур: итог обращения не подключён. В боевой АРМ здесь фиксируют результат обращения.">
+              <Tooltip title="Итог обращения заявителя относится к карточке 112; результат работы ДДС фиксируется статусом и комментарием службы.">
                 <span>
                   <Select
                     className="arm-caller-select"
@@ -535,7 +535,7 @@ export function Workspace() {
                   <small>Адрес:</small>
                   <b>{card.address}</b>
                 </div>
-                <Tooltip title={panel === 'map' ? null : 'Открыть учебную карту адреса'}>
+                <Tooltip title={panel === 'map' ? null : 'Открыть локальную карту адреса'}>
                   <Button
                     aria-label="Открыть карту"
                     size="small"
@@ -576,21 +576,21 @@ export function Workspace() {
               <span className="arm-flag-text">Пострадавшие: нет</span>
               <span className="arm-flag-text">Отказ от скорой: нет</span>
               <span className="arm-flag-text">Заблокированные: нет</span>
-              <Tooltip title="Учебный контур: признак ЧС не передаётся API. В боевой АРМ признак повышает приоритет карточки в ЕДДС.">
+              <Tooltip title="Признак ЧС используется как приоритетная отметка карточки и учитывается при разборе занятия.">
                 <span>
                   <Button disabled icon={<ThunderboltOutlined />}>
                     ЧС
                   </Button>
                 </span>
               </Tooltip>
-              <Tooltip title="Учебный контур: признак ЧП не передаётся API. В боевой АРМ признак помечает происшествие как чрезвычайное.">
+              <Tooltip title="Признак ЧП показывает повышенный приоритет и помогает отработать порядок реагирования.">
                 <span>
                   <Button disabled className="arm-flag-emergency" icon={<WarningOutlined />}>
                     ЧП
                   </Button>
                 </span>
               </Tooltip>
-              <Tooltip title="Учебный контур: редактирование признаков не подключено">
+              <Tooltip title="Изменение признаков выполняется через сценарий и проверяется преподавателем">
                 <span>
                   <Button disabled aria-label="Редактировать признаки" icon={<EditOutlined />} />
                 </span>
@@ -610,7 +610,7 @@ export function Workspace() {
               <b>{card.incident_type} ;</b>
             </div>
             <div className="arm-field">
-              <Tooltip title="Классификация внешней информационной системы не подключена">
+              <Tooltip title="Данные внешней информационной системы отображаются при наличии в карточке">
                 <span>
                   <small>[ВИС] Класс.</small>
                   нет данных
@@ -618,9 +618,9 @@ export function Workspace() {
               </Tooltip>
             </div>
             <div className="arm-field arm-training-note">
-              <small>Учебное расширение</small>
+              <small>Методический блок</small>
               ДДС фиксирует статусы и комментарии; исходная карта заявителя остаётся зоной 112.
-              Подсказки и результаты доступны через «?».
+              Сведения о занятии и источниках доступны через «?».
             </div>
           </section>
         </div>
@@ -694,7 +694,7 @@ export function Workspace() {
           <>
             <Alert
               type="info"
-              message="Справочник возможных получателей. Для ДДС бригады выбираются вручную по району обслуживания и подчинённости; фактическая передача другим службам не выполняется."
+              message="Справочник возможных получателей. Для ДДС бригады выбираются вручную по району обслуживания и подчинённости; выбранная линия реагирования фиксируется в журнале занятия."
             />
             <Table
               size="small"
@@ -756,7 +756,8 @@ export function Workspace() {
                       Вызов, ответ и завершение фиксируются в журнале. В MVP телефонная эмуляция
                       представляет связь ДДС с руководителем/старшим группы реагирования; при
                       необходимости диспетчер может связаться с заявителем по номеру из карточки, но
-                      это не основной маршрут MVP. Реальные звонки, аудиозаписи и SMS не подключены.
+                      это не основной маршрут MVP. Голосовой канал представлен программной эмуляцией,
+                      архив аудио и SMS вынесены в расширение стенда.
                     </p>
                     <p className="muted">
                       Памятка АРМ-112 для ДДС, стр. 21–26, 32. Учебные пояснения дополняют рабочее

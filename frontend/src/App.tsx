@@ -167,7 +167,7 @@ function Shell() {
           banner
           showIcon
           type="warning"
-          message="ML-модуль недоступен. Учебные занятия работают с резервной проверкой."
+          message="Автоматическая проверка работает в резервном режиме. Учебные занятия доступны."
         />
       ) : null}
       <main className="main-content">
@@ -187,15 +187,15 @@ function Shell() {
       <footer className="statusbar">
         <span>
           <span className="status-dot" />
-          Учебная среда
+          Тренировочная среда
         </span>
         <span>АРМ ДДС · v0.1.0</span>
         <span>
           {ml?.mode === 'local'
-            ? 'Локальный ML'
+            ? 'Локальная модель'
             : ml?.mode === 'fallback'
-              ? 'Резервная проверка'
-              : 'Проверка: учебный режим'}
+              ? 'Резервный алгоритм'
+              : 'Проверка: базовый режим'}
         </span>
       </footer>
     </Layout>

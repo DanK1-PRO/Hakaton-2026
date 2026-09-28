@@ -436,7 +436,7 @@ export function Training() {
           </div>
         ) : null}
         <div className="profile-band__note">
-          Справочник вариантов · TEAM_PROPOSAL · не является приказом заказчика
+          Методический справочник профиля ДДС для выбора зоны ответственности на занятии
         </div>
       </section>
       {error ? <ErrorPanel error={error} retry={refetch} /> : null}
@@ -463,7 +463,7 @@ export function Training() {
               </div>
               {s.expected_hint ? (
                 <div className="scenario-meta scenario-hint" data-testid="scenario-expected-hint">
-                  Методподсказка · ожидаемая линия: <b>{s.expected_hint}</b>
+                  Ожидаемая линия реагирования: <b>{s.expected_hint}</b>
                 </div>
               ) : null}
               <Button

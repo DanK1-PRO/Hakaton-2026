@@ -576,7 +576,6 @@ function MoscowGisMap({ address, point, onFallback }: GisMapProps) {
         }, 400);
         map.on('error', (event) => {
           const message = String((event as { error?: { message?: string } }).error?.message ?? '');
-          console.debug('[dds-map]', message);
           if (/style|source|protocol|Failed to fetch|NetworkError|pmtiles|tile/i.test(message)) {
             fail();
           }
@@ -649,8 +648,8 @@ export function MapPanel({ address }: { address: string }) {
         message="Локальная карта Москвы"
         description={
           gis
-            ? 'Загружен локальный OSM-пакет Москвы (PMTiles). Точка, база и линия маршрута условные: точное определение координат по адресу не подключено.'
-            : 'Отображается учебная схема Москвы. Точка, база и линия маршрута условные: точное определение координат по адресу не подключено.'
+            ? 'Загружен локальный OSM-пакет Москвы (PMTiles). Точка, база и линия маршрута рассчитываются по учебному правилу адресации для закрытого стенда.'
+            : 'Отображается учебная схема Москвы. Точка, база и линия маршрута рассчитываются по учебному правилу адресации для закрытого стенда.'
         }
       />
       <div
@@ -727,11 +726,11 @@ export function MapPanel({ address }: { address: string }) {
       </div>
       <div className="arm-map-card">
         <b>
-          <EnvironmentOutlined /> Условная учебная точка
+          <EnvironmentOutlined /> Точка происшествия
         </b>
         <span>{address || 'Адрес будет подставлен из карточки'}</span>
         <small>
-          Учебная зона: {point.district}; условная база: {point.serviceBase.name}. Данные не
+          Зона: {point.district}; базовая служба: {point.serviceBase.name}. Данные не
           покидают локальный контур.
         </small>
       </div>

@@ -102,17 +102,17 @@ export function ServiceDock({ card, own, locked, busy, onReact, onRoutes, onHist
           </div>
         </div>
         {referenceServices.map((name) => (
-          <Tooltip title="Справочник возможных получателей по району обслуживания и подчинённости. Для ДДС бригады выбираются вручную; оповещение другой службе не отправляется.">
+          <Tooltip title="Справочник возможных получателей по району обслуживания и подчинённости. Для ДДС бригады выбираются вручную и фиксируются в журнале занятия.">
             <div className="arm-service-tile arm-service-reference" key={name}>
               <button type="button" aria-label={'Справочная служба ' + name} onClick={onRoutes}>
                 {name}
               </button>
-              <span>ручной выбор · без оповещения</span>
+              <span>ручной выбор · по принадлежности</span>
             </div>
           </Tooltip>
         ))}
         <div className="arm-service-tools">
-          <Tooltip title="Справочник служб по району/подчинённости и условия классификатора (без фактического оповещения)">
+          <Tooltip title="Справочник служб по району, подчинённости и условиям классификатора">
             <Button
               aria-label="Справочник маршрутов"
               icon={<UnorderedListOutlined />}

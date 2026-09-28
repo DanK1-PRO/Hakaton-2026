@@ -91,9 +91,7 @@ test('ARM source layout, service history and training context remain accessible'
   await page.getByRole('button', { name: 'Открыть карту', exact: true }).click();
   await expect(page.getByTestId('arm-map-panel')).toBeVisible();
   await expect(page.getByText('Локальная карта Москвы', { exact: true })).toBeVisible();
-  await expect(
-    page.getByText(/точное определение координат по адресу не подключено/),
-  ).toBeVisible();
+  await expect(page.getByText(/учебному правилу адресации/)).toBeVisible();
   await expect(page.getByTestId('arm-offline-map')).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'локальный OSM-слой', exact: true }),

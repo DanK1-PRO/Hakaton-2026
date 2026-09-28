@@ -3,7 +3,7 @@
 Финальный проход 28.09: [интеграционный аудит и границы готовности](docs/FINAL_INTEGRATION_AUDIT.ru.md),
 [запуск реальной локальной модели](docs/LOCAL_ML_RUN.ru.md), [комплект сдачи](docs/SUBMISSION.ru.md).
 
-[English](README.en.md) · [Документация](docs/INDEX.md) · [Запуск](docs/DEPLOYMENT.md) · [Интеграция ML](docs/ML_INTEGRATION.md) · [Демонстрация](docs/DEMO.md)
+[English](README.en.md) · [Документация](docs/INDEX.md) · [Запуск](docs/DEPLOYMENT.md) · [Чеклист сдачи](docs/FINAL_DELIVERY_CHECKLIST.ru.md) · [Интеграция ML](docs/ML_INTEGRATION.md) · [Демонстрация](docs/DEMO.md)
 
 [![Quality and integration](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml/badge.svg)](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml)
 

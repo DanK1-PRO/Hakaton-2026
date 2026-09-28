@@ -7,6 +7,7 @@
 |---|---|
 | Репозиторий | https://github.com/DanK1-PRO/Hakaton-2026 ; запуск в корневом README.md |
 | Документация | [Индекс](INDEX.md), [архитектура](architecture.md), [развёртывание](DEPLOYMENT.md), [локальная ML](LOCAL_ML_RUN.ru.md) |
+| Финальная самопроверка | [Чеклист сдачи](FINAL_DELIVERY_CHECKLIST.ru.md) |
 | Проверки и ограничения | [Протокол](VERIFICATION.md), [финальный аудит](FINAL_INTEGRATION_AUDIT.ru.md) |
 | Демонстрация | [Маршрут показа](DEMO.md), docs/images; локальный UI http://127.0.0.1:5173 |
 | Веса | [Release modelURL](https://github.com/DanK1-PRO/Hakaton-2026/releases/tag/modelURL), SHA-256 в финальном аудите |

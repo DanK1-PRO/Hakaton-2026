@@ -77,7 +77,7 @@ test('offline GIS map loads local Moscow PMTiles pack with ODbL attribution', as
     animations: 'disabled',
   });
   await page.locator('.arm-map-card').scrollIntoViewIfNeeded();
-  await expect(page.getByText('Условная учебная точка', { exact: true })).toBeInViewport();
+  await expect(page.getByText('Точка происшествия', { exact: true })).toBeInViewport();
   await page.screenshot({
     path: `../docs/images/map-gis-caption-${test.info().project.name}.png`,
     animations: 'disabled',
