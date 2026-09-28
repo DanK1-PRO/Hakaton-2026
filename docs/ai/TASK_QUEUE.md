@@ -9,7 +9,7 @@ The historical integration queue below must not trigger repeated merges.
 - [x] Final timing/112 field ownership/ML validation fixes; instructor reviewed JSONL export.
 - [x] Real release GGUF verified and launched in separate ML environment; API local/fallback and concurrent finish passed.
 - [x] Local generation produced one case; reviewed-import dry validation passed without database writes.
-- [x] Backend 33 tests, Ruff, contract export, frontend build and 22 desktop/mobile tests passed.
+- [x] Backend 34 tests, Ruff, contract export, frontend build and 22 desktop/mobile tests passed.
 - [x] Native model/evaluator launcher start/stop verified; offline GIS external-request test passed.
 - [ ] Publish final audit commit and confirm both GitHub jobs on that exact revision.
 - [ ] Team: approve methodology/scenarios, prepare presentation/screencast and grant jury access before stop-code.

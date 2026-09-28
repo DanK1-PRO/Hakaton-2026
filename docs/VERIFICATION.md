@@ -8,7 +8,7 @@ UI-ветки и выбранные ML runtime-модули уже объеди�
 | Проверка | Фактический результат |
 |---|---|
 | `ruff check backend ml scripts` | Passed |
-| `pytest backend/tests -q` | 33 passed; 2 upstream warnings |
+| `pytest backend/tests -q` | 34 passed; 2 upstream warnings |
 | `npm run build` (frontend) | Passed; предупреждение о размере vendor/MapLibre chunks |
 | `npm test` (frontend, mock regression) | 22 passed, desktop + mobile, 1.8m |
 | `python scripts/export_contracts.py` | OpenAPI и JSON schemas обновлены |
@@ -17,6 +17,7 @@ UI-ветки и выбранные ML runtime-модули уже объеди�
 | Windows `start-ml.ps1` / `stop-ml.ps1` | Отдельная `.venv-ml`, model 8091 + evaluator 8090; запуск и освобождение портов проверены |
 | Генератор с локальным GGUF, тип 681 | Создан 1 сценарий; dry-run импортера прошёл; в БД не импортирован без проверки преподавателем |
 | Офлайн GIS | Локальные PMTiles/glyphs; тест блокирует внешние HTTP-запросы; desktop/mobile passed |
+| Повторный ML smoke | Обнаружен обрезанный ответ при лимите 600 tokens; добавлена ограниченная JSON-схема и регрессия `finish_reason=length`; 3 последовательных реальных ответа после исправления прошли |
 
 Release `modelURL` скачан, части проверены по опубликованным SHA-256 и собраны.
 Файл: 6 474 702 976 байт, SHA-256

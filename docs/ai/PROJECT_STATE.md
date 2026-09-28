@@ -12,7 +12,7 @@ validation, authoritative timing, loopback comment LLM adapter, DDS generator pr
 reviewed scenario import and instructor JSONL export. Map geocoding remains approximate
 and is now explicitly labelled. New ML launchers use .venv-ml with no runtime installs.
 Read docs/FINAL_INTEGRATION_AUDIT.ru.md and docs/LOCAL_ML_RUN.ru.md for current details.
-Final local gate: 33 backend tests, Ruff, production build and 22 browser tests passed.
+Final local gate: 34 backend tests, Ruff, production build and 22 browser tests passed.
 Real generator produced one scenario; import dry validation passed without DB changes.
 Remaining delivery gate: push this audit revision and verify its GitHub CI, then record
 the exact commit/run in docs/VERIFICATION.md. Do not redownload model weights or rerun
