@@ -2,6 +2,17 @@
 
 ## Current checkpoint: 2026-09-28 product delivery cleanup
 
+New customer-wow pass added a product readiness dashboard and richer ML result explanation.
+`/readiness` summarizes local deployment, API/PostgreSQL, ML mode, closed offline map,
+classifier size, scenario count, completed sessions, teacher feedback and the delivery
+document set. `Result` now shows the checking mode, experimental score, model version,
+comment-quality explanation and strengths/improvements when provided by the local evaluator.
+Browser coverage now includes the readiness dashboard and ML insight; screenshots include
+`docs/images/readiness.png`. Verification for this pass: Ruff passed, backend pytest 34/34
+passed, frontend build passed, Playwright 24/24 passed on desktop/mobile. This is a
+demonstration-value layer and does not claim real telephony, official scoring, certified
+security, exact geocoding or automatic retraining.
+
 The product-facing cleanup pass removed development wording from visible UI labels and
 tooltips: no user-visible `TEAM_PROPOSAL`, `Методподсказка`, `не подключено`,
 `не передаётся API` or map `console.debug` remains in `frontend/src`. The ARM screen,

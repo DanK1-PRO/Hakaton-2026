@@ -126,7 +126,7 @@ export const api = createApi({
       }),
       invalidatesTags: ['Sessions', 'Incidents'],
     }),
-    ml: b.query<{ mode: string; available: boolean; asr: boolean }, void>({
+    ml: b.query<{ mode: string; available: boolean; asr: boolean; capabilities?: string[] }, void>({
       query: () => '/ml/status',
     }),
     users: b.query<User[], void>({ query: () => '/admin/users', providesTags: ['Users'] }),

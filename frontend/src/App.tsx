@@ -6,6 +6,7 @@ import {
   ApartmentOutlined,
   BarChartOutlined,
   BookOutlined,
+  DashboardOutlined,
   LogoutOutlined,
   PhoneOutlined,
   ProfileOutlined,
@@ -14,7 +15,7 @@ import {
 } from '@ant-design/icons';
 import { api, signedIn, signedOut, setUser, type RootState } from './store';
 import { ErrorPanel } from './components';
-import { IncidentList, Workspace, Training, Results, Users } from './pages';
+import { IncidentList, Workspace, Training, Results, Users, Readiness } from './pages';
 function Login() {
   const dispatch = useDispatch();
   const [login, { isLoading }] = api.useLoginMutation();
@@ -110,6 +111,7 @@ function Shell() {
   const menu = [
     { key: '/incidents', icon: <ProfileOutlined />, label: 'Происшествия' },
     { key: '/training', icon: <BookOutlined />, label: 'Учебные задания' },
+    { key: '/readiness', icon: <DashboardOutlined />, label: 'Готовность' },
     {
       key: '/results',
       icon: <BarChartOutlined />,
@@ -176,6 +178,7 @@ function Shell() {
           <Route path="/incidents" element={<IncidentList />} />
           <Route path="/incidents/:id" element={<Workspace key={location.pathname} />} />
           <Route path="/training" element={<Training />} />
+          <Route path="/readiness" element={<Readiness />} />
           <Route path="/results" element={<Results />} />
           <Route
             path="/users"

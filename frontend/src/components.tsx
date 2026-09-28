@@ -1,5 +1,5 @@
 import { Alert, Button, Form, Input, Select, Tag, Timeline, Typography } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, ExperimentOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { Evaluation, IncidentType, Event } from './types';
 
 export const labels: Record<string, string> = {
@@ -114,19 +114,32 @@ export function CardFields({
 export function Result({ result }: { result: Evaluation }) {
   const problems =
     result.critical_errors.length + result.field_errors.length + result.missing_information.length;
+  const modeLabel =
+    result.mode === 'local'
+      ? 'Локальная модель'
+      : result.mode === 'fallback'
+        ? 'Резервный алгоритм'
+        : 'Базовая проверка';
+  const commentQuality = result.comment_quality;
+  const strengths = commentQuality?.strengths ?? [];
+  const improvements = commentQuality?.improvements ?? [];
+  const commentStatus =
+    commentQuality?.status === 'model_assessed'
+      ? 'Комментарий оценен моделью'
+      : commentQuality?.status === 'unavailable'
+        ? 'Комментарий проверен резервно'
+        : 'Комментарий проверяет преподаватель';
   return (
     <div className="evaluation">
       <div className="section-heading">
         <h3>Результат занятия</h3>
-        <Tag color={result.mode === 'local' ? 'green' : 'gold'}>
-          {result.mode === 'local'
-            ? 'Локальная проверка'
-            : result.mode === 'fallback'
-              ? 'Резервная проверка'
-              : 'Учебная проверка'}
-        </Tag>
+        <Tag color={result.mode === 'local' ? 'green' : 'gold'}>{modeLabel}</Tag>
       </div>
       <div className="metrics">
+        <div>
+          <strong>{result.score === null ? '—' : result.score.toFixed(1)}</strong>
+          <span>экспериментальный балл</span>
+        </div>
         <div>
           <strong>{problems}</strong>
           <span>замечаний</span>
@@ -177,6 +190,42 @@ export function Result({ result }: { result: Evaluation }) {
           description={result.missing_information.map((s) => labels[s] || s).join(', ')}
         />
       ) : null}
+      <section className="ml-insight" aria-label="Пояснение автоматической проверки">
+        <div className="ml-insight__head">
+          <ExperimentOutlined />
+          <div>
+            <b>{commentStatus}</b>
+            <span>{result.model_version}</span>
+          </div>
+        </div>
+        {commentQuality?.explanation ? <p>{commentQuality.explanation}</p> : null}
+        {strengths.length || improvements.length ? (
+          <div className="ml-insight__grid">
+            {strengths.length ? (
+              <div>
+                <b>Сильные стороны</b>
+                <ul>
+                  {strengths.map((item) => (
+                    <li key={item}>
+                      <CheckCircleOutlined /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {improvements.length ? (
+              <div>
+                <b>Что улучшить</b>
+                <ul>
+                  {improvements.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </section>
       <Typography.Paragraph type="secondary">{result.explanation}</Typography.Paragraph>
       <div className="muted">
         Проверка: {result.model_version} · Эталон: {result.reference_version}

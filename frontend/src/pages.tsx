@@ -31,6 +31,7 @@ import { DDS_PROFILES, DEFAULT_PROFILE_ID, type DdsProfile } from './domain/ddsP
 import type { Incident, Scenario } from './types';
 export { Workspace } from './workspace';
 export { Results, Users } from './results';
+export { Readiness } from './readiness';
 
 const PROFILE_STORAGE_KEY = 'dds_profile_id';
 

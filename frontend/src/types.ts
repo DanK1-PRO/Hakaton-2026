@@ -32,6 +32,14 @@ export type Evaluation = {
     first_response_seconds?: number | null;
     first_response_deadline_seconds?: number;
   };
+  routing_assessment?: Record<string, unknown>;
+  comment_quality?: {
+    status?: string;
+    model?: string;
+    explanation?: string;
+    strengths?: string[];
+    improvements?: string[];
+  };
   explanation: string;
 };
 export type Event = {

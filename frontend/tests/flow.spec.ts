@@ -163,6 +163,8 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   await page.getByRole('button', { name: 'Завершить', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Результат занятия' })).toBeVisible();
   await expect(page.getByText('По проверяемым критериям замечаний нет')).toBeVisible();
+  await expect(page.getByLabel('Пояснение автоматической проверки')).toBeVisible();
+  await expect(page.getByText('экспериментальный балл', { exact: true })).toBeVisible();
   await expect(page.locator('.ant-message-notice')).toHaveCount(0);
   if (testInfo.project.name === 'desktop')
     await page.screenshot({ path: '../docs/images/result.png', fullPage: true });
@@ -278,6 +280,25 @@ test('administrator filters users by role', async ({ page }, testInfo) => {
   await expect(table.getByText('instructor@dds.local')).toHaveCount(0);
   if (testInfo.project.name === 'desktop')
     await page.screenshot({ path: '../docs/images/users.png', fullPage: true });
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
+  ).toBeFalsy();
+});
+
+test('readiness dashboard summarizes product contour for demonstration', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await page.getByLabel('Электронная почта').fill('administrator@dds.local');
+  await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
+  await page.goto('/readiness');
+  await expect(page.getByRole('heading', { name: 'Готовность контура' })).toBeVisible();
+  await expect(page.getByText('Пилот готов к демонстрации в закрытом контуре')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ML-контур' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Комплект для проверки' })).toBeVisible();
+  await expect(page.getByText('типов классификатора')).toBeVisible();
+  if (testInfo.project.name === 'desktop')
+    await page.screenshot({ path: '../docs/images/readiness.png', fullPage: true });
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
   ).toBeFalsy();
