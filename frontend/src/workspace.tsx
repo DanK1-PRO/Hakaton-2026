@@ -21,6 +21,7 @@ import {
 } from 'antd';
 import {
   ArrowLeftOutlined,
+  CheckCircleOutlined,
   CheckOutlined,
   ClockCircleOutlined,
   CloseOutlined,
@@ -201,6 +202,21 @@ export function Workspace() {
     ? Math.max(0, (new Date(firstTextReaction.created_at).getTime() - cardCreatedMs) / 1000)
     : Math.max(0, (frozenNowMs - cardCreatedMs) / 1000);
   const firstRecordDone = Boolean(firstTextReaction);
+  const firstRecordDeadline = 180;
+  const openingLate = !card.acknowledged_at && elapsed > 30;
+  const firstRecordLate = !firstRecordDone && firstRecordSeconds > firstRecordDeadline;
+  const openingStatus = card.acknowledged_at
+    ? `выполнено за ${elapsed.toFixed(1)} с`
+    : locked
+      ? 'не зафиксировано'
+      : `идёт ${elapsed.toFixed(1)} с`;
+  const firstRecordStatus = firstRecordDone
+    ? `выполнена за ${firstRecordSeconds.toFixed(1)} с`
+    : locked
+      ? 'не внесена'
+      : firstRecordLate
+        ? `просрочено на ${time(firstRecordSeconds - firstRecordDeadline)}`
+        : `осталось ${time(firstRecordDeadline - firstRecordSeconds)}`;
   const currentCard = async () => {
     if (pendingPhone.current) await pendingPhone.current;
     return api.endpoints.incident.select(id)(store.getState()).data || card;
@@ -310,11 +326,6 @@ export function Workspace() {
       ) : null}
     </>
   );
-  const acknowledgementLabel = card.acknowledged_at
-    ? 'Карточка открыта'
-    : locked
-      ? 'Открытие не зафиксировано'
-      : 'Открытие карточки';
   return (
     <div className="arm-workspace">
       <div className="arm-training-rail">
@@ -327,21 +338,48 @@ export function Workspace() {
             />
           </Tooltip>
           <span className="arm-toolbar-title">Карточка происшествия</span>
-          <span
-            className={'arm-ack ' + (!card.acknowledged_at && elapsed > 30 ? 'arm-ack-late' : '')}
-            role="status"
-          >
-            <ClockCircleOutlined /> {acknowledgementLabel}: {elapsed.toFixed(1)} с / 30 с
-          </span>
-          <span
-            className={
-              'arm-ack ' + (!firstRecordDone && firstRecordSeconds > 180 ? 'arm-ack-late' : '')
-            }
-            role="status"
-          >
-            <ClockCircleOutlined /> Первая запись:{' '}
-            {firstRecordDone ? 'есть' : locked ? 'нет' : firstRecordSeconds.toFixed(1) + ' с'} / 3 мин
-          </span>
+          <Tooltip title="Время от появления карточки в строке сообщений до открытия диспетчером ДДС. После открытия показатель фиксируется.">
+            <span
+              className={
+                'arm-sla ' +
+                (card.acknowledged_at ? 'arm-sla-done' : openingLate ? 'arm-sla-late' : '')
+              }
+              role="status"
+            >
+              {card.acknowledged_at ? (
+                <CheckCircleOutlined />
+              ) : openingLate ? (
+                <WarningOutlined />
+              ) : (
+                <ClockCircleOutlined />
+              )}
+              <span>
+                <b>Открытие</b>
+                <small>{openingStatus} · норма 30 с</small>
+              </span>
+            </span>
+          </Tooltip>
+          <Tooltip title="Время от появления карточки до первой записи статуса ДДС с комментарием. Пока запись не внесена, показывается остаток или просрочка.">
+            <span
+              className={
+                'arm-sla ' +
+                (firstRecordDone ? 'arm-sla-done' : firstRecordLate ? 'arm-sla-late' : '')
+              }
+              role="status"
+            >
+              {firstRecordDone ? (
+                <CheckCircleOutlined />
+              ) : firstRecordLate ? (
+                <WarningOutlined />
+              ) : (
+                <ClockCircleOutlined />
+              )}
+              <span>
+                <b>Первая запись</b>
+                <small>{firstRecordStatus} · норма 3 мин</small>
+              </span>
+            </span>
+          </Tooltip>
         </Space>
         <Space wrap>
           <Tooltip title="Сведения о занятии и действии">

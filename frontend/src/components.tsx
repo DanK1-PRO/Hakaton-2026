@@ -151,19 +151,19 @@ export function Result({ result }: { result: Evaluation }) {
         <div>
           <strong>
             {result.timing.acknowledgement_seconds === null
-              ? 'Нет'
+              ? 'Не открыта'
               : result.timing.acknowledgement_seconds + ' с'}
           </strong>
-          <span>открытие карточки</span>
+          <span>получение карточки</span>
         </div>
         <div>
           <strong>
             {result.timing.first_response_seconds === undefined ||
             result.timing.first_response_seconds === null
-              ? 'Нет'
+              ? 'Не внесена'
               : result.timing.first_response_seconds + ' с'}
           </strong>
-          <span>первая запись</span>
+          <span>первая запись статуса</span>
         </div>
       </div>
       {problems === 0 ? (

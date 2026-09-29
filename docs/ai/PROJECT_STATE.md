@@ -1,6 +1,21 @@
 # Project State
 
-## Current checkpoint: 2026-09-29 workspace timer freeze after session finish
+## Current checkpoint: 2026-09-29 readable ARM timing SLA indicators
+
+Bug report from Danil after the OpenCode finalization: the time block looked like two
+running stopwatches and was unclear (`Карточка открыта: 0.1 с / 30 с`, `Первая запись:
+14.0 с / 3 мин`, result metric `Нет`). The server timing logic from the previous fix
+remains unchanged. UI fix: `frontend/src/workspace.tsx` now renders two semantic SLA
+chips instead of two identical timers. `Открытие` is a fixed acknowledgement result with
+the 30-second norm; `Первая запись` shows remaining time, overdue duration, completed
+duration, or `не внесена` after the session is locked. `frontend/src/components.tsx`
+uses explicit result labels (`получение карточки`, `первая запись статуса`, `Не
+внесена`). CSS moved from `.arm-ack` to `.arm-sla`; `frontend/tests/flow.spec.ts`
+covers the new copy and frozen terminal state. Verification 2026-09-29: frontend
+typecheck/build passed, targeted timer regression passed, full Playwright 30/30 passed,
+Ruff passed, backend pytest 42/42 passed. Screenshots in `docs/images` were refreshed.
+
+## Previous checkpoint: 2026-09-29 workspace timer freeze after session finish
 
 Bug report: counters kept ticking after «Завершить занятие» (chip «Первая запись» showed
 240.1 s on a 02:35 session). Cause in `frontend/src/workspace.tsx`: the fallback was

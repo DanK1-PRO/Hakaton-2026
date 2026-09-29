@@ -107,7 +107,10 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
     .click();
   await expect(page.getByRole('button', { name: 'Изменить статус' })).toBeVisible();
   await expect(page.getByText('Получена службой', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText(/Первая запись:/)).toBeVisible();
+  await expect(page.getByText('Открытие', { exact: true })).toBeVisible();
+  await expect(page.getByText(/норма 30 с/)).toBeVisible();
+  await expect(page.getByText('Первая запись', { exact: true })).toBeVisible();
+  await expect(page.getByText(/норма 3 мин/)).toBeVisible();
   const id = page.url().split('/').at(-1)!;
   const setStatus = async (label: string, comment: string) => {
     await page.getByRole('button', { name: 'Изменить статус' }).click();
@@ -166,6 +169,9 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
   await expect(page.getByLabel('Пояснение автоматической проверки')).toBeVisible();
   await expect(page.getByText('экспериментальный балл', { exact: true })).toBeVisible();
   await expect(page.locator('.ant-message-notice')).toHaveCount(0);
+  await page.mouse.move(920, 520);
+  await page.waitForTimeout(800);
+  await page.locator('.ant-tooltip').evaluateAll((nodes) => nodes.forEach((node) => node.remove()));
   if (testInfo.project.name === 'desktop')
     await page.screenshot({ path: '../docs/images/result.png', fullPage: true });
   await page.reload();
@@ -339,8 +345,8 @@ test('first record timer stops once the session is finished', async ({ page, req
   await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
   await page.goto('/incidents/' + card.id);
   await expect(page.getByRole('heading', { name: 'Результат занятия' })).toBeVisible();
-  const chip = page.getByText(/Первая запись:/);
-  await expect(chip).toContainText('нет');
+  const chip = page.locator('.arm-sla').filter({ hasText: 'Первая запись' });
+  await expect(chip).toContainText('не внесена');
   const frozen = await chip.innerText();
   await page.waitForTimeout(2000);
   expect(await chip.innerText()).toBe(frozen);
