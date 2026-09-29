@@ -2,17 +2,24 @@
 
 ## 2026-09-29 update
 
-Instructor scenario generation loop is implemented (Danil chose variant 1, full cycle in
-the UI): staff button «Генерация сценариев» on `/results` → local model preview → approve
-selected → import with reviewer provenance. Entry points: `frontend/src/generator.tsx`,
-`backend/app/routers/api.py` (`POST /instructor/scenarios/generate|import`),
-`backend/app/scenario_packages.py` (validation shared with
-`scripts/import_reviewed_scenarios.py`), `ml/evaluator_service.py` (`POST /v1/generate`,
-capability `scenario_generator`), `backend/app/ml_gateway/gateway.py`
-(`generate_scenarios`, `ML_GENERATE_TIMEOUT`). Verification is in docs/VERIFICATION.md
-(Ruff, pytest 42/42, frontend build, Playwright 28/28, real local generation and
-Postgres import/409 with cleanup). Start from the 2026-09-29 checkpoint in PROJECT_STATE;
-changes are not committed yet.
+Workspace timer freeze: counters «Первая запись»/«Карточка открыта» now stop at
+`finished_at` (or `updated_at` when the card is locked) instead of ticking after
+«Завершить занятие», and show `нет` once editing is closed; `Incident.finished_at`
+added in `frontend/src/types.ts`. Verification in docs/VERIFICATION.md: build passed,
+Playwright 30/30 desktop+mobile with the regression test `first record timer stops once
+the session is finished`; backend Ruff/pytest 42 unchanged. The timer fix is not
+committed yet.
+
+Published earlier on 2026-09-29: instructor scenario generation loop (Danil chose variant
+1, full cycle in the UI): staff button «Генерация сценариев» on `/results` → local model
+preview → approve selected → import with reviewer provenance. Entry points:
+`frontend/src/generator.tsx`, `backend/app/routers/api.py`
+(`POST /instructor/scenarios/generate|import`), `backend/app/scenario_packages.py`
+(validation shared with `scripts/import_reviewed_scenarios.py`), `ml/evaluator_service.py`
+(`POST /v1/generate`, capability `scenario_generator`), `backend/app/ml_gateway/gateway.py`
+(`generate_scenarios`, `ML_GENERATE_TIMEOUT`). Real local generation and Postgres
+import/409 with cleanup were verified; commits 75dfd02, 5a20214, bd11a23 are on public
+main. Start from the 2026-09-29 checkpoint in PROJECT_STATE.
 
 ## 2026-09-28 update
 

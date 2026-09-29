@@ -177,10 +177,16 @@ export function Workspace() {
   const locked =
     ['completed', 'refused'].includes(card.status) || card.session_status === 'finished';
   const busy = calling || reacting || saving || finishing || removing;
+  const cardCreatedMs = new Date(card.created_at).getTime();
+  const frozenNowMs = card.finished_at
+    ? new Date(card.finished_at).getTime()
+    : locked
+      ? new Date(card.updated_at).getTime()
+      : now;
   const elapsed =
-    card.acknowledged_at || card.session_status === 'finished'
+    card.acknowledged_at || locked
       ? card.acknowledgement_seconds
-      : Math.max(0, (now - new Date(card.created_at).getTime()) / 1000);
+      : Math.max(0, (now - cardCreatedMs) / 1000);
   const communications = (card.events || []).filter((e) => e.kind === 'communication');
   const last = communications.at(-1);
   const callState = last?.payload.action || 'hangup';
@@ -192,12 +198,8 @@ export function Workspace() {
     (event) => event.kind === 'reaction' && event.payload.comment?.trim(),
   );
   const firstRecordSeconds = firstTextReaction
-    ? Math.max(
-        0,
-        (new Date(firstTextReaction.created_at).getTime() - new Date(card.created_at).getTime()) /
-          1000,
-      )
-    : Math.max(0, (now - new Date(card.created_at).getTime()) / 1000);
+    ? Math.max(0, (new Date(firstTextReaction.created_at).getTime() - cardCreatedMs) / 1000)
+    : Math.max(0, (frozenNowMs - cardCreatedMs) / 1000);
   const firstRecordDone = Boolean(firstTextReaction);
   const currentCard = async () => {
     if (pendingPhone.current) await pendingPhone.current;
@@ -338,7 +340,7 @@ export function Workspace() {
             role="status"
           >
             <ClockCircleOutlined /> Первая запись:{' '}
-            {firstRecordDone ? 'есть' : firstRecordSeconds.toFixed(1) + ' с'} / 3 мин
+            {firstRecordDone ? 'есть' : locked ? 'нет' : firstRecordSeconds.toFixed(1) + ' с'} / 3 мин
           </span>
         </Space>
         <Space wrap>

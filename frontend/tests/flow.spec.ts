@@ -303,3 +303,45 @@ test('readiness dashboard summarizes product contour for demonstration', async (
     await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2),
   ).toBeFalsy();
 });
+
+test('first record timer stops once the session is finished', async ({ page, request }) => {
+  const teacher = await request.post('/api/v1/auth/login', {
+    form: { username: 'administrator@dds.local', password: 'DdsDemo2026!' },
+  });
+  expect(teacher.ok()).toBeTruthy();
+  const token = (await teacher.json()).access_token;
+  const email = 'timer-' + Date.now() + '@dds.local';
+  const created = await request.post('/api/v1/admin/users', {
+    headers: { Authorization: 'Bearer ' + token },
+    data: { email, name: 'Проверка таймера', password: 'DdsDemo2026!', role: 'trainee' },
+  });
+  expect(created.status()).toBe(201);
+  const auth = await request.post('/api/v1/auth/login', {
+    form: { username: email, password: 'DdsDemo2026!' },
+  });
+  expect(auth.ok()).toBeTruthy();
+  const headers = { Authorization: 'Bearer ' + (await auth.json()).access_token };
+  const started = await request.post('/api/v1/simulation/sessions', {
+    headers,
+    data: { scenario_id: 'wire' },
+  });
+  expect(started.status()).toBe(201);
+  const card = await started.json();
+  const finish = await request.post(
+    '/api/v1/simulation/sessions/' + card.session_id + '/finish',
+    { headers },
+  );
+  expect(finish.ok()).toBeTruthy();
+  await page.goto('/');
+  await page.getByLabel('Электронная почта').fill(email);
+  await page.getByLabel('Пароль', { exact: true }).fill('DdsDemo2026!');
+  await page.getByRole('button', { name: 'Войти', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Поиск происшествий' })).toBeVisible();
+  await page.goto('/incidents/' + card.id);
+  await expect(page.getByRole('heading', { name: 'Результат занятия' })).toBeVisible();
+  const chip = page.getByText(/Первая запись:/);
+  await expect(chip).toContainText('нет');
+  const frozen = await chip.innerText();
+  await page.waitForTimeout(2000);
+  expect(await chip.innerText()).toBe(frozen);
+});

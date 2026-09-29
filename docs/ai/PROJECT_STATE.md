@@ -1,6 +1,18 @@
 # Project State
 
-## Current checkpoint: 2026-09-29 instructor scenario generation loop
+## Current checkpoint: 2026-09-29 workspace timer freeze after session finish
+
+Bug report: counters kept ticking after «Завершить занятие» (chip «Первая запись» showed
+240.1 s on a 02:35 session). Cause in `frontend/src/workspace.tsx`: the fallback was
+`now - created_at` for any card without a comment-bearing reaction, so it ignored
+`locked`/`finished_at`. Fix: freeze the fallback at `finished_at` (or at `updated_at`
+when locked), render `нет` instead of a growing value after editing closes, add
+`Incident.finished_at` to `frontend/src/types.ts`. Verification 2026-09-29: frontend
+production build passed; Playwright 30/30 desktop+mobile including the regression test
+`first record timer stops once the session is finished`; backend Ruff/pytest 42
+untouched. Not committed yet.
+
+## Previous checkpoint: 2026-09-29 instructor scenario generation loop
 
 Danil chose the "full cycle inside the instructor UI" variant: preview variants from the
 local model, approve only the selected ones, import them with reviewer provenance.
@@ -21,9 +33,10 @@ generated in about 5 s through the API at `ML_MODE=local`, imported into Postgre
 `source.status=TEAM_REVIEWED` and reviewer name, duplicate import returned 409 «Уже
 импортированы», then the test row was removed so the demo catalogue still holds the
 original 3 scenarios. Evidence: `docs/VERIFICATION.md`, `docs/ML_INTEGRATION.md`,
-`docs/data/DATA_CONTRACT.md`. Changes are not committed yet.
+`docs/data/DATA_CONTRACT.md`. Published in commits 75dfd02 and bd11a23 after the
+repository was made public.
 
-## Previous checkpoint: 2026-09-28 product delivery cleanup
+## Earlier checkpoint: 2026-09-28 product delivery cleanup
 
 New customer-wow pass added a product readiness dashboard and richer ML result explanation.
 `/readiness` summarizes local deployment, API/PostgreSQL, ML mode, closed offline map,

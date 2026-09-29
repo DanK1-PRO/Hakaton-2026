@@ -116,6 +116,7 @@ export type Incident = {
   overdue: boolean;
   allowed_statuses: string[];
   session_status: string | null;
+  finished_at: string | null;
   events?: Event[];
   evaluation?: Evaluation | null;
   scenario?: Scenario | null;
