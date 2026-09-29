@@ -8,7 +8,7 @@ const API = 'http://127.0.0.1:8000';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const outDir = path.join(root, '.runtime', 'demo-video');
 const target = path.join(root, 'docs', 'delivery', 'dds-demo.webm');
-const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms * 2));
 
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.mkdirSync(outDir, { recursive: true });
