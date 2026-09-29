@@ -67,4 +67,8 @@ This release covers the team MVP, not the complete customer production specifica
 
 See [verification](docs/VERIFICATION.md), [architecture](docs/architecture.md), [source traceability](docs/REQUIREMENTS_TRACEABILITY.md), [contributing](CONTRIBUTING.md) and [security](SECURITY.md). Operational documentation is in Russian.
 
-Customer originals are excluded from Git. This repository is public and has no redistribution license; third-party materials retain their respective rights.
+Customer originals are excluded from Git. This repository is public and licensed under
+[GNU GPL v3](LICENSE), © 2026 Danil (DanK1-PRO): it may be read, run and modified under that
+license, derivative products distributed together with it must stay open source under GPL v3,
+and any closed commercial or branded integration requires a separate agreement with the
+copyright holder. Third-party materials retain their respective rights.

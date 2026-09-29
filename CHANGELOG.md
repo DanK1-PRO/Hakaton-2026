@@ -7,7 +7,10 @@
 - `/readiness` deployment/value dashboard and richer ML result explanation.
 - Real local GGUF model integrated for comment assessment with deterministic fallback.
 - Customer guide, GitHub Codespaces devcontainer, manual CI trigger; repository made public.
-- Verification: Ruff, 42 backend tests, frontend production build, 28 desktop/mobile
+- Repository licensed under GNU GPL v3.0 (`GPL-3.0-only`) with an intellectual property
+  notice for companies and hackathon organizers plus SPDX file header guidance.
+- Workspace timers freeze at session finish instead of ticking after the card is locked.
+- Verification: Ruff, 42 backend tests, frontend production build, 30 desktop/mobile
   browser tests.
 
 ## 0.1.0 - 2026-09-20
