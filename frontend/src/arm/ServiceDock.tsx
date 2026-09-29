@@ -25,10 +25,18 @@ export function ServiceDock({ card, own, locked, busy, onReact, onRoutes, onHist
   const events = (card.events || []).filter((event) =>
     ['incoming', 'created', 'opened', 'reaction'].includes(event.kind),
   );
-  const service = card.scenario?.service || 'ДДС учебного района';
+  const scenarioService = card.scenario?.service?.trim();
+  const service = scenarioService?.toLowerCase().startsWith('ддс')
+    ? scenarioService
+    : 'ДДС учебного района';
+  const routedService = scenarioService && scenarioService !== service ? scenarioService : null;
   const lastEvent = events.at(-1);
   const referenceServices = Array.from(
-    new Set((card.classification?.routes || []).map((route) => route.service).filter(Boolean)),
+    new Set(
+      [routedService, ...(card.classification?.routes || []).map((route) => route.service)].filter(
+        (name): name is string => Boolean(name),
+      ),
+    ),
   )
     .filter((name) => name !== service && !name.toLowerCase().includes('нет реагирования'))
     .slice(0, 5);
@@ -89,15 +97,14 @@ export function ServiceDock({ card, own, locked, busy, onReact, onRoutes, onHist
                 : ''}{' '}
               {labels[card.status] || card.status}
             </span>
+            {routedService ? <span>направление: {routedService}</span> : null}
             {own && !locked ? (
-              <Tooltip title="Изменить статус реагирования">
-                <Button
-                  aria-label="Изменить статус"
-                  icon={<EditOutlined />}
-                  disabled={busy || card.allowed_statuses.length === 0}
-                  onClick={onReact}
-                />
-              </Tooltip>
+              <Button
+                aria-label="Изменить статус"
+                icon={<EditOutlined />}
+                disabled={busy || card.allowed_statuses.length === 0}
+                onClick={onReact}
+              />
             ) : null}
           </div>
         </div>

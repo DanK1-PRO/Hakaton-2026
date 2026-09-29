@@ -122,6 +122,8 @@ test('training flow, phone, terminal lock and instructor feedback', async ({
     await page.getByLabel('Комментарий', { exact: true }).fill(comment);
     await page.getByRole('button', { name: 'Сохранить статус' }).click();
     await expect(page.getByRole('dialog')).toBeHidden();
+    await expect(page.locator('.ant-tooltip:not(.ant-tooltip-hidden)')).toHaveCount(0);
+    await expect(page.getByText('Сохранить статус', { exact: true })).toBeHidden();
   };
   await setStatus('Принята', 'Информация принята, бригада направлена');
   await page.getByRole('button', { name: /Учебный вызов$/ }).click();

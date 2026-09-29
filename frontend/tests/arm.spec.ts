@@ -29,6 +29,7 @@ async function caseFor(page: Page, request: APIRequestContext) {
   await expect(
     page.getByTestId('arm-service-history').getByText('Получена службой', { exact: true }),
   ).toBeVisible();
+  await expect(page.locator('.arm-service-tile').first()).toContainText('ДДС учебного района');
   return { card, headers, staff };
 }
 

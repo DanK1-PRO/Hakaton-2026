@@ -1,6 +1,20 @@
 # Project State
 
-## Current checkpoint: 2026-09-29 readable ARM timing SLA indicators
+## Current checkpoint: 2026-09-29 clean service dock after status save
+
+Danil reported two presentation issues after the timer fix: the black tooltip `Сохранить
+статус` could remain visible after saving a reaction, and a blue active service tile could
+show an external route/service such as `Полиция`, which made the trainee look like they
+were working inside Police instead of a DDS workplace. Frontend-only fix: removed Tooltip
+portals from the reaction modal save/cancel buttons and the dock edit button; `ServiceDock`
+now keeps the active blue tile as `ДДС учебного района` unless the scenario explicitly names
+a DDS service, while non-DDS `scenario.service` is shown as a direction/reference recipient.
+Regression coverage: ARM test asserts the active service tile is DDS; flow test asserts no
+visible `Сохранить статус` tooltip remains after status save. Verification 2026-09-29:
+frontend typecheck/build passed, targeted desktop/mobile flow passed, full Playwright 30/30
+passed. Backend unchanged.
+
+## Previous checkpoint: 2026-09-29 readable ARM timing SLA indicators
 
 Bug report from Danil after the OpenCode finalization: the time block looked like two
 running stopwatches and was unclear (`Карточка открыта: 0.1 с / 30 с`, `Первая запись:

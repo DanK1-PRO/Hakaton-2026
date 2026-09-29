@@ -963,24 +963,20 @@ export function Workspace() {
             )}
           </Form.Item>
           <div className="arm-reaction-actions">
-            <Tooltip title="Сохранить статус">
-              <Button
-                type="primary"
-                aria-label="Сохранить статус"
-                htmlType="submit"
-                icon={<CheckOutlined />}
-                loading={reacting}
-                disabled={locked || stale}
-              />
-            </Tooltip>
-            <Tooltip title="Отмена">
-              <Button
-                aria-label="Отмена"
-                icon={<CloseOutlined />}
-                onClick={closeEditor}
-                disabled={reacting}
-              />
-            </Tooltip>
+            <Button
+              type="primary"
+              aria-label="Сохранить статус"
+              htmlType="submit"
+              icon={<CheckOutlined />}
+              loading={reacting}
+              disabled={locked || stale}
+            />
+            <Button
+              aria-label="Отмена"
+              icon={<CloseOutlined />}
+              onClick={closeEditor}
+              disabled={reacting}
+            />
           </div>
         </Form>
       </Modal>
