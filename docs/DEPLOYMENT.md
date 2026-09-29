@@ -37,6 +37,17 @@ UI: http://127.0.0.1:5173. PostgreSQL: 127.0.0.1:55432. API: 127.0.0.1:8000.
 Если P: был создан launcher-ом и указывает именно на этот проект, stop-скрипт снимает его автоматически. Для ручной проверки используйте `subst`; для ручного снятия после остановки приложения можно выполнить `subst P: /D`.
 Логи: .runtime/api-error.log, ui-error.log, postgres.log. Фоновые процессы запускаются со скрытым окном.
 
+## GitHub Codespaces
+
+Репозиторий содержит `.devcontainer/devcontainer.json` (Python 3.11, Node 22,
+Docker-in-Docker, порты 8000/8080/5173), поэтому его можно открыть в облачном окружении
+GitHub без локальной установки: **Code → Codespaces → Create codespace on main** или
+`https://codespaces.new/DanK1-PRO/Hakaton-2026`. Нужен инвайт collaborator; read-доступ
+Codespaces не даёт. После создания окружения выполните `python scripts/init_local.py` и
+`docker compose up --build -d --wait`, затем пробросьте порт 8080. Лимиты бесплатного
+тарифа и статус «временное окружение, не боевой сервер» описаны в
+[инструкции для заказчика](CUSTOMER_GUIDE.ru.md).
+
 ## Ручной запуск на другой ОС
 
 1. Создать PostgreSQL15 БД/пользователя и .env с DATABASE_URL.

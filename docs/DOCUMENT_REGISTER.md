@@ -8,6 +8,7 @@
 | DDS-2026-AR | Описание архитектуры | architecture.md | Реализованная архитектура |
 | DDS-2026-RP | Руководство пользователя | USER_GUIDE.md | Для MVP |
 | DDS-2026-RS | Руководство развёртывания | DEPLOYMENT.md | Для MVP |
+| DDS-2026-RZ | Инструкция для заказчика | CUSTOMER_GUIDE.ru.md | Для MVP |
 | DDS-2026-PM | Программа и методика испытаний | ACCEPTANCE.md | Для MVP |
 | DDS-2026-PI | Протокол испытаний | VERIFICATION.md | Фактические результаты |
 | DDS-2026-API | Контракт интеграции | ../config/openapi.json; ML_INTEGRATION.md | Версия 1.0 |

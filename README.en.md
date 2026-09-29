@@ -6,7 +6,7 @@ assessment, validates ML responses and preserves deterministic fallback. See the
 and [submission packet](docs/SUBMISSION.ru.md). Speech recognition/synthesis and
 automatic retraining are not included; instructor-reviewed feedback is exportable.
 
-[Русский](README.md) · [Documentation](docs/INDEX.md) · [Deployment](docs/DEPLOYMENT.md) · [ML integration](docs/ML_INTEGRATION.md)
+[Русский](README.md) · [Documentation](docs/INDEX.md) · [Customer guide (RU)](docs/CUSTOMER_GUIDE.ru.md) · [Deployment](docs/DEPLOYMENT.md) · [ML integration](docs/ML_INTEGRATION.md)
 
 [![Quality and integration](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml/badge.svg)](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml)
 
@@ -40,6 +40,9 @@ docker compose up --build -d --wait
 ```
 
 UI: **http://localhost:8080**. API: **http://localhost:8000/docs**.
+
+For a reviewer the structured path (repository access, three launch approaches including
+GitHub Codespaces, CI and FAQ) is documented in [docs/CUSTOMER_GUIDE.ru.md](docs/CUSTOMER_GUIDE.ru.md).
 
 Demo accounts: `trainee@dds.local`, `instructor@dds.local`, `administrator@dds.local`.
 Initial password: `DdsDemo2026!`. Set `DEMO_PASSWORD` before initial seeding.

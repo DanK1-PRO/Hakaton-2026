@@ -3,7 +3,7 @@
 Финальный проход 28.09: [интеграционный аудит и границы готовности](docs/FINAL_INTEGRATION_AUDIT.ru.md),
 [запуск реальной локальной модели](docs/LOCAL_ML_RUN.ru.md), [комплект сдачи](docs/SUBMISSION.ru.md).
 
-[English](README.en.md) · [Документация](docs/INDEX.md) · [Запуск](docs/DEPLOYMENT.md) · [Чеклист сдачи](docs/FINAL_DELIVERY_CHECKLIST.ru.md) · [Интеграция ML](docs/ML_INTEGRATION.md) · [Демонстрация](docs/DEMO.md)
+[English](README.en.md) · [Документация](docs/INDEX.md) · [Для заказчика](docs/CUSTOMER_GUIDE.ru.md) · [Запуск](docs/DEPLOYMENT.md) · [Чеклист сдачи](docs/FINAL_DELIVERY_CHECKLIST.ru.md) · [Интеграция ML](docs/ML_INTEGRATION.md) · [Демонстрация](docs/DEMO.md)
 
 [![Quality and integration](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml/badge.svg)](https://github.com/DanK1-PRO/Hakaton-2026/actions/workflows/ci.yml)
 
@@ -41,6 +41,10 @@ docker compose up --build -d --wait
 
 Интерфейс: **http://localhost:8080**. API: **http://localhost:8000/docs**.
 Запуск без Docker на Windows описан в [инструкции](docs/DEPLOYMENT.md).
+
+Проверяющему: [инструкция для заказчика](docs/CUSTOMER_GUIDE.ru.md) — доступ, три подхода
+запуска, CI и частые вопросы. Без локальной установки: [открыть в GitHub Codespaces](https://codespaces.new/DanK1-PRO/Hakaton-2026)
+(нужен инвайт collaborator; лимиты бесплатного тарифа описаны в инструкции).
 
 ### Локальный запуск через виртуальное окружение
 
