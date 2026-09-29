@@ -10,7 +10,8 @@ when locked), render `нет` instead of a growing value after editing closes, a
 `Incident.finished_at` to `frontend/src/types.ts`. Verification 2026-09-29: frontend
 production build passed; Playwright 30/30 desktop+mobile including the regression test
 `first record timer stops once the session is finished`; backend Ruff/pytest 42
-untouched. Not committed yet.
+untouched. Shipped as commits 8a271fa (fix), 2a77631 and f30ab5a (GPL-3.0 + IP notice);
+CI runs 70 and 71 green, GitHub detects the repository as GPL-3.0.
 
 ## Previous checkpoint: 2026-09-29 instructor scenario generation loop
 

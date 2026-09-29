@@ -6,9 +6,10 @@ Workspace timer freeze: counters «Первая запись»/«Карточк�
 `finished_at` (or `updated_at` when the card is locked) instead of ticking after
 «Завершить занятие», and show `нет` once editing is closed; `Incident.finished_at`
 added in `frontend/src/types.ts`. Verification in docs/VERIFICATION.md: build passed,
-Playwright 30/30 desktop+mobile with the regression test `first record timer stops once
-the session is finished`; backend Ruff/pytest 42 unchanged. The timer fix is not
-committed yet.
+Playwright 30/30 desktop+mobile with the regression test `first record timer stops once the
+session is finished`; backend Ruff/pytest 42 unchanged. Shipped as commits 8a271fa, 2a77631 and
+f30ab5a; CI runs 70/71 green. Also on main: LICENSE with verbatim GPL-3.0 text (GitHub
+detects `GPL-3.0`), Russian IP notice at the top of README and SPDX header guidance.
 
 Published earlier on 2026-09-29: instructor scenario generation loop (Danil chose variant
 1, full cycle in the UI): staff button «Генерация сценариев» on `/results` → local model
