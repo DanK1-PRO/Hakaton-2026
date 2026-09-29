@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ml_mode: Literal["mock", "local"] = "mock"
     ml_url: str = "http://localhost:8090"
     ml_timeout: float = Field(default=5.0, gt=0, le=120)
+    ml_generate_timeout: float = Field(default=400.0, gt=0, le=900)
     demo_password: str = "DdsDemo2026!"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 

@@ -2,13 +2,16 @@ import csv
 import io
 import json
 import anyio
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import ValidationError
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from ..auth import current_user, staff, admin, authenticate, token_for, user_view, passwords
 from ..db import get_db
 from ..models import User, IncidentType, Incident, Scenario, TrainingSession, Action, Feedback, utcnow
+from ..scenario_packages import validate_packages
 from ..schemas import (
     IncidentInput,
     IncidentEdit,
@@ -18,6 +21,8 @@ from ..schemas import (
     FeedbackInput,
     UserInput,
     EvaluationRequest,
+    ScenarioGenerateInput,
+    ScenarioImportInput,
 )
 from ..domain import incident_for, editable, record, react, close_call, seconds_since, STATUS_LABELS
 from ..views import incident_view, scenario_view, session_view
@@ -191,6 +196,59 @@ def scenarios(db: Session = Depends(get_db), user=Depends(current_user)):
         view["expected_hint"] = EXPECTED_HINTS.get(first)
         items.append(view)
     return items
+
+
+@router.post("/instructor/scenarios/generate")
+async def generate_scenario(data: ScenarioGenerateInput, db: Session = Depends(get_db), user=Depends(staff)):
+    if not db.get(IncidentType, data.incident_type_id):
+        raise HTTPException(422, "Тип происшествия отсутствует в классификаторе")
+    try:
+        result = await gateway.generate_scenarios(data.model_dump())
+    except gateway.GenerationUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    try:
+        validate_packages(result["items"], {data.incident_type_id})
+    except ValidationError as exc:
+        raise HTTPException(502, "Локальная модель вернула сценарий, не прошедший проверку схемы") from exc
+    except ValueError as exc:
+        raise HTTPException(502, f"Локальная модель вернула некорректные данные: {exc}") from exc
+    return {
+        "schema_version": result.get("schema_version", "1.0"),
+        "mode": result.get("mode", "local"),
+        "model": str(result.get("model", "")),
+        "items": result["items"],
+    }
+
+
+@router.post("/instructor/scenarios/import", status_code=201)
+def import_scenarios(data: ScenarioImportInput, db: Session = Depends(get_db), user=Depends(staff)):
+    classifier_ids = set(db.scalars(select(IncidentType.id)))
+    try:
+        items = validate_packages(data.items, classifier_ids)
+    except ValidationError as exc:
+        first = exc.errors()[0]
+        raise HTTPException(
+            422, "Некорректный сценарий: " + ".".join(str(part) for part in first["loc"])
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    long_titles = [item["id"] for item in items if len(item["title"]) > 200]
+    if long_titles:
+        raise HTTPException(422, "Заголовок длиннее 200 символов: " + ", ".join(long_titles))
+    existing = [item["id"] for item in items if db.get(Scenario, item["id"])]
+    if existing:
+        raise HTTPException(409, "Уже импортированы: " + ", ".join(existing))
+    reviewed_at = datetime.now(timezone.utc).isoformat()
+    for item in items:
+        item["source"] = {
+            **item["source"],
+            "status": "TEAM_REVIEWED",
+            "reviewer": user.name,
+            "reviewed_at": reviewed_at,
+        }
+        db.add(Scenario(id=item["id"], title=item["title"], difficulty=item["difficulty"], data=item))
+    db.commit()
+    return {"imported": len(items), "ids": [item["id"] for item in items]}
 
 
 @router.post("/simulation/sessions", status_code=201)

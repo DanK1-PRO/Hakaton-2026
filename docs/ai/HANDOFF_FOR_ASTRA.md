@@ -1,5 +1,19 @@
 # Handoff
 
+## 2026-09-29 update
+
+Instructor scenario generation loop is implemented (Danil chose variant 1, full cycle in
+the UI): staff button «Генерация сценариев» on `/results` → local model preview → approve
+selected → import with reviewer provenance. Entry points: `frontend/src/generator.tsx`,
+`backend/app/routers/api.py` (`POST /instructor/scenarios/generate|import`),
+`backend/app/scenario_packages.py` (validation shared with
+`scripts/import_reviewed_scenarios.py`), `ml/evaluator_service.py` (`POST /v1/generate`,
+capability `scenario_generator`), `backend/app/ml_gateway/gateway.py`
+(`generate_scenarios`, `ML_GENERATE_TIMEOUT`). Verification is in docs/VERIFICATION.md
+(Ruff, pytest 42/42, frontend build, Playwright 28/28, real local generation and
+Postgres import/409 with cleanup). Start from the 2026-09-29 checkpoint in PROJECT_STATE;
+changes are not committed yet.
+
 ## 2026-09-28 update
 
 The Astra integration pass has been performed on main. Start with the current

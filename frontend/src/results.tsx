@@ -28,6 +28,7 @@ import {
 } from '@ant-design/icons';
 import { api, type RootState, store } from './store';
 import { ErrorPanel, Result, date, errorText } from './components';
+import { ScenarioLab } from './generator';
 import type { Session } from './types';
 export function Results() {
   const user = useSelector((s: RootState) => s.auth.user)!;
@@ -165,6 +166,7 @@ export function Results() {
               Проверенные заключения
             </Button>
           ) : null}
+          {staff ? <ScenarioLab /> : null}
           <Button icon={<ReloadOutlined spin={isFetching} />} onClick={refetch}>
             Обновить
           </Button>

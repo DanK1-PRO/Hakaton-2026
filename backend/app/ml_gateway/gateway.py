@@ -4,6 +4,10 @@ from ..schemas import EvaluationRequest, EvaluationResult
 from ..settings import settings
 
 
+class GenerationUnavailable(Exception):
+    """Scenario generation cannot be served right now; message is user-facing."""
+
+
 def deterministic_evaluate(request: EvaluationRequest, mode="mock"):
     reference = request.reference
     actual = request.card
@@ -62,13 +66,68 @@ async def evaluate(request: EvaluationRequest):
         return deterministic_evaluate(request, mode="fallback")
 
 
+async def generate_scenarios(request: dict) -> dict:
+    if settings.ml_mode == "mock":
+        raise GenerationUnavailable("Генерация сценариев требует ML_MODE=local")
+    timeout = settings.ml_generate_timeout
+    try:
+        async with httpx.AsyncClient(timeout=timeout, trust_env=False) as client:
+            response = await asyncio.wait_for(
+                client.post(settings.ml_url + "/v1/generate", json=request),
+                timeout=timeout,
+            )
+            if response.is_error:
+                try:
+                    detail = response.json().get("detail")
+                except ValueError:
+                    detail = None
+                raise GenerationUnavailable(
+                    detail or "Локальная модель не смогла сгенерировать сценарий"
+                )
+            data = response.json()
+    except GenerationUnavailable:
+        raise
+    except (httpx.HTTPError, ValueError, TimeoutError) as exc:
+        raise GenerationUnavailable(
+            "Не удалось сгенерировать сценарий: ML-сервис недоступен. Проверьте запуск start-ml.ps1"
+        ) from exc
+    items = data.get("items") if isinstance(data, dict) else None
+    if not isinstance(items, list) or not items:
+        raise GenerationUnavailable("ML-сервис не вернул ни одного сценария")
+    return data
+
+
 async def status():
     if settings.ml_mode == "mock":
-        return {"mode": "mock", "available": True, "capabilities": ["evaluator", "scenario_catalog"], "asr": False}
+        return {
+            "mode": "mock",
+            "available": True,
+            "capabilities": ["evaluator", "scenario_catalog"],
+            "asr": False,
+            "generator": False,
+        }
     try:
         async with httpx.AsyncClient(timeout=min(settings.ml_timeout, 2), trust_env=False) as client:
             result = await client.get(settings.ml_url + "/health")
             result.raise_for_status()
-        return {"mode": "local", "available": True, "capabilities": ["evaluator"], "asr": False}
-    except httpx.HTTPError:
-        return {"mode": "fallback", "available": False, "capabilities": ["evaluator"], "asr": False}
+            body = result.json() if result.headers.get("content-type", "").startswith("application/json") else {}
+        capabilities = ["evaluator"]
+        if isinstance(body, dict) and (
+            "scenario_generator" in body.get("capabilities", []) or body.get("llm_configured")
+        ):
+            capabilities.append("scenario_generator")
+        return {
+            "mode": "local",
+            "available": True,
+            "capabilities": capabilities,
+            "asr": False,
+            "generator": "scenario_generator" in capabilities,
+        }
+    except (httpx.HTTPError, ValueError):
+        return {
+            "mode": "fallback",
+            "available": False,
+            "capabilities": ["evaluator"],
+            "asr": False,
+            "generator": False,
+        }

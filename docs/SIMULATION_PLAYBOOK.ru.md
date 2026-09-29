@@ -152,7 +152,7 @@
 ### Что ждём от моделей (чтобы потом было просто дописать)
 
 1. **Evaluator** — уже контракт; Maxim `ml/scoring-experiment`: перед мержем `score` либо `null`, либо пометить `TEAM_PROPOSAL`; `routing` → `not_scored`.  
-2. **Генератор сценариев** — DTO отдельный; выгрузка в `data_derived/scenarios/` + `source.status`.  
+2. **Генератор сценариев** — контракт `POST /v1/generate` (capability `scenario_generator`) реализован, проверка и импорт теперь идут из UI преподавателя; выгрузка в `data_derived/scenarios/` + `source.status` через CLI сохранена.  
 3. **ASR/диалог** — поля транскрипта в actions (`kind=transcript`) — **не трогать UI, пока нет контракта**.  
 4. **Сложность/классификация** — может подсказывать тип, но **не** переопределять `incident_type_id` без действия пользователя.
 

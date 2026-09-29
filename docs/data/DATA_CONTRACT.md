@@ -1,6 +1,6 @@
 # Data Contract 1.0
 
-OpenAPI: config/openapi.json. Request schemas: config/*.schema.json. Export from code with PYTHONPATH=backend python scripts/export_contracts.py; generated files must match code. Regenerated 2026-09-22 after B9/B10/C2 fields.
+OpenAPI: config/openapi.json. Request schemas: config/*.schema.json. Export from code with PYTHONPATH=backend python scripts/export_contracts.py; generated files must match code. Regenerated 2026-09-29 after the instructor scenario generation endpoints.
 
 | Entity | Stable fields / storage |
 |---|---|
@@ -23,6 +23,17 @@ Arrays:
 Card length limits (30 phone,150 name,500 address,2048 comment) are implementation limits. Caller phone is not unique. UUIDs avoid collision between clients. UTC server timestamps are displayed in the browser locale.
 
 PATCH/reaction requires version. Unknown JSON properties are rejected. Invalid classifier FK →422; unauthorized →401/403; inaccessible object →404; conflict/terminal state →409; DB unavailable →503. Completing (`completed`) requires non-empty comment →422 «Укажите итог выполненных работ» (B10).
+
+Scenario generation is staff-only and two-step: POST `/api/v1/instructor/scenarios/generate`
+`{incident_type_id, count 1..3, difficulty?}` previews ML output without writing, POST
+`/api/v1/instructor/scenarios/import` `{items[1..10]}` commits the reviewed selection
+→201 `{imported, ids}`. Both sides share `backend/app/scenario_packages.py` with
+`scripts/import_reviewed_scenarios.py`: same scenario package shape, same classifier and
+provenance checks. Import never overwrites an existing id (→409), rejects unknown
+classifier rows (→422) and stamps `source.status=TEAM_REVIEWED` with `reviewer`/`reviewed_at`.
+Generation with `ML_MODE=mock`, a stopped ML service or an empty model answer →503 with a
+Russian detail string. Extra ML fields (`difficulty_score`, `ml_metadata`,
+`difficulty_factors`) pass through and are stored inside the scenario `data` JSON.
 
 Terminal DDS states differ from training completion. A dispatcher can finish/refuse work before the user ends the learning session. The acknowledgement timer starts when the card is created/directed to the trainee; opening does not restart it.
 

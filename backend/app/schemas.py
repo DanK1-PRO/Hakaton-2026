@@ -69,3 +69,13 @@ class EvaluationResult(StrictModel):
     routing_assessment: dict = Field(default_factory=dict)
     comment_quality: dict = Field(default_factory=dict)
     explanation: str
+
+
+class ScenarioGenerateInput(StrictModel):
+    incident_type_id: int
+    count: int = Field(default=1, ge=1, le=3)
+    difficulty: Literal["easy", "medium", "hard"] | None = None
+
+
+class ScenarioImportInput(StrictModel):
+    items: list[dict] = Field(min_length=1, max_length=10)

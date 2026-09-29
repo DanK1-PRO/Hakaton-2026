@@ -1,6 +1,6 @@
 # Task Queue
 
-Updated: 2026-09-28.
+Updated: 2026-09-29.
 
 ## Current Final Gate
 
@@ -14,6 +14,7 @@ The historical integration queue below must not trigger repeated merges.
 - [x] Published application c55103c; GitHub CI 36462902808 verify + containers passed. Later report-only commit uses [skip ci].
 - [x] Product-facing cleanup before submission: removed development wording from visible UI, added final delivery checklist, refreshed screenshots, reran Ruff + 34 backend tests + frontend build + 22 browser tests.
 - [x] Customer-wow pass: added `/readiness` deployment/value dashboard, richer ML result explanation, updated demo route, refreshed readiness screenshot, verified Ruff + 34 backend tests + frontend build + 24 browser tests.
+- [x] Instructor scenario generation loop (2026-09-29): separate `POST /v1/generate` contract with `scenario_generator` capability, gateway `generate_scenarios` + `ML_GENERATE_TIMEOUT`, staff endpoints `/instructor/scenarios/generate|import` sharing `backend/app/scenario_packages.py` validation with the CLI, React `ScenarioLab` preview/approve/import; Ruff + pytest 42 + Playwright 28 + build green; real local-model generation, Postgres import and 409 duplicate path verified.
 - [ ] Team: approve methodology/scenarios, prepare presentation/screencast and grant jury access before stop-code.
 
 Residual scope and evidence: docs/FINAL_INTEGRATION_AUDIT.ru.md and docs/VERIFICATION.md.

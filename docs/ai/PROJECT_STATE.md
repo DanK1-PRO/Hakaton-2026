@@ -1,6 +1,29 @@
 # Project State
 
-## Current checkpoint: 2026-09-28 product delivery cleanup
+## Current checkpoint: 2026-09-29 instructor scenario generation loop
+
+Danil chose the "full cycle inside the instructor UI" variant: preview variants from the
+local model, approve only the selected ones, import them with reviewer provenance.
+Implemented without touching the ML boundary — React still calls FastAPI only. New staff
+endpoints `POST /api/v1/instructor/scenarios/generate` and `.../import`; shared package
+validation in `backend/app/scenario_packages.py` (the CLI import script now imports it);
+separate ML contract `POST /v1/generate` on `ml/evaluator_service.py` advertised as
+capability `scenario_generator`; gateway `generate_scenarios` with `ML_GENERATE_TIMEOUT`
+(default 400 s) and `GenerationUnavailable` → HTTP 503 with a Russian detail string.
+Frontend: `frontend/src/generator.tsx` (`ScenarioLab`) in the staff «Контроль занятий»
+header, RTK Query mutations plus the new `Scenarios` cache tag, difficulty/source label
+fixes on the training list and the workspace scenario panel.
+
+Verification 2026-09-29: Ruff passed; backend pytest 42/42; frontend production build
+passed; Playwright 28/28 including the new `scenario-lab.spec.ts` with mocked ML routes;
+contracts regenerated with `scripts/export_contracts.py`. Real local run: one scenario
+generated in about 5 s through the API at `ML_MODE=local`, imported into PostgreSQL with
+`source.status=TEAM_REVIEWED` and reviewer name, duplicate import returned 409 «Уже
+импортированы», then the test row was removed so the demo catalogue still holds the
+original 3 scenarios. Evidence: `docs/VERIFICATION.md`, `docs/ML_INTEGRATION.md`,
+`docs/data/DATA_CONTRACT.md`. Changes are not committed yet.
+
+## Previous checkpoint: 2026-09-28 product delivery cleanup
 
 New customer-wow pass added a product readiness dashboard and richer ML result explanation.
 `/readiness` summarizes local deployment, API/PostgreSQL, ML mode, closed offline map,
@@ -26,7 +49,7 @@ production build passed, Playwright 22/22 desktop+mobile passed, local API healt
 `docs/images` were refreshed by the browser suite. Do not reopen branch merges or ML
 integration unless Danil asks for a new feature pass.
 
-## Previous checkpoint: 2026-09-28 final integration pass
+## Earlier checkpoint: 2026-09-28 final integration pass
 
 Current branch is main. Published application revision: c55103c36751aa2a31da33bfd8a29574c3304e68.
 GitHub CI 36462902808 passed both verify and containers. Final report-only commit

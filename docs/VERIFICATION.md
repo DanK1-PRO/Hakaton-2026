@@ -1,5 +1,25 @@
 # Протокол Проверки
 
+## 29.09.2026 — генерация учебных сценариев в интерфейсе преподавателя
+
+Цель прохода: закрыть «полный цикл в UI преподавателя» — локальная модель предлагает
+варианты заданий, преподаватель проверяет предпросмотр и импортирует только
+одобренные. React по-прежнему не обращается к ML напрямую: путь идёт через FastAPI
+(`/instructor/scenarios/generate|import`), валидация пакетов одна и та же для API и
+CLI-скрипта (`backend/app/scenario_packages.py`).
+
+| Проверка | Фактический результат |
+|---|---|
+| `ruff check backend ml scripts` | Passed |
+| `pytest backend/tests -q` | 42 passed; 2 upstream warnings |
+| `npm run build` (frontend) | Passed; сохраняется предупреждение Vite о крупных MapLibre/vendor chunks |
+| `npm test` (frontend) | 28 passed, desktop + mobile; новый `scenario-lab.spec.ts` (генерация, предпросмотр, импорт выборки, заблокированная кнопка без ML) |
+| Реальная генерация | `POST /api/v1/instructor/scenarios/generate` при `ML_MODE=local`: 1 вариант, `model=local-model`, русский текст, extras `difficulty_score`/`ml_metadata`/`difficulty_factors` сохранены |
+| Реальный импорт в PostgreSQL | generate → import `201` → сценарий в `GET /scenarios` с `source.status=TEAM_REVIEWED` и `reviewer` → повторный импорт `409` «Уже импортированы» → строка удалена после проверки, каталог остался из 3 сценариев |
+| Контроль доступности ML | `GET /ml/status` при `local`: `capabilities=[evaluator, scenario_generator]`, `generator=true`; при `mock`: `generator=false`, кнопка в UI отключена с подсказкой про `start-ml.ps1` |
+| Границы входа | trainee → `403`; неизвестный тип → `422`; `count>3` → `422`; ML недоступен/пустой ответ → `503` с русской подсказкой |
+| Контракты | `config/openapi.json` перегенерирован через `scripts/export_contracts.py` |
+
 ## 28.09.2026 — усиление демонстрационной ценности
 
 Цель прохода: добавить «вау»-слой без изменения безопасной архитектуры: витрину

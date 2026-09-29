@@ -5,7 +5,7 @@ ML Evaluator Service v1
 Формулы сложности на основе классификатора происшествий МВД/Департамента.
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import json
 from pathlib import Path
@@ -41,6 +41,19 @@ class EvaluationResult(BaseModel):
     routing_assessment: dict = Field(default_factory=dict)
     comment_quality: dict = Field(default_factory=dict)
     explanation: str
+
+class ScenarioGenerateRequest(BaseModel):
+    schema_version: Literal["1.0"] = "1.0"
+    incident_type_id: int
+    count: int = Field(default=1, ge=1, le=3)
+    difficulty: Optional[Literal["easy", "medium", "hard"]] = None
+    temperature: float = Field(default=0.8, ge=0.1, le=1.2)
+
+class ScenarioGenerateResponse(BaseModel):
+    schema_version: Literal["1.0"] = "1.0"
+    mode: Literal["local"] = "local"
+    model: str
+    items: list[dict]
 
 # ============================================================
 # ЗАГРУЗКА КЛАССИФИКАТОРА
@@ -277,13 +290,56 @@ def evaluate_dispatcher_response(request: EvaluationRequest) -> dict:
 
 @app.get("/health")
 def health():
+    llm_configured = bool(os.getenv("DDS_LLM_URL"))
+    capabilities = ["evaluator", "difficulty_scorer"]
+    if llm_configured:
+        capabilities.append("scenario_generator")
     return {
         "status": "ok",
-        "capabilities": ["evaluator", "difficulty_scorer"],
+        "capabilities": capabilities,
         "model_version": "ml-evaluator-v1.0",
         "difficulty_formula": "weighted_factors_v1",
-        "llm_configured": bool(os.getenv("DDS_LLM_URL")),
+        "llm_configured": llm_configured,
     }
+
+
+@app.post("/v1/generate", response_model=ScenarioGenerateResponse)
+def generate(request: ScenarioGenerateRequest):
+    """Генерация новых учебных сценариев локальной LLM.
+
+    Требует DDS_LLM_URL (см. scripts/windows/start-ml.ps1). Долгая операция:
+    до 120 секунд на каждый сценарий, поэтому вызывается API с отдельным таймаутом.
+    """
+    llm_url = os.getenv("DDS_LLM_URL", "")
+    if not llm_url:
+        raise HTTPException(503, "Локальная модель не настроена: задайте DDS_LLM_URL")
+    incident = next((i for i in CLASSIFIER if i.get("id") == request.incident_type_id), None)
+    if incident is None:
+        raise HTTPException(404, "Тип происшествия не найден в классификаторе")
+    try:
+        from dataclasses import asdict
+        from ml.scenario_generator import ScenarioGenerator
+
+        generator = ScenarioGenerator(
+            api_url=llm_url,
+            api_key=os.getenv("DDS_LLM_API_KEY", "local"),
+            model=os.getenv("DDS_LLM_MODEL", "local-model"),
+        )
+    except ValueError as exc:
+        raise HTTPException(503, "Некорректная конфигурация локальной модели") from exc
+    scenarios = generator.generate_batch(
+        incident_ids=[request.incident_type_id],
+        target_difficulty=request.difficulty,
+        count_per_type=request.count,
+        temperature=request.temperature,
+    )
+    items = [asdict(scenario) for scenario in scenarios]
+    if not items:
+        raise HTTPException(502, "Локальная модель не вернула ни одного валидного сценария")
+    for item in items:
+        if not isinstance(item.get("difficulty"), str) or item["difficulty"] not in {"easy", "medium", "hard"}:
+            raise HTTPException(502, "Локальная модель вернула неизвестный уровень сложности")
+    return ScenarioGenerateResponse(model=generator.llm.model, items=items)
 
 
 @app.post("/v1/evaluate", response_model=EvaluationResult)

@@ -15,6 +15,7 @@ import {
   Tooltip,
 } from 'antd';
 import {
+  CheckOutlined,
   ClearOutlined,
   ClockCircleOutlined,
   EyeOutlined,
@@ -450,15 +451,25 @@ export function Training() {
             <article className="scenario" key={s.id}>
               <div className="scenario-top">
                 <span className="scenario-number">{String(i + 1).padStart(2, '0')}</span>
-                <Tag color={s.difficulty === 'easy' ? 'green' : 'gold'}>
-                  {s.difficulty === 'easy' ? 'Базовый' : 'Средний'}
+                <Tag color={s.difficulty === 'easy' ? 'green' : s.difficulty === 'hard' ? 'red' : 'gold'}>
+                  {s.difficulty === 'easy' ? 'Базовый' : s.difficulty === 'hard' ? 'Сложный' : 'Средний'}
                 </Tag>
               </div>
               <h2>{s.title}</h2>
               <p>{s.prompt}</p>
               <div className="scenario-meta">
-                <FileTextOutlined /> Памятка ДДС · стр. {s.source.page}
+                <FileTextOutlined />{' '}
+                {s.source.page
+                  ? `Памятка ДДС · стр. ${s.source.page}`
+                  : s.source.type === 'llm_generated'
+                    ? 'Сгенерирован локальной моделью'
+                    : 'Учебный материал'}
               </div>
+              {s.source.reviewer ? (
+                <div className="scenario-meta">
+                  <CheckOutlined /> Проверил преподаватель: {s.source.reviewer}
+                </div>
+              ) : null}
               <div className="scenario-meta">
                 <ClockCircleOutlined /> Подтверждение карточки: 30 с
               </div>

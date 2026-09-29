@@ -20,6 +20,29 @@ The main API has no PyTorch/Whisper dependency. Model packages run in separate l
 - ML cannot change session state, routing, roles or stored actions.
 - Timeout/HTTP error/invalid JSON/schema/mismatched session triggers deterministic fallback with mode "fallback".
 
+## Scenario generator contract v1 (capability `scenario_generator`)
+
+Added 2026-09-29 as a separate v1 contract beside the evaluator; `/v1/evaluate` is untouched.
+
+- GET /health adds `scenario_generator` to `capabilities` and reports `llm_configured`
+  when `DDS_LLM_URL` points at the loopback model.
+- POST /v1/generate accepts `{schema_version:"1.0", incident_type_id, count 1..3,
+  difficulty?}` and returns `{schema_version, mode:"local", model, items[]}` where each
+  item is a scenario package (same shape as `scripts/import_reviewed_scenarios.py` input)
+  plus ML extras `difficulty_score`, `ml_metadata`, `difficulty_factors`.
+- 503 without `DDS_LLM_URL`, 404 for an unknown classifier row, 502 when the model
+  returns no valid scenario; generation runs in a worker thread because one scenario may
+  take up to 120 s of model time.
+- The API gateway `generate_scenarios` uses `ML_GENERATE_TIMEOUT` (default 400 s) and
+  converts transport errors, HTTP errors and empty payloads into `GenerationUnavailable`,
+  which the staff endpoint returns as 503 with a Russian detail string. In `ML_MODE=mock`
+  the gateway never calls ML.
+- React still never calls ML directly: the only entry is staff-only
+  `POST /api/v1/instructor/scenarios/generate`, followed by
+  `POST /api/v1/instructor/scenarios/import`, which shares package validation with the CLI.
+- Verified against the release GGUF on 2026-09-29: one scenario returned in ~5 s,
+  valid package, `model=local-model`.
+
 ## Run the integrated local evaluator
 
 From the project root, with backend dependencies installed:
@@ -41,6 +64,7 @@ For Compose, use a local service name on the Compose network or host.docker.inte
 |---|---|---|
 | evaluator | mock / local HTTP / fallback | `ml.evaluator_service:app`, validated by backend contract tests |
 | scenario catalogue | source-labelled synthetic fixtures + classifier-derived ML scenarios | Review/import validated generator output into versioned scenarios |
+| scenario_generator | separate v1 `POST /v1/generate` on the evaluator service, staff-only UI loop through FastAPI | Preview → instructor approval → import with reviewer provenance; CLI path unchanged |
 | ASR / dialogue / difficulty model | Not enabled | New DTO + adapter + contract test before UI controls |
 
 Scenario seed structure: data_derived/scenarios/demo.json. Preserve schema_version, source, reference version, incident_type_id and expected action arrays. Do not independently recreate incident categories: share the classifier codes/provenance. The current integer ID is a source row locator for this snapshot, not a universal code across XLSX revisions.

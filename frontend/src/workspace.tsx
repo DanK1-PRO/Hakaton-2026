@@ -782,13 +782,27 @@ export function Workspace() {
                     <Descriptions
                       column={1}
                       items={[
-                        { key: 'file', label: 'Источник', children: card.scenario.source.file },
-                        { key: 'page', label: 'Страница', children: card.scenario.source.page },
+                        {
+                          key: 'file',
+                          label: 'Источник',
+                          children:
+                            card.scenario.source.file ??
+                            (card.scenario.source.type === 'llm_generated'
+                              ? 'Локальная модель' +
+                                (card.scenario.source.model ? ' · ' + card.scenario.source.model : '')
+                              : '—'),
+                        },
+                        ...(card.scenario.source.page
+                          ? [{ key: 'page', label: 'Страница', children: String(card.scenario.source.page) }]
+                          : []),
                         {
                           key: 'note',
                           label: 'Статус эталона',
-                          children: card.scenario.source.note,
+                          children: card.scenario.source.note ?? '—',
                         },
+                        ...(card.scenario.source.reviewer
+                          ? [{ key: 'review', label: 'Проверил', children: card.scenario.source.reviewer }]
+                          : []),
                       ]}
                     />
                   </>

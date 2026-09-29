@@ -5,7 +5,16 @@ export type User = {
   role: 'trainee' | 'instructor' | 'administrator';
 };
 export type IncidentType = { id: number; external_code: string; name: string };
-export type Source = { file: string; page: number; note: string; status: string };
+export type Source = {
+  type?: string;
+  file?: string;
+  page?: number;
+  note?: string;
+  status?: string;
+  model?: string;
+  reviewer?: string;
+  reviewed_at?: string;
+};
 export type Scenario = {
   id: string;
   title: string;
@@ -16,6 +25,35 @@ export type Scenario = {
   source: Source;
   expected_hint?: string | null;
 };
+export type GeneratedScenario = {
+  schema_version: string;
+  id: string;
+  title: string;
+  difficulty: string;
+  difficulty_score?: number;
+  difficulty_factors?: string[];
+  service: string;
+  prompt: string;
+  briefing: string[];
+  card: CardFields;
+  reference: {
+    version: string;
+    address: string;
+    incident_type_id: number;
+    expected_actions: string[];
+    key_information?: unknown[];
+    routing_rules?: unknown[];
+  };
+  source: Source;
+  ml_metadata?: Record<string, unknown>;
+};
+export type GenerateResponse = {
+  schema_version: string;
+  mode: string;
+  model: string;
+  items: GeneratedScenario[];
+};
+export type ImportResponse = { imported: number; ids: string[] };
 export type Evaluation = {
   schema_version: string;
   session_id: string;

@@ -8,6 +8,9 @@ import type {
   Session,
   Evaluation,
   CardFields,
+  GeneratedScenario,
+  GenerateResponse,
+  ImportResponse,
 } from './types';
 
 const authSlice = createSlice({
@@ -55,7 +58,7 @@ export const api = createApi({
       ctx.dispatch(signedOut());
     return result;
   },
-  tagTypes: ['Incidents', 'Sessions', 'Users'],
+  tagTypes: ['Incidents', 'Sessions', 'Users', 'Scenarios'],
   endpoints: (b) => ({
     login: b.mutation<{ access_token: string; user: User }, { username: string; password: string }>(
       {
@@ -101,7 +104,20 @@ export const api = createApi({
       }),
       invalidatesTags: ['Incidents'],
     }),
-    scenarios: b.query<Scenario[], void>({ query: () => '/scenarios' }),
+    scenarios: b.query<Scenario[], void>({
+      query: () => '/scenarios',
+      providesTags: ['Scenarios'],
+    }),
+    generateScenarios: b.mutation<
+      GenerateResponse,
+      { incident_type_id: number; count: number; difficulty?: string | null }
+    >({
+      query: (body) => ({ url: '/instructor/scenarios/generate', method: 'POST', body }),
+    }),
+    importScenarios: b.mutation<ImportResponse, { items: GeneratedScenario[] }>({
+      query: (body) => ({ url: '/instructor/scenarios/import', method: 'POST', body }),
+      invalidatesTags: ['Scenarios'],
+    }),
     start: b.mutation<Incident, string>({
       query: (scenario_id) => ({
         url: '/simulation/sessions',
@@ -126,7 +142,10 @@ export const api = createApi({
       }),
       invalidatesTags: ['Sessions', 'Incidents'],
     }),
-    ml: b.query<{ mode: string; available: boolean; asr: boolean; capabilities?: string[] }, void>({
+    ml: b.query<
+      { mode: string; available: boolean; asr: boolean; capabilities?: string[]; generator?: boolean },
+      void
+    >({
       query: () => '/ml/status',
     }),
     users: b.query<User[], void>({ query: () => '/admin/users', providesTags: ['Users'] }),
