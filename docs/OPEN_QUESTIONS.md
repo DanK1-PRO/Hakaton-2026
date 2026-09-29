@@ -75,9 +75,9 @@
 | # | Пробел | Метка |
 |---|---|---|
 | D1 | DTO генератора/ASR, адреса, версии моделей — согласовать с Кириллом/Максимом | `TEAM_DECISION` — контракты в DATA_CONTRACT |
-| D2 | `ML_MODE=mock` — боевые веса не подключены | work item (ждём Максима, `ml/scoring-experiment`) |
+| D2 | Боевые веса: подключены локально через evaluator (release `modelURL`, `ML_MODE=local`), mock остаётся регрессионным путём | `CLOSED` |
 | D3 | `comment_quality` всегда requires_instructor_review | `TEAM_DECISION` (A3) |
-| D4 | Баллы не считаются | `TEAM_DECISION` |
+| D4 | Балл считается экспериментальной формулой команды и показывается в результате; официальная методика не утверждена | `CLOSED` |
 | D5 | Роутинг `routing_assessment = not_scored` | `TEAM_DECISION` |
 
 ---

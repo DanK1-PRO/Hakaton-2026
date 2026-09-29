@@ -1,6 +1,6 @@
 # Master Specification for the ML Team: Kirill and Maxim
 
-Version: 2026-09-20. Repository: https://github.com/DanK1-PRO/Hakaton-2026.git, private.
+Version: 2026-09-20. Repository: https://github.com/DanK1-PRO/Hakaton-2026.git, public (since 2026-09-29).
 
 This document explains how to connect local ML models to the existing DDS dispatcher simulator without breaking the UI, backend, database, or demo build.
 

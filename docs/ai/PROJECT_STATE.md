@@ -78,8 +78,8 @@ Updated: 2026-09-27. Version: 0.1.0 + Danil UI integration branch + offline GIS 
 ## Actual State
 
 The repository now contains a working FastAPI / React 18 / PostgreSQL 15 application,
-not only source folders. Git origin: https://github.com/DanK1-PRO/Hakaton-2026.git (private).
-Private main is published. GitHub run 35509118528 passed verify and containers
+not only source folders. Git origin: https://github.com/DanK1-PRO/Hakaton-2026.git (public).
+Main is published. GitHub run 35509118528 passed verify and containers
 for application commit 9d0227c. Evidence: docs/VERIFICATION.md.
 
 Implemented: role-aware JWT/Argon2 login, incidents/search/filter/create/edit,
@@ -129,9 +129,10 @@ Before ML, useful non-ML work is tracked in `docs/team/PRE_ML_WORKLIST.ru.md`: U
 
 Do not claim full general customer-spec acceptance. Customer materials are exhausted;
 remaining gaps are closed as `TEAM_DECISION` (see `docs/OPEN_QUESTIONS.md`), not as
-official rules. Real ASR/SIP/ML weights, groups,
-advanced analytics, field encryption and large-scale load acceptance are not implemented.
-No official numeric scoring rubric; result score=null. Scenario references require review.
+official rules. Real ASR/SIP, groups,
+advanced analytics, field encryption and large-scale load acceptance are not implemented;
+real local ML weights are integrated behind the gateway (docs/ML_INTEGRATION.md).
+No official numeric scoring rubric; the shown score is experimental. Scenario references require review.
 Tickets PDF remains scanned and not a completed scenario corpus.
 Standalone EDDS manual absent; direct DDS memo/screenshots used.
 Conditional classifier routing is preserved as reference data, not silently interpreted.

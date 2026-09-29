@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.1 - 2026-09-29
+
+- Instructor scenario generation loop: staff preview/approve/import in the UI, separate
+  ML `POST /v1/generate` contract, package validation shared with the CLI importer.
+- `/readiness` deployment/value dashboard and richer ML result explanation.
+- Real local GGUF model integrated for comment assessment with deterministic fallback.
+- Customer guide, GitHub Codespaces devcontainer, manual CI trigger; repository made public.
+- Verification: Ruff, 42 backend tests, frontend production build, 28 desktop/mobile
+  browser tests.
+
 ## 0.1.0 - 2026-09-20
 
 - Initial Russian DDS workstation and full mock training cycle.

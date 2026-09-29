@@ -1,9 +1,10 @@
 # DDS Training Workstation
 
-The 2026-09-28 integration pass connects the team's local GGUF release for comment
-assessment, validates ML responses and preserves deterministic fallback. See the
-[final audit](docs/FINAL_INTEGRATION_AUDIT.ru.md), [offline model launch](docs/LOCAL_ML_RUN.ru.md)
-and [submission packet](docs/SUBMISSION.ru.md). Speech recognition/synthesis and
+The 2026-09-28/29 passes connect the team's local GGUF release for comment assessment and
+add scenario generation in the instructor UI. See the
+[final audit](docs/FINAL_INTEGRATION_AUDIT.ru.md), [offline model launch](docs/LOCAL_ML_RUN.ru.md),
+[verification log](docs/VERIFICATION.md) and
+[submission packet](docs/SUBMISSION.ru.md). Speech recognition/synthesis and
 automatic retraining are not included; instructor-reviewed feedback is exportable.
 
 [Русский](README.md) · [Documentation](docs/INDEX.md) · [Customer guide (RU)](docs/CUSTOMER_GUIDE.ru.md) · [Deployment](docs/DEPLOYMENT.md) · [ML integration](docs/ML_INTEGRATION.md)
@@ -66,4 +67,4 @@ This release covers the team MVP, not the complete customer production specifica
 
 See [verification](docs/VERIFICATION.md), [architecture](docs/architecture.md), [source traceability](docs/REQUIREMENTS_TRACEABILITY.md), [contributing](CONTRIBUTING.md) and [security](SECURITY.md). Operational documentation is in Russian.
 
-Customer originals are excluded from Git. This private repository has no public redistribution license; third-party materials retain their respective rights.
+Customer originals are excluded from Git. This repository is public and has no redistribution license; third-party materials retain their respective rights.
